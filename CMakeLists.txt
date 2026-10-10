@@ -59,6 +59,9 @@ endif()
 
 add_library(minecraft_server_lib STATIC
     src/protocol/protocol.cpp
+    src/handlers/handshake.cpp
+    src/handlers/status.cpp
+    src/handlers/login.cpp
 )
 
 target_compile_features(minecraft_server_lib
