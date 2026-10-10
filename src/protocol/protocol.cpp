@@ -3,11 +3,13 @@
 #include "handlers/handshake.hpp"
 #include "handlers/login.hpp"
 #include "handlers/status.hpp"
+#include "tcp.hpp"
 #include <arpa/inet.h>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <optional>
+#include <span>
 #include <stdexcept>
 #include <string>
 #include <sys/socket.h>
@@ -16,16 +18,12 @@
 
 namespace minecraft::protocol {
 
-  int32_t readVarInt(int socket) {
+  int32_t readVarInt(TcpConnection& connection) {
     int32_t value = 0;
     int position = 0;
 
     while (true) {
-      uint8_t byte;
-
-      if (recv(socket, &byte, 1, MSG_WAITALL) != 1) {
-        throw std::runtime_error("Failed to read VarInt");
-      }
+      const uint8_t byte = connection.readByte();
 
       value |= (byte & 0x7F) << position;
 
@@ -56,14 +54,12 @@ namespace minecraft::protocol {
     }
   }
 
-  std::string readString(int socket) {
-    int32_t length = readVarInt(socket);
+  std::string readString(TcpConnection& connection) {
+    int32_t length = readVarInt(connection);
 
-    std::string result(length, '\0');
+    std::string result(static_cast<std::size_t>(length), '\0');
 
-    if (recv(socket, result.data(), length, MSG_WAITALL) != length) {
-      throw std::runtime_error("Failed to read string");
-    }
+    connection.readAll(result.data(), result.length());
 
     return result;
   }
@@ -72,6 +68,22 @@ namespace minecraft::protocol {
     writeVarInt(static_cast<int32_t>(text.size()), output);
 
     output.insert(output.end(), text.begin(), text.end());
+  }
+
+  void sendPacket(TcpConnection& connection, int32_t packetId, const std::span<uint8_t>& data) {
+    std::vector<uint8_t> packet;
+
+    writeVarInt(packetId, packet);
+
+    packet.insert(packet.end(), data.begin(), data.end());
+
+    std::vector<uint8_t> framed;
+
+    writeVarInt(static_cast<int32_t>(packet.size()), framed);
+
+    framed.insert(framed.end(), packet.begin(), packet.end());
+
+    connection.writeAll(framed.data(), framed.size());
   }
 
   std::optional<State> toState(int32_t value) {
@@ -91,24 +103,36 @@ namespace minecraft::protocol {
     }
   }
 
-  void handleClinet(Client& client) {
+  void handleClient(Client& client) {
+    while (client.isConnected()) {
+      try {
 
-    switch (client.getState()) {
-    case State::Handshake:
-      handlers::handleHandshake(client);
-      break;
-    case State::Status:
-      handlers::handleStatus(client);
-      break;
-    case State::Login:
-      // handleLogin(client);
-      break;
-    case State::Configuration:
-      // handleConfguration(client);
-      break;
-    case State::Play:
-      // handlePlay(client);
-      break;
+        switch (client.getState()) {
+        case State::Handshake:
+          std::cout << "Started handshake\n";
+          handlers::handleHandshake(client);
+          break;
+        case State::Status:
+          std::cout << "Started status state\n";
+          handlers::handleStatus(client);
+          break;
+        case State::Login:
+          // std::cout << "Started login state\n";
+          handlers::handleLogin(client);
+          break;
+        case State::Configuration:
+          std::cout << "Started configuration state\n";
+          // handleConfguration(client);
+          break;
+        case State::Play:
+          std::cout << "Started play state\n";
+          // handlePlay(client);
+          break;
+        }
+      } catch (const std::exception& e) {
+        std::cout << "Client disconnected: " << e.what() << '\n';
+        client.disconected();
+      }
     }
   }
 } // namespace minecraft::protocol

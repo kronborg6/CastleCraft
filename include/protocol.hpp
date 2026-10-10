@@ -1,8 +1,13 @@
 #pragma once
 
+#include "tcp.hpp"
 #include <cstdint>
+#include <span>
 #include <string>
 #include <vector>
+
+class Client;
+class Client;
 namespace minecraft::protocol {
   enum class State {
     Handshake,
@@ -12,7 +17,7 @@ namespace minecraft::protocol {
     Play
   };
 
-  std::string_view stateToString(State state) {
+  inline std::string_view stateToString(State state) {
     switch (state) {
     case State::Handshake:
       return "Handshake";
@@ -28,10 +33,11 @@ namespace minecraft::protocol {
 
     return "Unknown";
   }
-  int32_t readVarInt(int socket);
+  int32_t readVarInt(TcpConnection& connection);
   void writeVarInt(int32_t value, std::vector<uint8_t>& output);
-  std::string readString(int socket);
+  std::string readString(TcpConnection& connection);
   void writeString(const std::string& text, std::vector<uint8_t>& output);
+  void sendPacket(TcpConnection& connection, int32_t packetId, const std::span<uint8_t>& data);
 
-  void handleClinet(int socketId);
+  void handleClient(Client& client);
 } // namespace minecraft::protocol

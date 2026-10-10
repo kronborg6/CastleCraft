@@ -1,3 +1,5 @@
+#include "client.hpp"
+#include "protocol.hpp"
 #include <arpa/inet.h>
 #include <cstdint>
 #include <cstring>
@@ -153,19 +155,18 @@ int main() {
   std::cout << "Minecraft server listening on port 25565\n";
 
   while (true) {
-    int client = accept(server, nullptr, nullptr);
+    int socket = accept(server, nullptr, nullptr);
 
-    if (client < 0) {
+    if (socket < 0) {
       continue;
     }
+    Client client(socket);
 
     try {
-      // handleClient(client);
+      minecraft::protocol::handleClient(client);
     } catch (const std::exception& error) {
       std::cerr << "Client error: " << error.what() << "\n";
     }
-
-    close(client);
   }
 
   close(server);
