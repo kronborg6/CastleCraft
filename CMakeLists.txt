@@ -62,6 +62,7 @@ add_library(minecraft_server_lib STATIC
     src/handlers/handshake.cpp
     src/handlers/status.cpp
     src/handlers/login.cpp
+    src/handlers/configuration.cpp
     src/tcp.cpp
 )
 

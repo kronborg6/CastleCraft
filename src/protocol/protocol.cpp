@@ -1,5 +1,6 @@
 #include "protocol.hpp"
 #include "client.hpp"
+#include "handlers/configuration.hpp"
 #include "handlers/handshake.hpp"
 #include "handlers/login.hpp"
 #include "handlers/status.hpp"
@@ -121,8 +122,8 @@ namespace minecraft::protocol {
           handlers::handleLogin(client);
           break;
         case State::Configuration:
-          std::cout << "Started configuration state\n";
-          // handleConfguration(client);
+          // std::cout << "Started configuration state\n";
+          handlers::handleConfiguration(client);
           break;
         case State::Play:
           std::cout << "Started play state\n";

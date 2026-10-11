@@ -1,4 +1,4 @@
-#include "handlers/Configuration.hpp"
+#include "handlers/configuration.hpp"
 #include "protocol.hpp"
 #include "tcp.hpp"
 #include <cstdint>
@@ -10,6 +10,8 @@ namespace minecraft::protocol::handlers {
 
     const int32_t length = minecraft::protocol::readVarInt(connection);
     const int32_t packetId = minecraft::protocol::readVarInt(connection);
+
+    std::cout << "we now at: " << packetId << "\n";
 
     switch (packetId) {
     case 0x00:
