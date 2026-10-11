@@ -1,14 +1,18 @@
 #include "client.hpp"
 #include "protocol/protocol.hpp"
 #include <arpa/inet.h>
+#include <cerrno>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
+#include <netinet/in.h>
 #include <stdexcept>
 #include <string>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <vector>
+
+#define PROXCY false
 
 // void disconect(std::string username, int client) {
 //   const std::string json = R"({"text":"hello )" + username + R"(, login is
@@ -36,23 +40,36 @@ int main() {
 
 	sockaddr_in address{};
 
+	uint16_t port = 25565;
+
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
-	address.sin_port = htons(25565);
+	address.sin_port = htons(port);
 
 	if (bind(server, reinterpret_cast<sockaddr *>(&address), sizeof(address)) <
 	    0) {
+		if (errno == EADDRINUSE) {
+			port = 25566;
+			address.sin_port = htons(port);
 
-		std::cerr << "Bind failed\n";
-		return 1;
+			if (bind(server, reinterpret_cast<sockaddr *>(&address),
+			         sizeof(address)) < 0) {
+				std::cerr << "failed to bind to port " << port << ": "
+				          << std::strerror(errno) << '\n';
+				return 1;
+			}
+		} else {
+
+			std::cerr << "bind failed: " << std::strerror(errno) << '\n';
+			return 1;
+		}
 	}
 
 	if (listen(server, 16) < 0) {
 		std::cerr << "Listen failed\n";
 		return 1;
 	}
-
-	std::cout << "Minecraft server listening on port 25565\n";
+	std::cout << "Minecraft server listening on port " << port << "\n";
 
 	while (true) {
 		int socket = accept(server, nullptr, nullptr);
