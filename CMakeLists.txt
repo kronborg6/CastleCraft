@@ -57,6 +57,9 @@ endif()
 # Application logic
 ####################
 
+add_subdirectory(lib/nbt)
+
+
 add_library(minecraft_server_lib STATIC
     src/protocol/protocol.cpp
     src/handlers/handshake.cpp

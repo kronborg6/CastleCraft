@@ -11,7 +11,6 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <vector>
-
 #define PROXCY false
 
 // void disconect(std::string username, int client) {
