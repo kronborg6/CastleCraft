@@ -113,6 +113,7 @@ target_compile_definitions(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         minecraft_server_lib
+        nbt
         project_warnings
 )
 

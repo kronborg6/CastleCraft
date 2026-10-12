@@ -13,9 +13,11 @@
 #include <vector>
 #define PROXCY false
 
+#include <nbt/nbt.hpp>
+
 // void disconect(std::string username, int client) {
-//   const std::string json = R"({"text":"hello )" + username + R"(, login is
-//   not implemented yet!"})";
+//   const std::string json = R"({"text":"hello )" + username + R"(, login
+//   is not implemented yet!"})";
 //
 //   std::vector<uint8_t> response;
 //
@@ -23,6 +25,7 @@
 //
 //   sendPacket(client, 0x00, response);
 // }
+//
 //
 
 int main() {
@@ -38,6 +41,8 @@ int main() {
 	setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
 
 	sockaddr_in address{};
+
+	minecraft::nbt::kronborg();
 
 	uint16_t port = 25565;
 

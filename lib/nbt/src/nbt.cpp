@@ -1,5 +1,6 @@
-#include <nbt.hpp>
+#include <iostream>
+#include <nbt/nbt.hpp>
 
 namespace minecraft::nbt {
-void kronborg() {}
+void kronborg() { std::cout << "hello from lib\n"; }
 } // namespace minecraft::nbt

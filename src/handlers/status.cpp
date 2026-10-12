@@ -16,7 +16,7 @@ void handleStatusRequest(Client &client) {
         },
         "players": {
             "max": 69,
-            "online": 420,
+            "online": -420,
             "sample": [
       {
         "name": "kronborg",
@@ -25,7 +25,7 @@ void handleStatusRequest(Client &client) {
             ]
         },
         "description": {
-            "text": "Hello from C++!"
+            "text": "Hello to CastleCraft a minecraft written in C++!"
         }
     })";
 
