@@ -24,7 +24,7 @@ The server listens on port `25565`, or `25566` if that port is already in use.
 - Learn how to work with a protocol I did not design.
 - Support multiple Minecraft protocol versions.
 - Experiment with a proxy in C++ or Rust for logging.
-- Eventually create a better map generator.
+- Eventually create a map generator.
 
 This is a personal learning project and is not intended for production use.
 
