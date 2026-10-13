@@ -1,4 +1,5 @@
 add_library(nbt STATIC
+    src/endian.cpp
     src/nbt.cpp
 )
 

@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <cstdint>
+#include <nbt/endian.hpp>
 #include <nbt/nbt.hpp>
 #include <stdexcept>
 #include <string>
@@ -17,11 +18,10 @@ void ToTagShort(const std::string &name, int16_t value,
 	const uint16_t rawLength = static_cast<uint16_t>(length);
 	const uint16_t rawValue = static_cast<uint16_t>(value);
 
-	data.push_back(static_cast<uint8_t>((length >> 8) & 0xFF));
-	data.push_back(static_cast<uint8_t>(length & 0xFF));
+	endian::writeBigEndian<uint16_t>(rawLength, data);
 	data.insert(data.end(), name.begin(), name.end());
-	data.push_back(static_cast<uint8_t>((value >> 8) & 0xFF));
-	data.push_back(static_cast<uint8_t>(value & 0xFF));
+
+	endian::writeBigEndian<uint16_t>(rawValue, data);
 }
 void ToTagInt(const std::string &name, int32_t value,
               std::vector<std::uint8_t> &data) {
@@ -76,8 +76,6 @@ void ToTagCompound(const std::string &name, std::vector<std::uint8_t> &data) {
 	data.push_back(static_cast<std::uint8_t>(rawLength & 0xFF));
 
 	data.insert(data.end(), name.begin(), name.end());
-
-	ToEndCompound(data);
 }
 
 void ToTagString(const std::string &name, const std::string &value,
