@@ -18,4 +18,14 @@ void writeLittleEndian(T value, std::vector<uint8_t> &data) {
 		data.push_back(static_cast<std::uint8_t>((value >> shift) & 0xFF));
 	}
 }
+
+uint32_t floatToUint32(float value) {
+
+	uint32_t reslut = static_cast<uint32_t>(value);
+	return reslut;
+}
+uint64_t doubleToUint64(double value) {
+	uint64_t reslut = static_cast<uint64_t>(value);
+	return reslut;
+}
 } // namespace endian

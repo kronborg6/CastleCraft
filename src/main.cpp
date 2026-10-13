@@ -42,8 +42,6 @@ int main() {
 
 	sockaddr_in address{};
 
-	minecraft::nbt::kronborg();
-
 	uint16_t port = 25565;
 
 	address.sin_family = AF_INET;
