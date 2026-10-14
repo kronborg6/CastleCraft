@@ -4,6 +4,7 @@
 #include <cerrno>
 #include <cstdint>
 #include <cstring>
+#include <iomanip>
 #include <iostream>
 #include <netinet/in.h>
 #include <stdexcept>
@@ -28,7 +29,29 @@
 //
 //
 
+void printHex(const std::vector<uint8_t> &data) {
+	for (uint8_t byte : data) {
+		std::cout << std::hex << std::setw(2) << std::setfill('0')
+		          << static_cast<int>(byte) << ' ';
+	}
+
+	std::cout << std::dec << '\n';
+}
 int main() {
+
+	std::vector<uint8_t> data;
+
+	minecraft::nbt::ToTagCompound("hello world", data);
+	minecraft::nbt::ToTagString("hello", "kronborg", data);
+	minecraft::nbt::ToTagCompound("stats", data);
+	minecraft::nbt::ToTagFloat("health", 100.01f, data);
+	minecraft::nbt::ToTagInt("lvl", 16, data);
+	minecraft::nbt::ToTagInt("xp", 512, data);
+	minecraft::nbt::ToEndTag(data);
+	minecraft::nbt::ToEndTag(data);
+
+	printHex(data);
+
 	int server = socket(AF_INET, SOCK_STREAM, 0);
 
 	if (server < 0) {

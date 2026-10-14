@@ -23,11 +23,12 @@ enum class NbtTag : std::uint8_t {
 	LongArrayTag = 0x0C,
 
 };
-enum class TagContext { Named, ListElement };
+enum class TagContext {
+	Named,
+	ListElement,
+};
 
 constexpr std::uint8_t tag(NbtTag value) noexcept;
-
-uint16_t toNbtLength(size_t length);
 
 template <NbtTag Tag>
 constexpr void insertNameAndTag(const std::string &name,
@@ -51,11 +52,11 @@ void ToTagLong(const std::string &name, int64_t value,
                std::vector<std::uint8_t> &data,
                TagContext context = TagContext::Named);
 
-void ToTagFloat(const std::string &name, int64_t value,
+void ToTagFloat(const std::string &name, float value,
                 std::vector<std::uint8_t> &data,
                 TagContext context = TagContext::Named);
 
-void ToTagDouble(const std::string &name, int64_t value,
+void ToTagDouble(const std::string &name, double value,
                  std::vector<std::uint8_t> &data,
                  TagContext context = TagContext::Named);
 

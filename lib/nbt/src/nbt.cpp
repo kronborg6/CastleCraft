@@ -10,6 +10,26 @@
 
 namespace minecraft::nbt {
 
+template <typename T> T toNbtLength(size_t length) {
+
+	static_assert(std::is_same_v<T, uint16_t> || std::is_same_v<T, int32_t>,
+	              "Unsupported NBT legth type");
+
+	if constexpr (std::is_same_v<T, uint16_t>) {
+		if (length > std::numeric_limits<uint16_t>::max()) {
+			throw std::runtime_error("NBT string length is too large");
+		}
+	}
+
+	if constexpr (std::is_same_v<T, int32_t>) {
+		if (length > std::numeric_limits<int32_t>::max()) {
+			throw std::runtime_error("NBT array length is too large");
+		}
+	}
+
+	return static_cast<T>(length);
+}
+
 constexpr std::uint8_t tag(NbtTag value) noexcept {
 	return static_cast<uint8_t>(value);
 }
@@ -105,7 +125,7 @@ void ToTagString(const std::string &name, const std::string &value,
 
 	insertNameAndTag<NbtTag::StringTag>(name, data, context);
 
-	const uint16_t rawValueLength = toNbtLength(value.length());
+	const uint16_t rawValueLength = toNbtLength<uint16_t>(value.length());
 
 	endian::writeBigEndian<uint16_t>(rawValueLength, data);
 
@@ -160,23 +180,4 @@ void ToTagLongArray(const std::string &name, const std::vector<int64_t> &values,
 	}
 }
 
-template <typename T> T toNbtLength(size_t length) {
-
-	static_assert(std::is_same_v<T, uint16_t> || std::is_same_v<T, int32_t>,
-	              "Unsupported NBT legth type");
-
-	if constexpr (std::is_same_v<T, uint16_t>) {
-		if (length > std::numeric_limits<uint16_t>::max()) {
-			throw std::runtime_error("NBT string length is too large");
-		}
-	}
-
-	if constexpr (std::is_same_v<T, int32_t>) {
-		if (length > std::numeric_limits<int32_t>::max()) {
-			throw std::runtime_error("NBT array length is too large");
-		}
-	}
-
-	return static_cast<T>(length);
-}
 } // namespace minecraft::nbt
