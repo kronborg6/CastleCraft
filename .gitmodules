@@ -1,0 +1,3 @@
+[submodule "lib/castleNBT"]
+	path = lib/castleNBT
+	url = https://github.com/kronborg6/CastleNBT.git
