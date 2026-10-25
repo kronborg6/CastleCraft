@@ -3,3 +3,5 @@ build/
 .clang-format
 
 rust_proxcy/target
+
+*.nbt
