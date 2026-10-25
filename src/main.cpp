@@ -14,7 +14,7 @@
 #include <vector>
 #define PROXCY false
 
-#include <nbt/nbt.hpp>
+#include <castle/nbt.hpp>
 
 // void disconect(std::string username, int client) {
 //   const std::string json = R"({"text":"hello )" + username + R"(, login

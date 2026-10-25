@@ -86,8 +86,8 @@ target_compile_definitions(minecraft_server_lib
 )
 
 target_link_libraries(minecraft_server_lib
-    # PUBLIC
-    #     yaml-cpp::yaml-cpp
+    PUBLIC
+    castleNBT
     PRIVATE
         project_warnings
 )
