@@ -1,6 +1,8 @@
+#include "generators/registries/dimension.hpp"
 #include <castle/nbt.hpp>
 #include <castle/writer.hpp>
 #include <filesystem>
+#include <iostream>
 
 namespace fs = std::filesystem;
 
@@ -83,14 +85,19 @@ namespace castle::generators::registries {
     return root;
   }
 
-  void generateOverworld() {
-    const fs::path path = "./generated/registries/dimension/overworld.nbt";
+  void generateOverworld(bool override) {
+    const fs::path path = "./generated/dimensions/overworld.nbt";
+
+    if (std::filesystem::exists(path) && !override) {
+      return;
+    }
+
+    std::string file_path = std::filesystem::absolute(path).string();
+    std::cout << "created overworld nbt file in: " << file_path << "\n";
 
     fs::create_directories(path.parent_path());
 
-    nbt::NbtWriter::writer(createOverworld(),
-                           "./generated/registries/dimension/overworld.nbt",
-                           {.namelessRoot = true});
+    nbt::NbtWriter::writer(createOverworld(), path, {.namelessRoot = true});
   }
 
 } // namespace castle::generators::registries

@@ -1,5 +1,6 @@
 #include "handlers/configuration.hpp"
 #include "castle/nbt.hpp"
+#include "castle/reader.hpp"
 #include "castle/writer.hpp"
 #include "client.hpp"
 #include "protocol/protocol.hpp"
@@ -54,8 +55,13 @@ namespace {
   }
   void sendEnty(TcpConnection& connection) {
     std::vector<uint8_t> data;
-
-    std::vector<uint8_t> rawNbt = castle::nbt::NbtWriter::writer(root, {.namelessRoot = true});
+    std::vector<uint8_t> rawNbt;
+    size_t size = castle::nbt::NbtReader::reader(
+        "./generated/dimensions/overworld.nbt", rawNbt, {.namelessRoot = true});
+    std::cout << "size of overworld: " << size << "\n";
+    std::cout << "size of overworld: " << size << "\n";
+    std::cout << "size of overworld: " << size << "\n";
+    std::cout << "size of overworld: " << size << "\n";
     minecraft::protocol::writeString("minecraft:dimension_type", data);
 
     // zero entries
@@ -371,19 +377,10 @@ namespace minecraft::protocol::handlers {
     std::vector<std::uint8_t> temp;
     std::cout << "we now at: " << packet.packetId << "\n";
 
-    if (client.sent == false) {
-      sendWorldClockRegistry(connection);
-      sendTimelineRegistry(connection);
-      sendEnty(connection); // dimension_type
-      sendTimelineTags(connection);
-      sendKnownPacks(connection);
-      minecraft::protocol::sendPacket(connection, 0x03, {});
-      client.sent = true;
-    }
-
     switch (packet.packetId) {
     case 0x00:
       // minecraft::protocol::readVarInt(connection);
+      sendKnownPacks(connection);
       std::cout << "0\n";
       break;
     case 0x01:

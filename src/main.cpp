@@ -1,4 +1,5 @@
 #include "client.hpp"
+#include "generators/registries/dimension.hpp"
 #include "protocol/protocol.hpp"
 #include <arpa/inet.h>
 #include <cerrno>
@@ -37,6 +38,9 @@ void printHex(const std::vector<uint8_t>& data) {
   std::cout << std::dec << '\n';
 }
 int main() {
+
+  // castle::generators::registries::generateOverworld();
+  castle::generators::registries::generateOverworld();
 
   std::vector<uint8_t> data;
 
