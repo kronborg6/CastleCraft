@@ -3,6 +3,7 @@
 #include "castle/reader.hpp"
 #include "castle/writer.hpp"
 #include "client.hpp"
+#include "io/nbt_loader.hpp"
 #include "protocol/protocol.hpp"
 #include "tcp.hpp"
 #include <cstdint>
@@ -56,8 +57,9 @@ namespace {
   void sendEnty(TcpConnection& connection) {
     std::vector<uint8_t> data;
     std::vector<uint8_t> rawNbt;
-    size_t size = castle::nbt::NbtReader::reader(
-        "./generated/dimensions/overworld.nbt", rawNbt, {.namelessRoot = true});
+
+    castle::io::appendsNbtFile("./generated/dimensions/overworld.nbt", rawNbt);
+
     minecraft::protocol::writeString("minecraft:dimension_type", data);
 
     // zero entries
@@ -136,8 +138,7 @@ namespace {
 
     std::vector<uint8_t> rawDay;
 
-    size_t size = castle::nbt::NbtReader::reader(
-        "./generated/registries/timeline/day.nbt", rawDay, {.namelessRoot = true});
+    castle::io::appendsNbtFile("./generated/registries/timeline/day.nbt", rawDay);
 
     data.insert(data.end(), rawDay.begin(), rawDay.end());
 
@@ -151,8 +152,7 @@ namespace {
 
     std::vector<std::uint8_t> rawEarlyGame;
 
-    size_t size2 = castle::nbt::NbtReader::reader(
-        "./generated/registries/timeline/early_game.nbt", rawEarlyGame, {.namelessRoot = true});
+    castle::io::appendsNbtFile("./generated/registries/timeline/early_game.nbt", rawEarlyGame);
 
     data.insert(data.end(), rawEarlyGame.begin(), rawEarlyGame.end());
 
@@ -166,8 +166,7 @@ namespace {
 
     std::vector<std::uint8_t> rawMon;
 
-    size_t size3 = castle::nbt::NbtReader::reader(
-        "./generated/registries/timeline/moon.nbt", rawMon, {.namelessRoot = true});
+    castle::io::appendsNbtFile("./generated/registries/timeline/moon.nbt", rawMon);
 
     data.insert(data.end(), rawMon.begin(), rawMon.end());
 
