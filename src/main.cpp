@@ -1,5 +1,7 @@
 #include "client.hpp"
 #include "generators/registries/dimension.hpp"
+#include "generators/registries/timeline.hpp"
+#include "generators/registries/worldClock.hpp"
 #include "protocol/protocol.hpp"
 #include <arpa/inet.h>
 #include <cerrno>
@@ -41,6 +43,8 @@ int main() {
 
   // castle::generators::registries::generateOverworld();
   castle::generators::registries::generateOverworld();
+  castle::generators::registries::generateTimelines();
+  castle::generators::registries::generateWorldClock();
 
   std::vector<uint8_t> data;
 

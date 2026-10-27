@@ -58,10 +58,6 @@ namespace {
     std::vector<uint8_t> rawNbt;
     size_t size = castle::nbt::NbtReader::reader(
         "./generated/dimensions/overworld.nbt", rawNbt, {.namelessRoot = true});
-    std::cout << "size of overworld: " << size << "\n";
-    std::cout << "size of overworld: " << size << "\n";
-    std::cout << "size of overworld: " << size << "\n";
-    std::cout << "size of overworld: " << size << "\n";
     minecraft::protocol::writeString("minecraft:dimension_type", data);
 
     // zero entries
@@ -138,17 +134,12 @@ namespace {
     minecraft::protocol::writeString("minecraft:day", data);
     data.push_back(0x01);
 
-    auto day = castle::nbt::Nbt::makeCompound(
-        "",
-        {castle::nbt::Nbt::makeString("clock", "minecraft:overworld"),
+    std::vector<uint8_t> rawDay;
 
-         castle::nbt::Nbt::makeInt("period_ticks", 24000),
+    size_t size = castle::nbt::NbtReader::reader(
+        "./generated/registries/timeline/day.nbt", rawDay, {.namelessRoot = true});
 
-         castle::nbt::Nbt::makeCompound("tracks", {})});
-
-    auto dayRaw = castle::nbt::NbtWriter::writer(day, {.namelessRoot = true});
-
-    data.insert(data.end(), dayRaw.begin(), dayRaw.end());
+    data.insert(data.end(), rawDay.begin(), rawDay.end());
 
     // --------------------------------------------------
     // Entry 1: minecraft:early_game
@@ -158,29 +149,12 @@ namespace {
 
     data.push_back(0x01);
 
-    auto earlyGame = castle::nbt::Nbt::makeCompound(
-        "",
-        {castle::nbt::Nbt::makeString("clock", "minecraft:overworld"),
+    std::vector<std::uint8_t> rawEarlyGame;
 
-         castle::nbt::Nbt::makeCompound(
-             "tracks",
-             {castle::nbt::Nbt::makeCompound(
-                 "minecraft:gameplay/can_pillager_patrol_spawn",
-                 {castle::nbt::Nbt::makeList(
-                      "keyframes",
-                      {castle::nbt::Nbt::makeCompound("",
-                                                      {castle::nbt::Nbt::makeInt("ticks", 0),
-                                                       castle::nbt::Nbt::makeByte("value", 0)}),
+    size_t size2 = castle::nbt::NbtReader::reader(
+        "./generated/registries/timeline/early_game.nbt", rawEarlyGame, {.namelessRoot = true});
 
-                       castle::nbt::Nbt::makeCompound("",
-                                                      {castle::nbt::Nbt::makeInt("ticks", 120000),
-                                                       castle::nbt::Nbt::makeByte("value", 1)})}),
-
-                  castle::nbt::Nbt::makeString("modifier", "and")})})});
-
-    auto earlyGameRaw = castle::nbt::NbtWriter::writer(earlyGame, {.namelessRoot = true});
-
-    data.insert(data.end(), earlyGameRaw.begin(), earlyGameRaw.end());
+    data.insert(data.end(), rawEarlyGame.begin(), rawEarlyGame.end());
 
     // --------------------------------------------------
     // Entry 2: minecraft:moon
@@ -190,95 +164,12 @@ namespace {
 
     data.push_back(0x01);
 
-    auto moon = castle::nbt::Nbt::makeCompound(
-        "",
-        {castle::nbt::Nbt::makeString("clock", "minecraft:overworld"),
+    std::vector<std::uint8_t> rawMon;
 
-         castle::nbt::Nbt::makeInt("period_ticks", 192000),
+    size_t size3 = castle::nbt::NbtReader::reader(
+        "./generated/registries/timeline/moon.nbt", rawMon, {.namelessRoot = true});
 
-         castle::nbt::Nbt::makeCompound(
-             "tracks",
-             {castle::nbt::Nbt::makeCompound(
-                  "minecraft:gameplay/surface_slime_spawn_chance",
-                  {castle::nbt::Nbt::makeString("ease", "constant"),
-
-                   castle::nbt::Nbt::makeList(
-                       "keyframes",
-                       {castle::nbt::Nbt::makeCompound(
-                            "",
-                            {castle::nbt::Nbt::makeInt("ticks", 0),
-                             castle::nbt::Nbt::makeDouble("value", 0.5)}),
-                        castle::nbt::Nbt::makeCompound(
-                            "",
-                            {castle::nbt::Nbt::makeInt("ticks", 24000),
-                             castle::nbt::Nbt::makeDouble("value", 0.375)}),
-                        castle::nbt::Nbt::makeCompound(
-                            "",
-                            {castle::nbt::Nbt::makeInt("ticks", 48000),
-                             castle::nbt::Nbt::makeDouble("value", 0.25)}),
-                        castle::nbt::Nbt::makeCompound(
-                            "",
-                            {castle::nbt::Nbt::makeInt("ticks", 72000),
-                             castle::nbt::Nbt::makeDouble("value", 0.125)}),
-                        castle::nbt::Nbt::makeCompound(
-                            "",
-                            {castle::nbt::Nbt::makeInt("ticks", 96000),
-                             castle::nbt::Nbt::makeDouble("value", 0.0)}),
-                        castle::nbt::Nbt::makeCompound(
-                            "",
-                            {castle::nbt::Nbt::makeInt("ticks", 120000),
-                             castle::nbt::Nbt::makeDouble("value", 0.125)}),
-                        castle::nbt::Nbt::makeCompound(
-                            "",
-                            {castle::nbt::Nbt::makeInt("ticks", 144000),
-                             castle::nbt::Nbt::makeDouble("value", 0.25)}),
-                        castle::nbt::Nbt::makeCompound(
-                            "",
-                            {castle::nbt::Nbt::makeInt("ticks", 168000),
-                             castle::nbt::Nbt::makeDouble("value", 0.375)})}),
-
-                   castle::nbt::Nbt::makeString("modifier", "maximum")}),
-
-              castle::nbt::Nbt::makeCompound(
-                  "minecraft:visual/moon_phase",
-                  {castle::nbt::Nbt::makeList(
-                      "keyframes",
-                      {castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 0),
-                            castle::nbt::Nbt::makeString("value", "full_moon")}),
-                       castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 24000),
-                            castle::nbt::Nbt::makeString("value", "waning_gibbous")}),
-                       castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 48000),
-                            castle::nbt::Nbt::makeString("value", "third_quarter")}),
-                       castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 72000),
-                            castle::nbt::Nbt::makeString("value", "waning_crescent")}),
-                       castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 96000),
-                            castle::nbt::Nbt::makeString("value", "new_moon")}),
-                       castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 120000),
-                            castle::nbt::Nbt::makeString("value", "waxing_crescent")}),
-                       castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 144000),
-                            castle::nbt::Nbt::makeString("value", "first_quarter")}),
-                       castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 168000),
-                            castle::nbt::Nbt::makeString("value", "waxing_gibbous")})})})})});
-
-    auto moonRaw = castle::nbt::NbtWriter::writer(moon, {.namelessRoot = true});
-
-    data.insert(data.end(), moonRaw.begin(), moonRaw.end());
+    data.insert(data.end(), rawMon.begin(), rawMon.end());
 
     // --------------------------------------------------
     // Entry 3: minecraft:villager_schedule
@@ -287,68 +178,14 @@ namespace {
     minecraft::protocol::writeString("minecraft:villager_schedule", data);
 
     data.push_back(0x01);
+    std::vector<std::uint8_t> rawVillager;
 
-    auto villagerSchedule = castle::nbt::Nbt::makeCompound(
-        "",
-        {castle::nbt::Nbt::makeString("clock", "minecraft:overworld"),
+    size_t size4 =
+        castle::nbt::NbtReader::reader("./generated/registries/timeline/villager_schedule.nbt",
+                                       rawVillager,
+                                       {.namelessRoot = true});
 
-         castle::nbt::Nbt::makeInt("period_ticks", 24000),
-
-         castle::nbt::Nbt::makeCompound(
-             "tracks",
-             {castle::nbt::Nbt::makeCompound(
-                  "minecraft:gameplay/baby_villager_activity",
-                  {castle::nbt::Nbt::makeList(
-                      "keyframes",
-                      {castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 10),
-                            castle::nbt::Nbt::makeString("value", "minecraft:idle")}),
-                       castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 3000),
-                            castle::nbt::Nbt::makeString("value", "minecraft:play")}),
-                       castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 6000),
-                            castle::nbt::Nbt::makeString("value", "minecraft:idle")}),
-                       castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 10000),
-                            castle::nbt::Nbt::makeString("value", "minecraft:play")}),
-                       castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 12000),
-                            castle::nbt::Nbt::makeString("value", "minecraft:rest")})})}),
-
-              castle::nbt::Nbt::makeCompound(
-                  "minecraft:gameplay/villager_activity",
-                  {castle::nbt::Nbt::makeList(
-                      "keyframes",
-                      {castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 10),
-                            castle::nbt::Nbt::makeString("value", "minecraft:idle")}),
-                       castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 2000),
-                            castle::nbt::Nbt::makeString("value", "minecraft:work")}),
-                       castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 9000),
-                            castle::nbt::Nbt::makeString("value", "minecraft:meet")}),
-                       castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 11000),
-                            castle::nbt::Nbt::makeString("value", "minecraft:idle")}),
-                       castle::nbt::Nbt::makeCompound(
-                           "",
-                           {castle::nbt::Nbt::makeInt("ticks", 12000),
-                            castle::nbt::Nbt::makeString("value", "minecraft:rest")})})})})});
-
-    auto villagerRaw = castle::nbt::NbtWriter::writer(villagerSchedule, {.namelessRoot = true});
-
-    data.insert(data.end(), villagerRaw.begin(), villagerRaw.end());
+    data.insert(data.end(), rawVillager.begin(), rawVillager.end());
 
     minecraft::protocol::sendPacket(connection, 0x07, data);
   }
@@ -435,6 +272,14 @@ namespace minecraft::protocol::handlers {
       //
 
       sendTimelineTags(connection);
+
+      std::cout << "aarhh\n";
+      std::cout << "aarhh\n";
+      std::cout << "aarhh\n";
+      std::cout << "aarhh\n";
+      std::cout << "aarhh\n";
+      std::cout << "aarhh\n";
+      std::cout << "aarhh\n";
 
       //
       // Only after ALL registry data/tags have been sent:

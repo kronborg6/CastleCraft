@@ -1,3 +1,4 @@
+#include "generators/registries/timeline.hpp"
 #include "castle/nbt.hpp"
 #include <castle/writer.hpp>
 #include <filesystem>
@@ -194,24 +195,24 @@ namespace castle::generators::registries {
     castle::nbt::NbtWriter::writer(villagerSchedule, path, {.namelessRoot = true});
   }
 
-  void generateTimelines() {
+  void generateTimelines(bool override) {
     const std::filesystem::path directory = "./generated/registries/timeline";
 
     std::filesystem::create_directories(directory);
 
-    if (!std::filesystem::exists(directory / "day.nbt")) {
+    if (!std::filesystem::exists(directory / "day.nbt") || override) {
       generateDay(directory / "day.nbt");
     }
 
-    if (!std::filesystem::exists(directory / "early_game.nbt")) {
+    if (!std::filesystem::exists(directory / "early_game.nbt") || override) {
       generateEarlyGame(directory / "early_game.nbt");
     }
 
-    if (!std::filesystem::exists(directory / "moon.nbt")) {
+    if (!std::filesystem::exists(directory / "moon.nbt") || override) {
       generateMoon(directory / "moon.nbt");
     }
 
-    if (!std::filesystem::exists(directory / "villager_schedule.nbt")) {
+    if (!std::filesystem::exists(directory / "villager_schedule.nbt") || override) {
       generateVillagerSchedule(directory / "villager_schedule.nbt");
     }
   }

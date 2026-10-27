@@ -92,9 +92,6 @@ namespace castle::generators::registries {
       return;
     }
 
-    std::string file_path = std::filesystem::absolute(path).string();
-    std::cout << "created overworld nbt file in: " << file_path << "\n";
-
     fs::create_directories(path.parent_path());
 
     nbt::NbtWriter::writer(createOverworld(), path, {.namelessRoot = true});
