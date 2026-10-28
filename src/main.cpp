@@ -1,4 +1,5 @@
 #include "client.hpp"
+#include "generators/registries/damge_type.hpp"
 #include "generators/registries/dimension.hpp"
 #include "generators/registries/timeline.hpp"
 #include "generators/registries/worldClock.hpp"
@@ -45,6 +46,7 @@ int main() {
   castle::generators::registries::generateOverworld();
   castle::generators::registries::generateTimelines();
   castle::generators::registries::generateWorldClock();
+  castle::generators::registries::generateDamgeType();
 
   std::vector<uint8_t> data;
 

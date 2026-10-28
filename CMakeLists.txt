@@ -69,7 +69,16 @@ add_library(minecraft_server_lib STATIC
     src/generators/registries/dimension.cpp
     src/generators/registries/timeline.cpp
     src/generators/registries/worldClock.cpp
+    src/generators/registries/damge_type.cpp
+    src/generators/registries/mobs/cat.cpp
+    src/generators/registries/mobs/chicken.cpp
+    src/generators/registries/mobs/cow.cpp
+    src/generators/registries/mobs/frog.cpp
+    src/generators/registries/mobs/pig.cpp
+    src/generators/registries/mobs/wolf.cpp
+    src/generators/registries/mobs/zombie.cpp
     src/generators/biome.cpp
+    src/registry/damge_types.cpp
     src/io/nbt_loader.cpp
     src/tcp.cpp
 )
