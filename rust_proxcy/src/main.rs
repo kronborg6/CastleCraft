@@ -4,8 +4,6 @@ use tokio::net::{TcpListener, TcpStream};
 async fn main() -> std::io::Result<()> {
     let listener = TcpListener::bind("127.0.0.1:25565").await?;
 
-    // let mut server = TcpStream::connect("127.0.0.1:25566").await?;
-
     loop {
         let (mut client, _) = listener.accept().await?;
 

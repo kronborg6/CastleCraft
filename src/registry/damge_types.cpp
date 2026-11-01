@@ -8,7 +8,7 @@
 namespace castle::registry {
   std::uint16_t dameTypeId(std::string_view name) {
     auto it = std::find_if(DAMAGE_TYPES.begin(), DAMAGE_TYPES.end(), [&](const DamageTypeData& d) {
-      return d.messageId == name;
+      return d.registryId == name;
     });
 
     if (it == DAMAGE_TYPES.end()) {

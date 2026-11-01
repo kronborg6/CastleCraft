@@ -3,9 +3,12 @@
 #include "castle/reader.hpp"
 #include "castle/writer.hpp"
 #include "client.hpp"
+#include "entries/damge_types.hpp"
+#include "entries/mobs.hpp"
 #include "io/nbt_loader.hpp"
 #include "protocol/protocol.hpp"
 #include "tcp.hpp"
+#include <array>
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -119,9 +122,11 @@ namespace {
     minecraft::protocol::writeVarInt(1, data); // early_game
     minecraft::protocol::writeVarInt(2, data); // moon
     minecraft::protocol::writeVarInt(3, data); // villager_schedule
+                                               //
 
     minecraft::protocol::sendPacket(connection, 0x0E, data);
   }
+
   void sendTimelineRegistry(TcpConnection& connection) {
     std::vector<uint8_t> data;
 
@@ -202,6 +207,48 @@ namespace {
 
     minecraft::protocol::sendPacket(connection, 0x0F, data);
   }
+  void sendTrimMaterials(TcpConnection& connection) {
+    std::vector<std::uint8_t> data;
+
+    minecraft::protocol::writeString("minecraft:trim_material", data);
+
+    constexpr std::array variants = {"minecraft:quartz",
+                                     "minecraft:iron",
+                                     "minecraft:netherite",
+                                     "minecraft:redstone",
+                                     "minecraft:copper",
+                                     "minecraft:gold",
+                                     "minecraft:emerald",
+                                     "minecraft:diamond",
+                                     "minecraft:lapis",
+                                     "minecraft:amethyst",
+                                     "minecraft:resin"};
+
+    minecraft::protocol::writeVarInt(variants.size(), data);
+
+    for (const auto& variant : variants) {
+      minecraft::protocol::writeString(variant, data);
+      data.push_back(0x00);
+    }
+
+    minecraft::protocol::sendPacket(connection, 0x07, data);
+  }
+  void blockTransformerEntrie(TcpConnection& connection) {
+    std::vector<std::uint8_t> data;
+
+    minecraft::protocol::writeString("minecraft:block_transformer", data);
+
+    constexpr std::array variants = {"minecraft:axe", "minecraft:hoe", "minecraft:shovel"};
+
+    minecraft::protocol::writeVarInt(variants.size(), data);
+
+    for (const auto& variant : variants) {
+      minecraft::protocol::writeString(variant, data);
+      data.push_back(0x00);
+    }
+
+    minecraft::protocol::sendPacket(connection, 0x07, data);
+  }
 } // namespace
 
 namespace minecraft::protocol::handlers {
@@ -258,12 +305,32 @@ namespace minecraft::protocol::handlers {
 
       sendWorldClockRegistry(connection);
       sendTimelineRegistry(connection);
+
+      sendTrimMaterials(connection);
+      blockTransformerEntrie(connection);
       sendEnty(connection); // dimension_type
+      castle::entries::damgeTypesEntrie(connection);
 
       //
       // TODO:
       // Send the other required registries here.
-      //
+      castle::entries::cowEntrie(connection);
+      castle::entries::cowSoundEntrie(connection);
+      castle::entries::catEntrie(connection);
+      castle::entries::catSoundEntrie(connection);
+      castle::entries::chickenEntrie(connection);
+      castle::entries::chickenSoundEntrie(connection);
+
+      castle::entries::frogEntrie(connection);
+      castle::entries::paintingEntrie(connection);
+      castle::entries::pigEntrie(connection);
+      castle::entries::pigSoundEntrie(connection);
+      castle::entries::wolfEntrie(connection);
+      castle::entries::wolfSoundEntrie(connection);
+      castle::entries::zombieEntrie(connection);
+
+      castle::entries::fireExplosionTypes(connection);
+
       // cat_variant
       // cat_sound_variant
       // chicken_variant
