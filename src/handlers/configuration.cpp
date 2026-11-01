@@ -8,9 +8,11 @@
 #include "entries/entries.hpp"
 #include "entries/jukebox.hpp"
 #include "entries/mobs.hpp"
+#include "entries/pottery.hpp"
 #include "io/nbt_loader.hpp"
 #include "protocol/protocol.hpp"
 #include "registry/banner_patterns.hpp"
+#include "registry/instrument.hpp"
 #include "tcp.hpp"
 #include <array>
 #include <cstdint>
@@ -290,9 +292,9 @@ namespace minecraft::protocol::handlers {
       sendTrimMaterials(connection);
       blockTransformerEntrie(connection);
       sendEnty(connection); // dimension_type
-      // castle::entries::entriesTypes(connection);
       castle::entries::damgeTypesEntrie(connection);
       castle::registry::BannerPatternRegistry(connection);
+      castle::registry::instrumentRegistry(connection);
 
       //
       // TODO:
@@ -314,6 +316,7 @@ namespace minecraft::protocol::handlers {
 
       castle::entries::jukeboxEntrie(connection);
 
+      castle::entries::potteryEntrie(connection);
       castle::entries::entriesTypes(connection);
 
       // cat_variant
