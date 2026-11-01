@@ -102,13 +102,15 @@ int main() {
   }
   std::cout << "Minecraft server listening on port " << port << "\n";
 
+  int32_t id = 0;
+
   while (true) {
     int socket = accept(server, nullptr, nullptr);
 
     if (socket < 0) {
       continue;
     }
-    Client client(socket);
+    Client client(socket, id++);
 
     try {
       minecraft::protocol::handleClient(client);

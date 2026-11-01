@@ -66,6 +66,7 @@ add_library(minecraft_server_lib STATIC
     src/handlers/status.cpp
     src/handlers/login.cpp
     src/handlers/configuration.cpp
+    src/handlers/play.cpp
     src/generators/registries/dimension.cpp
     src/generators/registries/timeline.cpp
     src/generators/registries/worldClock.cpp

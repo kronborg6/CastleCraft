@@ -3,10 +3,11 @@
 #include "protocol/state.hpp"
 #include "protocol/types/game_profile.hpp"
 #include "tcp.hpp"
+#include <cstdint>
 
 class Client {
   public:
-    Client(int socketId) : _connection(socketId) {
+    Client(int socketId, int32_t id) : _entityId(id), _connection(socketId) {
     }
     TcpConnection& connection() {
       return _connection;
@@ -24,6 +25,10 @@ class Client {
       return _connected;
     }
 
+    int32_t getEntityId() const {
+      return _entityId;
+    }
+
     void disconected() {
       _connected = false;
     }
@@ -36,6 +41,7 @@ class Client {
     bool sent = false;
 
   private:
+    int32_t _entityId;
     TcpConnection _connection;
     bool _connected = true;
     minecraft::protocol::State _state = minecraft::protocol::State::Handshake;

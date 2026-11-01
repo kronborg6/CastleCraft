@@ -8,6 +8,7 @@
 #include "entries/entries.hpp"
 #include "entries/jukebox.hpp"
 #include "entries/mobs.hpp"
+#include "handlers/play.hpp"
 #include "io/nbt_loader.hpp"
 #include "protocol/protocol.hpp"
 #include "registry/banner_patterns.hpp"
@@ -17,6 +18,7 @@
 #include <array>
 #include <cstdint>
 #include <iostream>
+#include <string>
 #include <vector>
 
 namespace {
@@ -245,46 +247,48 @@ namespace minecraft::protocol::handlers {
 
     switch (packet.packetId) {
     case 0x00:
-      // minecraft::protocol::readVarInt(connection);
       sendKnownPacks(connection);
       std::cout << "0\n";
       break;
     case 0x01:
-      // minecraft::protocol::readVarInt(connection);
       std::cout << "1\n";
       break;
     case 0x02:
-      // minecraft::protocol::readVarInt(connection);
       std::cout << "2\n";
       break;
     case 0x03:
-      // minecraft::protocol::sendPacket(connection, 0x03, {});
+
       client.updateState(minecraft::protocol::State::Play);
+
+      minecraft::protocol::handlers::initialiizePlay(client);
       std::cout << "3\n";
       break;
     case 0x04:
-      // minecraft::protocol::readVarInt(connection);
       std::cout << "4\n";
       break;
     case 0x05:
-      // int gg = readVarInt2(packet.data);
-
-      // minecraft::protocol::writeVarInt(0, temp);
-      // minecraft::protocol::sendPacket(connection, 0x05, temp);
       std::cout << "5\n";
       break;
     case 0x06:
-      // minecraft::protocol::readVarInt(connection);
       std::cout << "6\n";
       break;
     case 0x07: {
       std::cout << "Known Packs response\n";
 
-      //
-      // NOW the Known Packs negotiation is finished.
-      //
-      // Next send the registries.
-      //
+      std::size_t offset = 0;
+
+      /* auto count = */ readVarInt(packet.data, offset);
+      // count = 1, offset = 1
+
+      auto nameSpace = readString(packet.data, offset);
+      // nameSpace = "minecraft", offset = 11
+
+      auto id = readString(packet.data, offset);
+      // id = "core", offset = 16
+
+      auto version = readString(packet.data, offset);
+
+      std::cout << nameSpace << ":" << id << " version: " << version << "\n";
 
       sendWorldClockRegistry(connection);
       sendTimelineRegistry(connection);
@@ -297,9 +301,6 @@ namespace minecraft::protocol::handlers {
       castle::registry::instrumentRegistry(connection);
       castle::registry::potteryEntrie(connection);
 
-      //
-      // TODO:
-      // Send the other required registries here.
       castle::entries::cowEntrie(connection);
       castle::entries::cowSoundEntrie(connection);
       castle::entries::catEntrie(connection);
@@ -326,14 +327,6 @@ namespace minecraft::protocol::handlers {
       //
 
       sendTimelineTags(connection);
-
-      std::cout << "aarhh\n";
-      std::cout << "aarhh\n";
-      std::cout << "aarhh\n";
-      std::cout << "aarhh\n";
-      std::cout << "aarhh\n";
-      std::cout << "aarhh\n";
-      std::cout << "aarhh\n";
 
       //
       // Only after ALL registry data/tags have been sent:
