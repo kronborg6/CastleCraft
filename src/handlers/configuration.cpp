@@ -8,11 +8,11 @@
 #include "entries/entries.hpp"
 #include "entries/jukebox.hpp"
 #include "entries/mobs.hpp"
-#include "entries/pottery.hpp"
 #include "io/nbt_loader.hpp"
 #include "protocol/protocol.hpp"
 #include "registry/banner_patterns.hpp"
 #include "registry/instrument.hpp"
+#include "registry/pottery.hpp"
 #include "tcp.hpp"
 #include <array>
 #include <cstdint>
@@ -295,6 +295,7 @@ namespace minecraft::protocol::handlers {
       castle::entries::damgeTypesEntrie(connection);
       castle::registry::BannerPatternRegistry(connection);
       castle::registry::instrumentRegistry(connection);
+      castle::registry::potteryEntrie(connection);
 
       //
       // TODO:
@@ -316,7 +317,6 @@ namespace minecraft::protocol::handlers {
 
       castle::entries::jukeboxEntrie(connection);
 
-      castle::entries::potteryEntrie(connection);
       castle::entries::entriesTypes(connection);
 
       // cat_variant
