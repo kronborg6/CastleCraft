@@ -1,0 +1,57 @@
+#pragma once
+#include "tcp.hpp"
+#include <cstdint>
+#include <string>
+#include <string_view>
+#include <vector>
+namespace castle::registry {
+
+  static const std::vector<std::string> BANNER_PATTERS = {
+      "minecraft:base",
+      "minecraft:border",
+      "minecraft:bricks",
+      "minecraft:circle",
+      "minecraft:creeper",
+      "minecraft:cross",
+      "minecraft:curly_border",
+      "minecraft:diagonal_left",
+      "minecraft:diagonal_right",
+      "minecraft:diagonal_up_left",
+      "minecraft:diagonal_up_right",
+      "minecraft:flow",
+      "minecraft:flower",
+      "minecraft:globe",
+      "minecraft:gradient",
+      "minecraft:gradient_up",
+      "minecraft:guster",
+      "minecraft:half_horizontal",
+      "minecraft:half_horizontal_bottom",
+      "minecraft:half_vertical",
+      "minecraft:half_vertical_right",
+      "minecraft:mojang",
+      "minecraft:piglin",
+      "minecraft:rhombus",
+      "minecraft:skull",
+      "minecraft:small_stripes",
+      "minecraft:square_bottom_left",
+      "minecraft:square_bottom_right",
+      "minecraft:square_top_left",
+      "minecraft:square_top_right",
+      "minecraft:straight_cross",
+      "minecraft:stripe_bottom",
+      "minecraft:stripe_center",
+      "minecraft:stripe_downleft",
+      "minecraft:stripe_downright",
+      "minecraft:stripe_left",
+      "minecraft:stripe_middle",
+      "minecraft:stripe_right",
+      "minecraft:stripe_top",
+      "minecraft:triangle_bottom",
+      "minecraft:triangle_top",
+      "minecraft:triangles_bottom",
+      "minecraft:triangles_top",
+  };
+
+  void BannerPatternRegistry(TcpConnection& connection);
+  std::uint16_t bannerPatternId(std::string_view name);
+} // namespace castle::registry

@@ -3,10 +3,14 @@
 #include "castle/reader.hpp"
 #include "castle/writer.hpp"
 #include "client.hpp"
+#include "entries/banner.hpp"
 #include "entries/damge_types.hpp"
+#include "entries/entries.hpp"
+#include "entries/jukebox.hpp"
 #include "entries/mobs.hpp"
 #include "io/nbt_loader.hpp"
 #include "protocol/protocol.hpp"
+#include "registry/banner_patterns.hpp"
 #include "tcp.hpp"
 #include <array>
 #include <cstdint>
@@ -14,28 +18,6 @@
 #include <vector>
 
 namespace {
-  int32_t readVarInt2(std::vector<std::uint8_t>& data) {
-    int32_t value = 0;
-    int position = 0;
-
-    while (true) {
-      const uint8_t byte = data.at(1);
-
-      value |= (byte & 0x7F) << position;
-
-      if ((byte & 0x80) == 0) {
-        break;
-      }
-
-      position += 7;
-
-      if (position >= 32) {
-        throw std::runtime_error("VarInt too large");
-      }
-    }
-
-    return value;
-  }
   struct Packget {
       int32_t packetId;
       std::vector<std::uint8_t> data;
@@ -184,10 +166,9 @@ namespace {
     data.push_back(0x01);
     std::vector<std::uint8_t> rawVillager;
 
-    size_t size4 =
-        castle::nbt::NbtReader::reader("./generated/registries/timeline/villager_schedule.nbt",
-                                       rawVillager,
-                                       {.namelessRoot = true});
+    castle::nbt::NbtReader::reader("./generated/registries/timeline/villager_schedule.nbt",
+                                   rawVillager,
+                                   {.namelessRoot = true});
 
     data.insert(data.end(), rawVillager.begin(), rawVillager.end());
 
@@ -309,7 +290,9 @@ namespace minecraft::protocol::handlers {
       sendTrimMaterials(connection);
       blockTransformerEntrie(connection);
       sendEnty(connection); // dimension_type
+      // castle::entries::entriesTypes(connection);
       castle::entries::damgeTypesEntrie(connection);
+      castle::registry::BannerPatternRegistry(connection);
 
       //
       // TODO:
@@ -329,7 +312,9 @@ namespace minecraft::protocol::handlers {
       castle::entries::wolfSoundEntrie(connection);
       castle::entries::zombieEntrie(connection);
 
-      castle::entries::fireExplosionTypes(connection);
+      castle::entries::jukeboxEntrie(connection);
+
+      castle::entries::entriesTypes(connection);
 
       // cat_variant
       // cat_sound_variant

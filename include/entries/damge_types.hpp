@@ -6,6 +6,7 @@ namespace castle::entries {
   void damgeTypesEntrie(TcpConnection& connection);
   void explosionTypesEntrie(std::vector<std::uint8_t>& output);
   void fireTypesEntrie(std::vector<std::uint8_t>& output);
+  void bypassShieldTypesEntrie(std::vector<std::uint8_t>& output);
 
   void fireExplosionTypes(TcpConnection& connection);
 } // namespace castle::entries

@@ -79,7 +79,11 @@ add_library(minecraft_server_lib STATIC
     src/generators/registries/mobs/zombie.cpp
     src/generators/biome.cpp
     src/registry/damge_types.cpp
+    src/registry/banner_patterns.cpp
+    src/entries/entries.cpp
     src/entries/mobs.cpp
+    src/entries/jukebox.cpp
+    src/entries/banner.cpp
     src/entries/damge_types.cpp
     src/io/nbt_loader.cpp
     src/tcp.cpp
