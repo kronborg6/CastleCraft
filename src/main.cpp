@@ -50,15 +50,6 @@ int main() {
 
   std::vector<uint8_t> data;
 
-  // castle::nbt::ToTagCompound("hello world", data);
-  // minecraft::nbt::ToTagString("hello", "kronborg", data);
-  // minecraft::nbt::ToTagCompound("stats", data);
-  // minecraft::nbt::ToTagFloat("health", 100.01f, data);
-  // minecraft::nbt::ToTagInt("lvl", 16, data);
-  // minecraft::nbt::ToTagInt("xp", 512, data);
-  // minecraft::nbt::ToEndTag(data);
-  // minecraft::nbt::ToEndTag(data);
-
   printHex(data);
 
   int server = socket(AF_INET, SOCK_STREAM, 0);

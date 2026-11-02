@@ -64,6 +64,17 @@ namespace minecraft::protocol::handlers {
 
     minecraft::protocol::sendPacket(connection, 0x32, data);
   }
+
+  void start(TcpConnection& connection) {
+    std::vector<std::uint8_t> data;
+
+    data.push_back(0xd);
+    std::int32_t value = minecraft::protocol::endian::floatToint32(0.0f);
+
+    minecraft::protocol::endian::writeBigEndian<std::int32_t>(value, data);
+
+    minecraft::protocol::sendPacket(connection, 0x27, data);
+  }
   void handlePlayState(Client& client) {
 
     TcpConnection& connection = client.connection();
@@ -75,6 +86,8 @@ namespace minecraft::protocol::handlers {
 
     const int32_t packetId = minecraft::protocol::readVarInt(connection);
     std::cout << "packetLength: " << packetLength << " packetId: " << packetId << "\n";
+
+    start(connection);
 
     switch (packetId) {
     case 0x32:
