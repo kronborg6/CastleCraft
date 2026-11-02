@@ -62,6 +62,7 @@ add_subdirectory(lib/castleNBT)
 
 add_library(minecraft_server_lib STATIC
     src/protocol/protocol.cpp
+    src/protocol/endian.cpp
     src/handlers/handshake.cpp
     src/handlers/status.cpp
     src/handlers/login.cpp
@@ -83,6 +84,7 @@ add_library(minecraft_server_lib STATIC
     src/registry/banner_patterns.cpp
     src/registry/instrument.cpp
     src/registry/pottery.cpp
+    src/registry/biome.cpp
     src/entries/entries.cpp
     src/entries/mobs.cpp
     src/entries/jukebox.cpp

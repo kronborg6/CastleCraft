@@ -12,6 +12,7 @@
 #include "io/nbt_loader.hpp"
 #include "protocol/protocol.hpp"
 #include "registry/banner_patterns.hpp"
+#include "registry/biome.hpp"
 #include "registry/instrument.hpp"
 #include "registry/pottery.hpp"
 #include "tcp.hpp"
@@ -300,6 +301,7 @@ namespace minecraft::protocol::handlers {
       castle::registry::BannerPatternRegistry(connection);
       castle::registry::instrumentRegistry(connection);
       castle::registry::potteryEntrie(connection);
+      castle::registry::biomeRegistry(connection);
 
       castle::entries::cowEntrie(connection);
       castle::entries::cowSoundEntrie(connection);
