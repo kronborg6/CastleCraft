@@ -102,7 +102,7 @@ int main() {
   }
   std::cout << "Minecraft server listening on port " << port << "\n";
 
-  int32_t id = 0;
+  int32_t id = 1;
 
   while (true) {
     int socket = accept(server, nullptr, nullptr);
