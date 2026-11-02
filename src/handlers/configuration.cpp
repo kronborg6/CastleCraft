@@ -265,7 +265,9 @@ namespace minecraft::protocol::handlers {
       std::cout << "3\n";
       break;
     case 0x04:
-      std::cout << "4\n";
+      std::cout << "keep alive\n";
+      // client send keep alive ID in a long need to decord that and check if it match the one
+      // server send to client
       break;
     case 0x05:
       std::cout << "5\n";

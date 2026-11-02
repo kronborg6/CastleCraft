@@ -75,6 +75,14 @@ namespace minecraft::protocol::handlers {
 
     minecraft::protocol::sendPacket(connection, 0x27, data);
   }
+
+  // TODO
+  // DONE Game Event (0x27) — Send event 13 to tell the client to start waiting for chunks.
+  // Synchronize Player Position (0x49) — Set the player's spawn position and rotation.
+  // Set Center Chunk (0x60) — Tell the client which chunk to load around.
+  // Chunk Data and Update Light (0x2E) — Send terrain and lighting information.
+  // Keep Alive (0x2D) — Keep the connection alive.
+
   void handlePlayState(Client& client) {
 
     TcpConnection& connection = client.connection();

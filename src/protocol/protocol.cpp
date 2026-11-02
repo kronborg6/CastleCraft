@@ -148,6 +148,13 @@ namespace minecraft::protocol {
     while (client.isConnected()) {
       try {
 
+        /*
+         * need to make a check what sate client is in and then send a keep alive every somfing
+         * the corresponse hanlder need to check agaist that id we send i think we gona save it in
+         * the client and have a last send value we check if i last send is grater then if it is we
+         * send a new one
+         */
+
         switch (client.getState()) {
         case State::Handshake:
           std::cout << "Started handshake\n";
