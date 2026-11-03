@@ -37,7 +37,7 @@ namespace minecraft::protocol::handlers {
   void startCuck(TcpConnection& connection) {
     std::vector<std::uint8_t> data;
     data.push_back(0x00);
-    sendPacket(connection, 0x0E, data);
+    sendPacket(connection, 0x0C, data);
   }
   void finishChunkBatch(TcpConnection& connection, std::int32_t chucks) {
     std::vector<std::uint8_t> data;
