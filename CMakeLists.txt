@@ -63,6 +63,7 @@ add_subdirectory(lib/castleNBT)
 add_library(minecraft_server_lib STATIC
     src/protocol/protocol.cpp
     src/protocol/endian.cpp
+    src/protocol/packget.cpp
     src/handlers/handshake.cpp
     src/handlers/status.cpp
     src/handlers/login.cpp

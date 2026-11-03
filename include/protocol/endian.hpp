@@ -13,6 +13,7 @@ namespace minecraft::protocol::endian {
   uint32_t floatToUint32(float from);
   int32_t floatToint32(float from);
   uint64_t doubleToUint64(double from);
+  int64_t doubleToint64(double value);
 
   float uint32ToFloat(uint32_t from);
   double uint64ToDouble(uint64_t from);

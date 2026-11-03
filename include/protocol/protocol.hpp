@@ -7,7 +7,6 @@
 #include <vector>
 
 class Client;
-class Client;
 namespace minecraft::protocol {
 
   int32_t readVarInt(TcpConnection& connection);

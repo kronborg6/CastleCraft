@@ -80,6 +80,10 @@ namespace minecraft::protocol::endian {
     int32_t reslut = std::bit_cast<int32_t>(value);
     return reslut;
   }
+  int64_t doubleToint64(double value) {
+    int64_t reslut = std::bit_cast<int64_t>(value);
+    return reslut;
+  }
 
   uint64_t doubleToUint64(double value) {
     uint64_t reslut = std::bit_cast<uint64_t>(value);

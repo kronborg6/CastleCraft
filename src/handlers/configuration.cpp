@@ -10,6 +10,7 @@
 #include "entries/mobs.hpp"
 #include "handlers/play.hpp"
 #include "io/nbt_loader.hpp"
+#include "protocol/packget.hpp"
 #include "protocol/protocol.hpp"
 #include "registry/banner_patterns.hpp"
 #include "registry/biome.hpp"
@@ -23,27 +24,6 @@
 #include <vector>
 
 namespace {
-  struct Packget {
-      int32_t packetId;
-      std::vector<std::uint8_t> data;
-  };
-  Packget createPacket(TcpConnection& connection) {
-    const int32_t packetLength = minecraft::protocol::readVarInt(connection);
-
-    const int32_t packetId = minecraft::protocol::readVarInt(connection);
-
-    if (packetLength < 1) {
-      throw std::runtime_error("Invalid packet length");
-    }
-
-    const std::size_t payloadLength = static_cast<std::size_t>(packetLength - 1);
-
-    std::vector<std::uint8_t> data(payloadLength);
-
-    connection.readAll(data.data(), data.size());
-
-    return Packget{packetId, std::move(data)};
-  }
   void sendEnty(TcpConnection& connection) {
     std::vector<uint8_t> data;
     std::vector<uint8_t> rawNbt;
@@ -236,7 +216,7 @@ namespace {
     minecraft::protocol::sendPacket(connection, 0x07, data);
   }
 } // namespace
-
+using namespace minecraft::protocol;
 namespace minecraft::protocol::handlers {
   void handleConfiguration(Client& client) {
     TcpConnection& connection = client.connection();
