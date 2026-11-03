@@ -36,7 +36,6 @@ namespace minecraft::protocol::handlers {
 
   void startCuck(TcpConnection& connection) {
     std::vector<std::uint8_t> data;
-    data.push_back(0x00);
     sendPacket(connection, 0x0C, data);
   }
   void finishChunkBatch(TcpConnection& connection, std::int32_t chucks) {
@@ -186,12 +185,12 @@ namespace minecraft::protocol::handlers {
     setCenterChuck(connection);
     startCuck(connection);
 
-    for (int i = 0; i < 16; i++) {
-      for (int x = 0; x < 16; x++) {
+    for (int i = -2; i <= 2; i++) {
+      for (int x = -2; x <= 2; x++) {
         chuck(connection, i, x);
       }
     }
-    finishChunkBatch(connection, 16 * 16);
+    finishChunkBatch(connection, 25);
   }
 
   // TODO
