@@ -6,6 +6,7 @@
 #include "tcp.hpp"
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -59,16 +60,16 @@ namespace minecraft::protocol::handlers {
     //
 
     for (int i = 0; i < 24; ++i) {
-      bool isStone = (i == 7);
+      bool randomBlock = (i == 7);
       // Non-air block count (Short)
-      endian::writeBigEndian<std::int16_t>(isStone ? 4096 : 0, sections);
+      endian::writeBigEndian<std::int16_t>(randomBlock ? 4096 : 0, sections);
 
       // Fluid count (Short)
       endian::writeBigEndian<std::int16_t>(0, sections);
 
       // Block states: single-valued palette
-      sections.push_back(0x00);                                    // Bits per entry = 0
-      minecraft::protocol::writeVarInt(isStone ? 1 : 0, sections); // Air
+      sections.push_back(0x00); // Bits per entry = 0
+      minecraft::protocol::writeVarInt(randomBlock ? rand() % 25 : 0, sections); // Air
 
       // Biomes: single-valued palette
       sections.push_back(0x00);                      // Bits per entry = 0
