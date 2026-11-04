@@ -35,6 +35,14 @@ class Player {
       return _teleport.id;
     }
 
+    bool checkTeleport(std::int32_t id) {
+      if (_teleport.id == id) {
+        _teleport.used = true;
+        return true;
+      }
+      return false;
+    }
+
   private:
     std::int32_t _entityId;
     Teleport _teleport;

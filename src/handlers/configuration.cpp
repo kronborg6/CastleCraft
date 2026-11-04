@@ -244,11 +244,24 @@ namespace minecraft::protocol::handlers {
       minecraft::protocol::handlers::initialiizePlay(client);
       std::cout << "3\n";
       break;
-    case 0x04:
-      std::cout << "keep alive\n";
-      // client send keep alive ID in a long need to decord that and check if it match the one
-      // server send to client
+    case 0x04: {
+      std::size_t offset;
+      auto value = endian::readBigEndian<std::int64_t>(packet.data, offset);
+      if (value != client.lastPing) {
+        // close connection / time out
+        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
+                  << "\n";
+        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
+                  << "\n";
+        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
+                  << "\n";
+        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
+                  << "\n";
+        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
+                  << "\n";
+      }
       break;
+    }
     case 0x05:
       std::cout << "5\n";
       break;

@@ -8,6 +8,7 @@
 #include "protocol/state.hpp"
 #include "tcp.hpp"
 #include <arpa/inet.h>
+#include <chrono>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
@@ -16,6 +17,7 @@
 #include <stdexcept>
 #include <string>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <vector>
 
@@ -148,14 +150,18 @@ namespace minecraft::protocol {
     while (client.isConnected()) {
       try {
 
+        State clientState = client.getState();
+
         /*
          * need to make a check what sate client is in and then send a keep alive every somfing
          * the corresponse hanlder need to check agaist that id we send i think we gona save it in
-         * the client and have a last send value we check if i last send is grater then if it is we
-         * send a new one
+         * the client and have a last send value we check if i last send is grater then if it is
+         * we send a new one
          */
 
-        switch (client.getState()) {
+        client.connectionCheck();
+
+        switch (clientState) {
         case State::Handshake:
           std::cout << "Started handshake\n";
           handlers::handleHandshake(client);

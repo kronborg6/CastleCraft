@@ -23,8 +23,7 @@ namespace minecraft::protocol::endian {
     }
   }
 
-  template <std::unsigned_integral U>
-  U readBigEndian(std::span<const std::uint8_t> data, size_t& offset) {
+  template <std::integral U> U readBigEndian(std::span<const std::uint8_t> data, size_t& offset) {
     if (offset > data.size() || data.size() - offset < sizeof(U)) {
       throw std::runtime_error("readBigEndian: unexpected end of data");
     }
@@ -65,10 +64,14 @@ namespace minecraft::protocol::endian {
 
   template void writeLittleEndian<uint64_t>(uint64_t, std::vector<uint8_t>&);
 
-  template uint8_t readBigEndian<uint8_t>(std::span<const std::uint8_t>, std::size_t&);
-  template uint16_t readBigEndian<uint16_t>(std::span<const std::uint8_t>, std::size_t&);
-  template uint32_t readBigEndian<uint32_t>(std::span<const std::uint8_t>, std::size_t&);
-  template uint64_t readBigEndian<uint64_t>(std::span<const std::uint8_t>, std::size_t&);
+  template int8_t readBigEndian<int8_t>(std::span<const std::uint8_t>, std::size_t&);
+  template int16_t readBigEndian<int16_t>(std::span<const std::uint8_t>, std::size_t&);
+  template int32_t readBigEndian<int32_t>(std::span<const std::uint8_t>, std::size_t&);
+  template int64_t readBigEndian<int64_t>(std::span<const std::uint8_t>, std::size_t&);
+  // template uint8_t readBigEndian<uint8_t>(std::span<const std::uint8_t>, std::size_t&);
+  // template uint16_t readBigEndian<uint16_t>(std::span<const std::uint8_t>, std::size_t&);
+  // template uint32_t readBigEndian<uint32_t>(std::span<const std::uint8_t>, std::size_t&);
+  // template uint64_t readBigEndian<uint64_t>(std::span<const std::uint8_t>, std::size_t&);
 
   uint32_t floatToUint32(float value) {
 
@@ -90,6 +93,11 @@ namespace minecraft::protocol::endian {
     return reslut;
   }
 
+  int64_t longToInt64(long value) {
+    int64_t result = std::bit_cast<int64_t>(value);
+    return result;
+  }
+
   float uint32ToFloat(uint32_t from) {
     float result = std::bit_cast<float>(from);
 
@@ -99,5 +107,10 @@ namespace minecraft::protocol::endian {
     double reslut = std::bit_cast<double>(from);
 
     return reslut;
+  }
+
+  long int64ToLong(int64_t from) {
+    long result = std::bit_cast<long>(from);
+    return result;
   }
 } // namespace minecraft::protocol::endian

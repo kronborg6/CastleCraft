@@ -217,26 +217,37 @@ namespace minecraft::protocol::handlers {
       std::cout << "palyerTeleportId: " << client.getPlayer().teleportId() << "\n"
                 << "TeleportId: " << teleportId << std::endl;
 
-      std::cout << "palyerTeleportId: " << client.getPlayer().teleportId() << "\n"
-                << "TeleportId: " << teleportId << std::endl;
-      std::cout << "palyerTeleportId: " << client.getPlayer().teleportId() << "\n"
-                << "TeleportId: " << teleportId << std::endl;
-      std::cout << "palyerTeleportId: " << client.getPlayer().teleportId() << "\n"
-                << "TeleportId: " << teleportId << std::endl;
-      std::cout << "palyerTeleportId: " << client.getPlayer().teleportId() << "\n"
-                << "TeleportId: " << teleportId << std::endl;
-
-      if (teleportId != client.getPlayer().teleportId()) {
+      if (!client.getPlayer().checkTeleport(teleportId)) {
         std::cout << "teleport id did not match\n";
       }
-      std::cout << "telportId did match: " << teleportId << "\n";
+      std::cout << "telportId did match\n";
 
       break;
     }
     case 0x32:
+      break;
+    case 0x1C: {
+      std::size_t offset = 0;
+      auto value = endian::readBigEndian<std::int64_t>(packget.data, offset);
+      if (value != client.lastPing) {
+        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
+                  << "\n";
+        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
+                  << "\n";
+        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
+                  << "\n";
+        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
+                  << "\n";
+        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
+                  << "\n";
+      }
+      std::cout << "keep alive match\n";
+      break;
+    }
+
     default:
-      std::cerr << "Unknown Configuration packet: 0x" << std::hex << packget.packetId << std::dec
-                << '\n';
+      // std::cerr << "Unknown Configuration packet: 0x" << std::hex << packget.packetId << std::dec
+      //           << '\n';
       break;
     }
   }

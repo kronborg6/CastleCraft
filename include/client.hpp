@@ -1,10 +1,14 @@
 #pragma once
-#include "player.hpp"
+#include "player/player.hpp"
+#include "player/postion.hpp"
+#include "protocol/endian.hpp"
 #include "protocol/protocol.hpp"
 #include "protocol/state.hpp"
 #include "protocol/types/game_profile.hpp"
 #include "tcp.hpp"
+#include <chrono>
 #include <cstdint>
+#include <vector>
 
 class Client {
   public:
@@ -44,9 +48,44 @@ class Client {
     GameProfile profile;
     bool sent = false;
 
+    Postion getPostion() const {
+      return _postion;
+    }
+
+    void connectionCheck() {
+      std::vector<std::uint8_t> data;
+
+      auto now = std::chrono::system_clock::now();
+
+      auto duration = now.time_since_epoch();
+
+      long milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+
+      if (lastPing + 10000 >= milliseconds) {
+        return;
+      }
+
+      lastPing = milliseconds;
+      minecraft::protocol::endian::writeBigEndian<std::int64_t>(milliseconds, data);
+
+      switch (_state) {
+      case minecraft::protocol::State::Play:
+        minecraft::protocol::sendPacket(_connection, 0x2D, data);
+        break;
+      case minecraft::protocol::State::Configuration:
+        minecraft::protocol::sendPacket(_connection, 0x04, data);
+        break;
+      default:
+        break;
+      }
+    }
+
+    long lastPing;
+
   private:
     Player _player;
     TcpConnection _connection;
+    Postion _postion;
     bool _connected = true;
     minecraft::protocol::State _state = minecraft::protocol::State::Handshake;
 };
