@@ -55,17 +55,17 @@ class Client {
     void connectionCheck() {
       std::vector<std::uint8_t> data;
 
-      auto now = std::chrono::system_clock::now();
+      auto now = std::chrono::steady_clock::now();
 
       auto duration = now.time_since_epoch();
 
-      long milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+      std::int64_t milliseconds =
+          std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
 
       if (lastPing + 10000 >= milliseconds) {
         return;
       }
 
-      lastPing = milliseconds;
       minecraft::protocol::endian::writeBigEndian<std::int64_t>(milliseconds, data);
 
       switch (_state) {
@@ -76,8 +76,9 @@ class Client {
         minecraft::protocol::sendPacket(_connection, 0x04, data);
         break;
       default:
-        break;
+        return;
       }
+      lastPing = milliseconds;
     }
 
     long lastPing;

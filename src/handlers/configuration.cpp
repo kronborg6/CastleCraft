@@ -245,7 +245,7 @@ namespace minecraft::protocol::handlers {
       std::cout << "3\n";
       break;
     case 0x04: {
-      std::size_t offset;
+      std::size_t offset = 0;
       auto value = endian::readBigEndian<std::int64_t>(packet.data, offset);
       if (value != client.lastPing) {
         // close connection / time out
