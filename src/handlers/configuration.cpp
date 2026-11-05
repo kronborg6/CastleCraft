@@ -10,6 +10,7 @@
 #include "entries/mobs.hpp"
 #include "handlers/play.hpp"
 #include "io/nbt_loader.hpp"
+#include "protocol/configuration.hpp"
 #include "protocol/packget.hpp"
 #include "protocol/protocol.hpp"
 #include "registry/banner_patterns.hpp"
@@ -22,6 +23,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+
+using namespace minecraft::protocol;
 
 namespace {
   void sendEnty(TcpConnection& connection) {
@@ -41,7 +44,7 @@ namespace {
 
     data.insert(data.end(), rawNbt.begin(), rawNbt.end());
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+    minecraft::protocol::sendPacket(connection, ConfigurationClientbound::RegistryData, data);
   }
   void sendWorldClockRegistry(TcpConnection& connection) {
     std::vector<uint8_t> data;
@@ -61,7 +64,7 @@ namespace {
 
     data.insert(data.end(), raw.begin(), raw.end());
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+    minecraft::protocol::sendPacket(connection, ConfigurationClientbound::RegistryData, data);
   }
   void sendTimelineTags(TcpConnection& connection) {
     std::vector<uint8_t> data;
@@ -91,7 +94,7 @@ namespace {
     minecraft::protocol::writeVarInt(3, data); // villager_schedule
                                                //
 
-    minecraft::protocol::sendPacket(connection, 0x0E, data);
+    minecraft::protocol::sendPacket(connection, ConfigurationClientbound::ClientInfomation, data);
   }
 
   void sendTimelineRegistry(TcpConnection& connection) {
@@ -157,7 +160,7 @@ namespace {
 
     data.insert(data.end(), rawVillager.begin(), rawVillager.end());
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+    minecraft::protocol::sendPacket(connection, ConfigurationClientbound::RegistryData, data);
   }
   void sendKnownPacks(TcpConnection& connection) {
     std::vector<uint8_t> data;
@@ -171,7 +174,7 @@ namespace {
 
     minecraft::protocol::writeString("26.3", data);
 
-    minecraft::protocol::sendPacket(connection, 0x0F, data);
+    minecraft::protocol::sendPacket(connection, ConfigurationClientbound::SelectKnownPacks, data);
   }
   void sendTrimMaterials(TcpConnection& connection) {
     std::vector<std::uint8_t> data;
@@ -197,7 +200,7 @@ namespace {
       data.push_back(0x00);
     }
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+    minecraft::protocol::sendPacket(connection, ConfigurationClientbound::RegistryData, data);
   }
   void blockTransformerEntrie(TcpConnection& connection) {
     std::vector<std::uint8_t> data;
@@ -213,7 +216,7 @@ namespace {
       data.push_back(0x00);
     }
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+    minecraft::protocol::sendPacket(connection, ConfigurationClientbound::RegistryData, data);
   }
 } // namespace
 using namespace minecraft::protocol;
@@ -226,49 +229,35 @@ namespace minecraft::protocol::handlers {
     std::vector<std::uint8_t> temp;
     std::cout << "we now at: " << packet.packetId << "\n";
 
-    switch (packet.packetId) {
-    case 0x00:
+    switch (static_cast<ConfigurationServerbound>(packet.packetId)) {
+    case ConfigurationServerbound::ClientInfomation:
       sendKnownPacks(connection);
-      std::cout << "0\n";
       break;
-    case 0x01:
-      std::cout << "1\n";
+    case ConfigurationServerbound::CookieResponse:
       break;
-    case 0x02:
-      std::cout << "2\n";
+    case ConfigurationServerbound::PluginMessage:
       break;
-    case 0x03:
+    case ConfigurationServerbound::AcknowledgeFinishConfiguration:
 
       client.updateState(minecraft::protocol::State::Play);
 
       minecraft::protocol::handlers::initialiizePlay(client);
-      std::cout << "3\n";
       break;
-    case 0x04: {
+    case ConfigurationServerbound::KeepAlive: {
       std::size_t offset = 0;
       auto value = endian::readBigEndian<std::int64_t>(packet.data, offset);
       if (value != client.lastPing) {
         // close connection / time out
-        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
-                  << "\n";
-        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
-                  << "\n";
-        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
-                  << "\n";
-        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
-                  << "\n";
-        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
-                  << "\n";
       }
       break;
     }
-    case 0x05:
+    case ConfigurationServerbound::Pong:
       std::cout << "5\n";
       break;
-    case 0x06:
+    case ConfigurationServerbound::ResourcePackResponse:
       std::cout << "6\n";
       break;
-    case 0x07: {
+    case ConfigurationServerbound::KnownPacks: {
       std::cout << "Known Packs response\n";
 
       std::size_t offset = 0;
@@ -328,15 +317,16 @@ namespace minecraft::protocol::handlers {
       //
       // Only after ALL registry data/tags have been sent:
       //
-      minecraft::protocol::sendPacket(connection, 0x03, {});
+      minecraft::protocol::sendPacket(
+          connection, ConfigurationClientbound::FinishConfiguration, {});
 
       break;
     }
-    case 0x08:
+    case ConfigurationServerbound::CustomClickAction:
       // minecraft::protocol::readVarInt(connection);
       std::cout << "8\n";
       break;
-    case 0x09:
+    case ConfigurationServerbound::AcceptCodeOfConduct:
       // minecraft::protocol::readVarInt(connection);
       std::cout << "9\n";
       break;

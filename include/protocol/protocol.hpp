@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <span>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 class Client;
@@ -15,9 +16,16 @@ namespace minecraft::protocol {
   std::string readString(TcpConnection& connection);
   std::string readString(std::span<const std::uint8_t> data, std::size_t& offset);
   void writeString(const std::string& text, std::vector<uint8_t>& output);
+
   void sendPacket(TcpConnection& connection, int32_t packetId, const std::span<uint8_t>& data);
 
   void handleClient(Client& client);
+
+  template <typename PackgetId>
+    requires std::is_enum_v<PackgetId>
+  void sendPacket(TcpConnection& connection, PackgetId packetId, const std::span<uint8_t>& data) {
+    sendPacket(connection, static_cast<std::int32_t>(packetId), data);
+  }
 } // namespace minecraft::protocol
   //
   //
