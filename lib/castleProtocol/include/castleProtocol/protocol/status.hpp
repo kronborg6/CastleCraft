@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-namespace minecraft::protocol {
+namespace castle::protocol {
   enum class StatusClientbound : std::int32_t {
     StatusResponse = 0x00,
     PongResponse = 0x01
@@ -10,4 +10,4 @@ namespace minecraft::protocol {
     StatusRequest = 0x00,
     PingRequest = 0x01
   };
-} // namespace minecraft::protocol
+} // namespace castle::protocol

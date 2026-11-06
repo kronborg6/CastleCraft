@@ -58,6 +58,7 @@ endif()
 ####################
 
 add_subdirectory(lib/castleNBT)
+add_subdirectory(lib/castleProtocol)
 
 
 add_library(minecraft_server_lib STATIC
@@ -114,6 +115,7 @@ target_compile_definitions(minecraft_server_lib
 target_link_libraries(minecraft_server_lib
     PUBLIC
     castleNBT
+    castleProtocol
     PRIVATE
         project_warnings
 )
@@ -140,6 +142,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         minecraft_server_lib
        castleNBT 
+       castleProtocol
         project_warnings
 )
 

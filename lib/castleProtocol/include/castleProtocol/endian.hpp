@@ -3,7 +3,7 @@
 #include <span>
 #include <vector>
 
-namespace minecraft::protocol::endian {
+namespace castle::endian {
   template <typename T> void writeBigEndian(T value, std::vector<std::uint8_t>& data);
   template <typename T> void writeLittleEndian(T value, std::vector<std::uint8_t>& data);
 
@@ -19,4 +19,4 @@ namespace minecraft::protocol::endian {
 
   float uint32ToFloat(uint32_t from);
   double uint64ToDouble(uint64_t from);
-} // namespace minecraft::protocol::endian
+} // namespace castle::endian

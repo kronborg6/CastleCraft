@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-namespace minecraft::protocol {
+namespace castle::protocol {
   enum class ConfigurationClientbound : std::int32_t {
     CookieRequest = 0x00,
     PluginMessage = 0x01,
@@ -37,4 +37,4 @@ namespace minecraft::protocol {
     CustomClickAction = 0x08,
     AcceptCodeOfConduct = 0x09,
   };
-} // namespace minecraft::protocol
+} // namespace castle::protocol

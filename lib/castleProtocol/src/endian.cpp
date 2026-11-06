@@ -1,0 +1,116 @@
+#include "endian.hpp"
+#include <bit>
+#include <concepts>
+#include <cstddef>
+#include <cstdint>
+#include <span>
+#include <stdexcept>
+#include <type_traits>
+#include <vector>
+namespace castle::endian {
+  template <typename T> void writeBigEndian(T value, std::vector<uint8_t>& data) {
+    // static_assert(std::is_integral_v<T>);
+
+    for (int shift = static_cast<int>(sizeof(T) * 8) - 8; shift >= 0; shift -= 8) {
+      data.push_back(static_cast<std::uint8_t>((value >> shift) & 0xFF));
+    }
+  }
+  template <typename T> void writeLittleEndian(T value, std::vector<uint8_t>& data) {
+    static_assert(std::is_unsigned_v<T>);
+
+    for (int shift = 0; shift < static_cast<int>(sizeof(T) * 8); shift += 8) {
+      data.push_back(static_cast<std::uint8_t>((value >> shift) & 0xFF));
+    }
+  }
+
+  template <std::integral U> U readBigEndian(std::span<const std::uint8_t> data, size_t& offset) {
+    if (offset > data.size() || data.size() - offset < sizeof(U)) {
+      throw std::runtime_error("readBigEndian: unexpected end of data");
+    }
+
+    std::size_t size = sizeof(U);
+
+    U value = 0;
+
+    for (std::size_t i = 0; i < size; i++) {
+      value = static_cast<U>((value << 8) | data[offset + i]);
+    }
+
+    offset += size;
+
+    return value;
+  }
+  template void writeBigEndian<uint8_t>(uint8_t, std::vector<uint8_t>&);
+
+  template void writeBigEndian<uint16_t>(uint16_t, std::vector<uint8_t>&);
+
+  template void writeBigEndian<uint32_t>(uint32_t, std::vector<uint8_t>&);
+
+  template void writeBigEndian<uint64_t>(uint64_t, std::vector<uint8_t>&);
+
+  template void writeBigEndian<int8_t>(int8_t, std::vector<uint8_t>&);
+
+  template void writeBigEndian<int16_t>(int16_t, std::vector<uint8_t>&);
+
+  template void writeBigEndian<int32_t>(int32_t, std::vector<uint8_t>&);
+
+  template void writeBigEndian<int64_t>(int64_t, std::vector<uint8_t>&);
+
+  template void writeLittleEndian<uint8_t>(uint8_t, std::vector<uint8_t>&);
+
+  template void writeLittleEndian<uint16_t>(uint16_t, std::vector<uint8_t>&);
+
+  template void writeLittleEndian<uint32_t>(uint32_t, std::vector<uint8_t>&);
+
+  template void writeLittleEndian<uint64_t>(uint64_t, std::vector<uint8_t>&);
+
+  template int8_t readBigEndian<int8_t>(std::span<const std::uint8_t>, std::size_t&);
+  template int16_t readBigEndian<int16_t>(std::span<const std::uint8_t>, std::size_t&);
+  template int32_t readBigEndian<int32_t>(std::span<const std::uint8_t>, std::size_t&);
+  template int64_t readBigEndian<int64_t>(std::span<const std::uint8_t>, std::size_t&);
+  // template uint8_t readBigEndian<uint8_t>(std::span<const std::uint8_t>, std::size_t&);
+  // template uint16_t readBigEndian<uint16_t>(std::span<const std::uint8_t>, std::size_t&);
+  // template uint32_t readBigEndian<uint32_t>(std::span<const std::uint8_t>, std::size_t&);
+  // template uint64_t readBigEndian<uint64_t>(std::span<const std::uint8_t>, std::size_t&);
+
+  uint32_t floatToUint32(float value) {
+
+    uint32_t reslut = std::bit_cast<uint32_t>(value);
+    return reslut;
+  }
+
+  int32_t floatToint32(float value) {
+    int32_t reslut = std::bit_cast<int32_t>(value);
+    return reslut;
+  }
+  int64_t doubleToint64(double value) {
+    int64_t reslut = std::bit_cast<int64_t>(value);
+    return reslut;
+  }
+
+  uint64_t doubleToUint64(double value) {
+    uint64_t reslut = std::bit_cast<uint64_t>(value);
+    return reslut;
+  }
+
+  int64_t longToInt64(long value) {
+    int64_t result = std::bit_cast<int64_t>(value);
+    return result;
+  }
+
+  float uint32ToFloat(uint32_t from) {
+    float result = std::bit_cast<float>(from);
+
+    return result;
+  }
+  double uint64ToDouble(uint64_t from) {
+    double reslut = std::bit_cast<double>(from);
+
+    return reslut;
+  }
+
+  long int64ToLong(int64_t from) {
+    long result = std::bit_cast<long>(from);
+    return result;
+  }
+} // namespace castle::endian
