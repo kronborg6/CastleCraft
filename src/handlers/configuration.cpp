@@ -19,6 +19,7 @@
 #include "registry/pottery.hpp"
 #include "tcp.hpp"
 #include <array>
+#include <castleProtocol/package/readPackage.hpp>
 #include <cstdint>
 #include <iostream>
 #include <string>
@@ -27,314 +28,313 @@
 using namespace minecraft::protocol;
 
 namespace {
-  void sendEnty(TcpConnection& connection) {
-    std::vector<uint8_t> data;
-    std::vector<uint8_t> rawNbt;
+void sendEnty(TcpConnection& connection) {
+  std::vector<uint8_t> data;
+  std::vector<uint8_t> rawNbt;
 
-    castle::io::appendsNbtFile("./generated/dimensions/overworld.nbt", rawNbt);
+  castle::io::appendsNbtFile("./generated/dimensions/overworld.nbt", rawNbt);
 
-    minecraft::protocol::writeString("minecraft:dimension_type", data);
+  minecraft::protocol::writeString("minecraft:dimension_type", data);
 
-    // zero entries
-    minecraft::protocol::writeVarInt(1, data);
+  // zero entries
+  minecraft::protocol::writeVarInt(1, data);
 
-    minecraft::protocol::writeString("minecraft:overworld", data);
+  minecraft::protocol::writeString("minecraft:overworld", data);
 
-    data.push_back(0x01);
+  data.push_back(0x01);
 
-    data.insert(data.end(), rawNbt.begin(), rawNbt.end());
+  data.insert(data.end(), rawNbt.begin(), rawNbt.end());
 
-    minecraft::protocol::sendPacket(connection, ConfigurationClientbound::RegistryData, data);
+  minecraft::protocol::sendPacket(connection, ConfigurationClientbound::RegistryData, data);
+}
+void sendWorldClockRegistry(TcpConnection& connection) {
+  std::vector<uint8_t> data;
+
+  minecraft::protocol::writeString("minecraft:world_clock", data);
+
+  minecraft::protocol::writeVarInt(1, data);
+
+  minecraft::protocol::writeString("minecraft:overworld", data);
+
+  // Optional NBT present
+  data.push_back(0x01);
+
+  auto clock = castle::nbt::Nbt::makeCompound("");
+
+  std::vector<uint8_t> raw = castle::nbt::NbtWriter::writer(clock, {.namelessRoot = true});
+
+  data.insert(data.end(), raw.begin(), raw.end());
+
+  minecraft::protocol::sendPacket(connection, ConfigurationClientbound::RegistryData, data);
+}
+void sendTimelineTags(TcpConnection& connection) {
+  std::vector<uint8_t> data;
+
+  // 1 tagged registry
+  minecraft::protocol::writeVarInt(1, data);
+
+  minecraft::protocol::writeString("minecraft:timeline", data);
+
+  // 2 tags
+  minecraft::protocol::writeVarInt(2, data);
+
+  // minecraft:universal
+  minecraft::protocol::writeString("minecraft:universal", data);
+
+  minecraft::protocol::writeVarInt(1, data);
+  minecraft::protocol::writeVarInt(3, data);
+
+  // minecraft:in_overworld
+  minecraft::protocol::writeString("minecraft:in_overworld", data);
+
+  minecraft::protocol::writeVarInt(4, data);
+
+  minecraft::protocol::writeVarInt(0, data); // day
+  minecraft::protocol::writeVarInt(1, data); // early_game
+  minecraft::protocol::writeVarInt(2, data); // moon
+  minecraft::protocol::writeVarInt(3, data); // villager_schedule
+                                             //
+
+  minecraft::protocol::sendPacket(connection, ConfigurationClientbound::UpdateTags, data);
+}
+
+void sendTimelineRegistry(TcpConnection& connection) {
+  std::vector<uint8_t> data;
+
+  minecraft::protocol::writeString("minecraft:timeline", data);
+
+  minecraft::protocol::writeVarInt(4, data);
+
+  // --------------------------------------------------
+  // Entry 0: minecraft:day
+  // --------------------------------------------------
+
+  minecraft::protocol::writeString("minecraft:day", data);
+  data.push_back(0x01);
+
+  std::vector<uint8_t> rawDay;
+
+  castle::io::appendsNbtFile("./generated/registries/timeline/day.nbt", rawDay);
+
+  data.insert(data.end(), rawDay.begin(), rawDay.end());
+
+  // --------------------------------------------------
+  // Entry 1: minecraft:early_game
+  // --------------------------------------------------
+
+  minecraft::protocol::writeString("minecraft:early_game", data);
+
+  data.push_back(0x01);
+
+  std::vector<std::uint8_t> rawEarlyGame;
+
+  castle::io::appendsNbtFile("./generated/registries/timeline/early_game.nbt", rawEarlyGame);
+
+  data.insert(data.end(), rawEarlyGame.begin(), rawEarlyGame.end());
+
+  // --------------------------------------------------
+  // Entry 2: minecraft:moon
+  // --------------------------------------------------
+
+  minecraft::protocol::writeString("minecraft:moon", data);
+
+  data.push_back(0x01);
+
+  std::vector<std::uint8_t> rawMon;
+
+  castle::io::appendsNbtFile("./generated/registries/timeline/moon.nbt", rawMon);
+
+  data.insert(data.end(), rawMon.begin(), rawMon.end());
+
+  // --------------------------------------------------
+  // Entry 3: minecraft:villager_schedule
+  // --------------------------------------------------
+
+  minecraft::protocol::writeString("minecraft:villager_schedule", data);
+
+  data.push_back(0x01);
+  std::vector<std::uint8_t> rawVillager;
+
+  castle::nbt::NbtReader::reader(
+      "./generated/registries/timeline/villager_schedule.nbt", rawVillager, {.namelessRoot = true});
+
+  data.insert(data.end(), rawVillager.begin(), rawVillager.end());
+
+  minecraft::protocol::sendPacket(connection, ConfigurationClientbound::RegistryData, data);
+}
+void sendKnownPacks(TcpConnection& connection) {
+  std::vector<uint8_t> data;
+
+  // 1 known pack
+  minecraft::protocol::writeVarInt(1, data);
+
+  minecraft::protocol::writeString("minecraft", data);
+
+  minecraft::protocol::writeString("core", data);
+
+  minecraft::protocol::writeString("26.3", data);
+
+  minecraft::protocol::sendPacket(connection, ConfigurationClientbound::KnownPacks, data);
+}
+void sendTrimMaterials(TcpConnection& connection) {
+  std::vector<std::uint8_t> data;
+
+  minecraft::protocol::writeString("minecraft:trim_material", data);
+
+  constexpr std::array variants = {"minecraft:quartz",
+                                   "minecraft:iron",
+                                   "minecraft:netherite",
+                                   "minecraft:redstone",
+                                   "minecraft:copper",
+                                   "minecraft:gold",
+                                   "minecraft:emerald",
+                                   "minecraft:diamond",
+                                   "minecraft:lapis",
+                                   "minecraft:amethyst",
+                                   "minecraft:resin"};
+
+  minecraft::protocol::writeVarInt(variants.size(), data);
+
+  for (const auto& variant : variants) {
+    minecraft::protocol::writeString(variant, data);
+    data.push_back(0x00);
   }
-  void sendWorldClockRegistry(TcpConnection& connection) {
-    std::vector<uint8_t> data;
 
-    minecraft::protocol::writeString("minecraft:world_clock", data);
+  minecraft::protocol::sendPacket(connection, ConfigurationClientbound::RegistryData, data);
+}
+void blockTransformerEntrie(TcpConnection& connection) {
+  std::vector<std::uint8_t> data;
 
-    minecraft::protocol::writeVarInt(1, data);
+  minecraft::protocol::writeString("minecraft:block_transformer", data);
 
-    minecraft::protocol::writeString("minecraft:overworld", data);
+  constexpr std::array variants = {"minecraft:axe", "minecraft:hoe", "minecraft:shovel"};
 
-    // Optional NBT present
-    data.push_back(0x01);
+  minecraft::protocol::writeVarInt(variants.size(), data);
 
-    auto clock = castle::nbt::Nbt::makeCompound("");
-
-    std::vector<uint8_t> raw = castle::nbt::NbtWriter::writer(clock, {.namelessRoot = true});
-
-    data.insert(data.end(), raw.begin(), raw.end());
-
-    minecraft::protocol::sendPacket(connection, ConfigurationClientbound::RegistryData, data);
-  }
-  void sendTimelineTags(TcpConnection& connection) {
-    std::vector<uint8_t> data;
-
-    // 1 tagged registry
-    minecraft::protocol::writeVarInt(1, data);
-
-    minecraft::protocol::writeString("minecraft:timeline", data);
-
-    // 2 tags
-    minecraft::protocol::writeVarInt(2, data);
-
-    // minecraft:universal
-    minecraft::protocol::writeString("minecraft:universal", data);
-
-    minecraft::protocol::writeVarInt(1, data);
-    minecraft::protocol::writeVarInt(3, data);
-
-    // minecraft:in_overworld
-    minecraft::protocol::writeString("minecraft:in_overworld", data);
-
-    minecraft::protocol::writeVarInt(4, data);
-
-    minecraft::protocol::writeVarInt(0, data); // day
-    minecraft::protocol::writeVarInt(1, data); // early_game
-    minecraft::protocol::writeVarInt(2, data); // moon
-    minecraft::protocol::writeVarInt(3, data); // villager_schedule
-                                               //
-
-    minecraft::protocol::sendPacket(connection, ConfigurationClientbound::ClientInfomation, data);
+  for (const auto& variant : variants) {
+    minecraft::protocol::writeString(variant, data);
+    data.push_back(0x00);
   }
 
-  void sendTimelineRegistry(TcpConnection& connection) {
-    std::vector<uint8_t> data;
-
-    minecraft::protocol::writeString("minecraft:timeline", data);
-
-    minecraft::protocol::writeVarInt(4, data);
-
-    // --------------------------------------------------
-    // Entry 0: minecraft:day
-    // --------------------------------------------------
-
-    minecraft::protocol::writeString("minecraft:day", data);
-    data.push_back(0x01);
-
-    std::vector<uint8_t> rawDay;
-
-    castle::io::appendsNbtFile("./generated/registries/timeline/day.nbt", rawDay);
-
-    data.insert(data.end(), rawDay.begin(), rawDay.end());
-
-    // --------------------------------------------------
-    // Entry 1: minecraft:early_game
-    // --------------------------------------------------
-
-    minecraft::protocol::writeString("minecraft:early_game", data);
-
-    data.push_back(0x01);
-
-    std::vector<std::uint8_t> rawEarlyGame;
-
-    castle::io::appendsNbtFile("./generated/registries/timeline/early_game.nbt", rawEarlyGame);
-
-    data.insert(data.end(), rawEarlyGame.begin(), rawEarlyGame.end());
-
-    // --------------------------------------------------
-    // Entry 2: minecraft:moon
-    // --------------------------------------------------
-
-    minecraft::protocol::writeString("minecraft:moon", data);
-
-    data.push_back(0x01);
-
-    std::vector<std::uint8_t> rawMon;
-
-    castle::io::appendsNbtFile("./generated/registries/timeline/moon.nbt", rawMon);
-
-    data.insert(data.end(), rawMon.begin(), rawMon.end());
-
-    // --------------------------------------------------
-    // Entry 3: minecraft:villager_schedule
-    // --------------------------------------------------
-
-    minecraft::protocol::writeString("minecraft:villager_schedule", data);
-
-    data.push_back(0x01);
-    std::vector<std::uint8_t> rawVillager;
-
-    castle::nbt::NbtReader::reader("./generated/registries/timeline/villager_schedule.nbt",
-                                   rawVillager,
-                                   {.namelessRoot = true});
-
-    data.insert(data.end(), rawVillager.begin(), rawVillager.end());
-
-    minecraft::protocol::sendPacket(connection, ConfigurationClientbound::RegistryData, data);
-  }
-  void sendKnownPacks(TcpConnection& connection) {
-    std::vector<uint8_t> data;
-
-    // 1 known pack
-    minecraft::protocol::writeVarInt(1, data);
-
-    minecraft::protocol::writeString("minecraft", data);
-
-    minecraft::protocol::writeString("core", data);
-
-    minecraft::protocol::writeString("26.3", data);
-
-    minecraft::protocol::sendPacket(connection, ConfigurationClientbound::SelectKnownPacks, data);
-  }
-  void sendTrimMaterials(TcpConnection& connection) {
-    std::vector<std::uint8_t> data;
-
-    minecraft::protocol::writeString("minecraft:trim_material", data);
-
-    constexpr std::array variants = {"minecraft:quartz",
-                                     "minecraft:iron",
-                                     "minecraft:netherite",
-                                     "minecraft:redstone",
-                                     "minecraft:copper",
-                                     "minecraft:gold",
-                                     "minecraft:emerald",
-                                     "minecraft:diamond",
-                                     "minecraft:lapis",
-                                     "minecraft:amethyst",
-                                     "minecraft:resin"};
-
-    minecraft::protocol::writeVarInt(variants.size(), data);
-
-    for (const auto& variant : variants) {
-      minecraft::protocol::writeString(variant, data);
-      data.push_back(0x00);
-    }
-
-    minecraft::protocol::sendPacket(connection, ConfigurationClientbound::RegistryData, data);
-  }
-  void blockTransformerEntrie(TcpConnection& connection) {
-    std::vector<std::uint8_t> data;
-
-    minecraft::protocol::writeString("minecraft:block_transformer", data);
-
-    constexpr std::array variants = {"minecraft:axe", "minecraft:hoe", "minecraft:shovel"};
-
-    minecraft::protocol::writeVarInt(variants.size(), data);
-
-    for (const auto& variant : variants) {
-      minecraft::protocol::writeString(variant, data);
-      data.push_back(0x00);
-    }
-
-    minecraft::protocol::sendPacket(connection, ConfigurationClientbound::RegistryData, data);
-  }
+  minecraft::protocol::sendPacket(connection, ConfigurationClientbound::RegistryData, data);
+}
 } // namespace
 using namespace minecraft::protocol;
 namespace minecraft::protocol::handlers {
-  void handleConfiguration(Client& client) {
-    TcpConnection& connection = client.connection();
+void handleConfiguration(Client& client) {
+  TcpConnection& connection = client.connection();
 
-    Packget packet = createPacket(connection);
+  // castle::protocol::ReadPackage<ConfigurationServerbound> packet()
+  Packget packet = createPacket(connection);
 
-    std::vector<std::uint8_t> temp;
-    std::cout << "we now at: " << packet.packetId << "\n";
+  std::vector<std::uint8_t> temp;
+  std::cout << "we now at: " << packet.packetId << "\n";
 
-    switch (static_cast<ConfigurationServerbound>(packet.packetId)) {
-    case ConfigurationServerbound::ClientInfomation:
-      sendKnownPacks(connection);
-      break;
-    case ConfigurationServerbound::CookieResponse:
-      break;
-    case ConfigurationServerbound::PluginMessage:
-      break;
-    case ConfigurationServerbound::AcknowledgeFinishConfiguration:
+  switch (static_cast<ConfigurationServerbound>(packet.packetId)) {
+  case ConfigurationServerbound::ClientInfomation:
+    sendKnownPacks(connection);
+    break;
+  case ConfigurationServerbound::CookieResponse:
+    break;
+  case ConfigurationServerbound::PluginMessage:
+    break;
+  case ConfigurationServerbound::AcknowledgeFinishConfiguration:
 
-      client.updateState(minecraft::protocol::State::Play);
+    client.updateState(minecraft::protocol::State::Play);
 
-      minecraft::protocol::handlers::initialiizePlay(client);
-      break;
-    case ConfigurationServerbound::KeepAlive: {
-      std::size_t offset = 0;
-      auto value = endian::readBigEndian<std::int64_t>(packet.data, offset);
-      if (value != client.lastPing) {
-        // close connection / time out
-      }
-      break;
+    minecraft::protocol::handlers::initialiizePlay(client);
+    break;
+  case ConfigurationServerbound::KeepAlive: {
+    std::size_t offset = 0;
+    auto value = endian::readBigEndian<std::int64_t>(packet.data, offset);
+    if (value != client.lastPing) {
+      // close connection / time out
     }
-    case ConfigurationServerbound::Pong:
-      std::cout << "5\n";
-      break;
-    case ConfigurationServerbound::ResourcePackResponse:
-      std::cout << "6\n";
-      break;
-    case ConfigurationServerbound::KnownPacks: {
-      std::cout << "Known Packs response\n";
-
-      std::size_t offset = 0;
-
-      /* auto count = */ readVarInt(packet.data, offset);
-      // count = 1, offset = 1
-
-      auto nameSpace = readString(packet.data, offset);
-      // nameSpace = "minecraft", offset = 11
-
-      auto id = readString(packet.data, offset);
-      // id = "core", offset = 16
-
-      auto version = readString(packet.data, offset);
-
-      std::cout << nameSpace << ":" << id << " version: " << version << "\n";
-
-      sendWorldClockRegistry(connection);
-      sendTimelineRegistry(connection);
-
-      sendTrimMaterials(connection);
-      blockTransformerEntrie(connection);
-      sendEnty(connection); // dimension_type
-      castle::entries::damgeTypesEntrie(connection);
-      castle::registry::BannerPatternRegistry(connection);
-      castle::registry::instrumentRegistry(connection);
-      castle::registry::potteryEntrie(connection);
-      castle::registry::biomeRegistry(connection);
-
-      castle::entries::cowEntrie(connection);
-      castle::entries::cowSoundEntrie(connection);
-      castle::entries::catEntrie(connection);
-      castle::entries::catSoundEntrie(connection);
-      castle::entries::chickenEntrie(connection);
-      castle::entries::chickenSoundEntrie(connection);
-
-      castle::entries::frogEntrie(connection);
-      castle::entries::paintingEntrie(connection);
-      castle::entries::pigEntrie(connection);
-      castle::entries::pigSoundEntrie(connection);
-      castle::entries::wolfEntrie(connection);
-      castle::entries::wolfSoundEntrie(connection);
-      castle::entries::zombieEntrie(connection);
-
-      castle::entries::jukeboxEntrie(connection);
-
-      castle::entries::entriesTypes(connection);
-
-      // cat_variant
-      // cat_sound_variant
-      // chicken_variant
-      // etc.
-      //
-
-      sendTimelineTags(connection);
-
-      //
-      // Only after ALL registry data/tags have been sent:
-      //
-      minecraft::protocol::sendPacket(
-          connection, ConfigurationClientbound::FinishConfiguration, {});
-
-      break;
-    }
-    case ConfigurationServerbound::CustomClickAction:
-      // minecraft::protocol::readVarInt(connection);
-      std::cout << "8\n";
-      break;
-    case ConfigurationServerbound::AcceptCodeOfConduct:
-      // minecraft::protocol::readVarInt(connection);
-      std::cout << "9\n";
-      break;
-    default:
-      std::cerr << "Unknown Configuration packet: 0x" << std::hex << packet.packetId << std::dec
-                << '\n';
-      break;
-      break;
-    }
+    break;
   }
+  case ConfigurationServerbound::Pong:
+    std::cout << "5\n";
+    break;
+  case ConfigurationServerbound::ResourcePackResponse:
+    std::cout << "6\n";
+    break;
+  case ConfigurationServerbound::KnownPacks: {
+    std::cout << "Known Packs response\n";
+
+    std::size_t offset = 0;
+
+    /* auto count = */ readVarInt(packet.data, offset);
+    // count = 1, offset = 1
+
+    auto nameSpace = readString(packet.data, offset);
+    // nameSpace = "minecraft", offset = 11
+
+    auto id = readString(packet.data, offset);
+    // id = "core", offset = 16
+
+    auto version = readString(packet.data, offset);
+
+    std::cout << nameSpace << ":" << id << " version: " << version << "\n";
+
+    sendWorldClockRegistry(connection);
+    sendTimelineRegistry(connection);
+
+    sendTrimMaterials(connection);
+    blockTransformerEntrie(connection);
+    sendEnty(connection); // dimension_type
+    castle::entries::damgeTypesEntrie(connection);
+    castle::registry::BannerPatternRegistry(connection);
+    castle::registry::instrumentRegistry(connection);
+    castle::registry::potteryEntrie(connection);
+    castle::registry::biomeRegistry(connection);
+
+    castle::entries::cowEntrie(connection);
+    castle::entries::cowSoundEntrie(connection);
+    castle::entries::catEntrie(connection);
+    castle::entries::catSoundEntrie(connection);
+    castle::entries::chickenEntrie(connection);
+    castle::entries::chickenSoundEntrie(connection);
+
+    castle::entries::frogEntrie(connection);
+    castle::entries::paintingEntrie(connection);
+    castle::entries::pigEntrie(connection);
+    castle::entries::pigSoundEntrie(connection);
+    castle::entries::wolfEntrie(connection);
+    castle::entries::wolfSoundEntrie(connection);
+    castle::entries::zombieEntrie(connection);
+
+    castle::entries::jukeboxEntrie(connection);
+
+    castle::entries::entriesTypes(connection);
+
+    // cat_variant
+    // cat_sound_variant
+    // chicken_variant
+    // etc.
+    //
+
+    sendTimelineTags(connection);
+
+    //
+    // Only after ALL registry data/tags have been sent:
+    //
+    minecraft::protocol::sendPacket(connection, ConfigurationClientbound::FinishConfiguration, {});
+
+    break;
+  }
+  case ConfigurationServerbound::CustomClickAction:
+    // minecraft::protocol::readVarInt(connection);
+    std::cout << "8\n";
+    break;
+  case ConfigurationServerbound::AcceptCodeOfConduct:
+    // minecraft::protocol::readVarInt(connection);
+    std::cout << "9\n";
+    break;
+  default:
+    std::cerr << "Unknown Configuration packet: 0x" << std::hex << packet.packetId << std::dec
+              << '\n';
+    break;
+    break;
+  }
+}
 } // namespace minecraft::protocol::handlers

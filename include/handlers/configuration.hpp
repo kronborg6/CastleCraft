@@ -3,5 +3,5 @@
 #include "protocol/protocol.hpp"
 
 namespace minecraft::protocol::handlers {
-void handleConfiguration(Client &client);
+void handleConfiguration(Client& client);
 }
