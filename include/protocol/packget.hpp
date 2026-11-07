@@ -1,13 +1,13 @@
 #pragma once
-#include "tcp.hpp"
+#include "castle/network/tcp_connection.hpp"
 #include <cstdint>
 #include <vector>
 ;
 namespace minecraft::protocol {
-  struct Packget {
-      std::int32_t packetId;
-      std::vector<std::uint8_t> data;
-  };
+struct Packget {
+  std::int32_t packetId;
+  std::vector<std::uint8_t> data;
+};
 
-  Packget createPacket(TcpConnection& connection);
+Packget createPacket(csatle::network::TcpConnection &connection);
 } // namespace minecraft::protocol

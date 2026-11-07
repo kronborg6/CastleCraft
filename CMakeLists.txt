@@ -64,12 +64,13 @@ add_subdirectory(lib/castleProtocol)
 add_library(minecraft_server_lib STATIC
     src/protocol/protocol.cpp
     src/protocol/endian.cpp
+    src/network/packet_receiver.cpp
+    src/network/varint.cpp
     src/protocol/packget.cpp
     src/handlers/handshake.cpp
     src/handlers/status.cpp
     src/handlers/login.cpp
     src/handlers/configuration.cpp
-    src/handlers/play.cpp
     src/generators/registries/dimension.cpp
     src/generators/registries/timeline.cpp
     src/generators/registries/worldClock.cpp
@@ -93,7 +94,6 @@ add_library(minecraft_server_lib STATIC
     src/entries/banner.cpp
     src/entries/damge_types.cpp
     src/io/nbt_loader.cpp
-    src/tcp.cpp
 )
 
 target_compile_features(minecraft_server_lib
