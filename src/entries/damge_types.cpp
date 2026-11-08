@@ -2,7 +2,6 @@
 #include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
 #include "castleProtocol/protocol/configuration.hpp"
-#include "protocol/protocol.hpp"
 #include "registry/damge_types.hpp"
 #include <cstdint>
 #include <vector>

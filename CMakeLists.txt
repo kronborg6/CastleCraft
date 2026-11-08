@@ -62,12 +62,10 @@ add_subdirectory(lib/castleProtocol)
 
 
 add_library(minecraft_server_lib STATIC
-    src/protocol/protocol.cpp
-    src/protocol/endian.cpp
     src/network/packet_receiver.cpp
     src/network/tcp_connection.cpp
     src/network/varint.cpp
-    src/protocol/packget.cpp
+    src/server.cpp
     src/handlers/handshake.cpp
     src/handlers/status.cpp
     src/handlers/login.cpp

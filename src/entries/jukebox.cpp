@@ -2,7 +2,6 @@
 #include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
 #include "castleProtocol/protocol/configuration.hpp"
-#include "protocol/state.hpp"
 
 namespace castle::entries {
 using ConfigurationPacket =

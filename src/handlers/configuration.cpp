@@ -1,4 +1,5 @@
 #include "handlers/configuration.hpp"
+#include "castle/client.hpp"
 #include "castle/nbt.hpp"
 #include "castle/network/packet_receiver.hpp"
 #include "castle/network/packet_send.hpp"
@@ -6,14 +7,12 @@
 #include "castle/reader.hpp"
 #include "castle/writer.hpp"
 #include "castleProtocol/package/writePacket.hpp"
-#include "client.hpp"
 #include "entries/damge_types.hpp"
 #include "entries/entries.hpp"
 #include "entries/jukebox.hpp"
 #include "entries/mobs.hpp"
 #include "handlers/play.hpp"
 #include "io/nbt_loader.hpp"
-#include "protocol/protocol.hpp"
 #include "registry/banner_patterns.hpp"
 #include "registry/biome.hpp"
 #include "registry/instrument.hpp"
@@ -237,7 +236,7 @@ void handleConfiguration(Client &client) {
 	case castle::protocol::ConfigurationServerbound::
 	    AcknowledgeFinishConfiguration:
 
-		client.updateState(minecraft::protocol::State::Play);
+		client.updateState(castle::protocol::State::Play);
 
 		minecraft::protocol::handlers::initialiizePlay(client);
 		break;

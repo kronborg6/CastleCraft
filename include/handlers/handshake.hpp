@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../client.hpp"
-
+#include "castle/client.hpp"
 namespace minecraft::protocol::handlers {
-  void handleHandshake(Client& client);
+void handleHandshake(Client &client);
 }
