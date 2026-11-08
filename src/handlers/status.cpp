@@ -51,8 +51,12 @@ namespace {
 
     auto payload = packet.bytes(8);
 
-    minecraft::protocol::sendPacket(
-        connection, minecraft::protocol::StatusClientbound::PongResponse, payload);
+    castle::protocol::PacketWriter<castle::protocol::StatusClientbound> writePacket(
+        castle::protocol::StatusClientbound::PongResponse);
+
+    writePacket.addBytes(payload);
+
+    castle::network::sendPacket(connection, writePacket);
   }
 } // namespace
 

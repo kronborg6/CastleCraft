@@ -11,7 +11,6 @@
 #include "entries/mobs.hpp"
 #include "handlers/play.hpp"
 #include "io/nbt_loader.hpp"
-// #include "protocol/configuration.hpp"
 #include "protocol/protocol.hpp"
 #include "registry/banner_patterns.hpp"
 #include "registry/biome.hpp"

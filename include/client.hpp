@@ -1,18 +1,17 @@
 #pragma once
 
+#include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
+#include "castleProtocol/package/writePacket.hpp"
 #include "castleProtocol/protocol/configuration.hpp"
 #include "castleProtocol/protocol/play.hpp"
 #include "player/player.hpp"
 #include "player/postion.hpp"
-#include "protocol/configuration.hpp"
-#include "protocol/endian.hpp"
 #include "protocol/protocol.hpp"
 #include "protocol/state.hpp"
 #include "protocol/types/game_profile.hpp"
 #include <chrono>
 #include <cstdint>
-#include <vector>
 
 class Client {
   public:
@@ -57,8 +56,6 @@ class Client {
     }
 
     void connectionCheck() {
-      std::vector<std::uint8_t> data;
-
       auto now = std::chrono::steady_clock::now();
 
       auto duration = now.time_since_epoch();
@@ -70,17 +67,24 @@ class Client {
         return;
       }
 
-      minecraft::protocol::endian::writeBigEndian<std::int64_t>(milliseconds, data);
-
       switch (_state) {
-      case minecraft::protocol::State::Play:
-        minecraft::protocol::sendPacket(
-            _connection, castle::protocol::PlayClientbound::KeepAlive, data);
+      case minecraft::protocol::State::Play: {
+        castle::protocol::PacketWriter<castle::protocol::PlayClientbound> packetP(
+            castle::protocol::PlayClientbound::KeepAlive);
+
+        packetP.addInt<std::int64_t>(milliseconds);
+
+        castle::network::sendPacket(_connection, packetP);
         break;
-      case minecraft::protocol::State::Configuration:
-        minecraft::protocol::sendPacket(
-            _connection, minecraft::protocol::ConfigurationClientbound::KeepAlive, data);
-        break;
+      }
+      case minecraft::protocol::State::Configuration: {
+        castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound> packetC(
+            castle::protocol::ConfigurationClientbound::KeepAlive);
+        packetC.addInt<std::int64_t>(milliseconds);
+
+        castle::network::sendPacket(_connection, packetC);
+
+      } break;
       default:
         return;
       }

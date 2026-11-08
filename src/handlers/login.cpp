@@ -1,4 +1,8 @@
+#include "castleProtocol/protocol/login.hpp"
+#include "castle/network/packet_receiver.hpp"
+#include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
+#include "castleProtocol/package/readPackage.hpp"
 #include "client.hpp"
 #include "protocol/protocol.hpp"
 #include <algorithm>
@@ -6,8 +10,10 @@
 #include <iomanip>
 #include <iostream>
 #include <random>
+#include <span>
 #include <string>
 #include <uuid/uuid.h>
+#include <vector>
 
 namespace {
   std::string uuidToString(const std::array<uint8_t, 16>& uuid) {
@@ -43,53 +49,58 @@ namespace {
     return uuid;
   }
 
-  void handleLoginRequst(Client& client) {
+  void
+  handleLoginRequst(Client& client,
+                    castle::protocol::PacketReader<castle::protocol::LoginServerbound>& packet) {
+    auto& connection = client.connection();
 
-    csatle::network::TcpConnection& connection = client.connection();
+    std::string username = packet.string();
 
-    std::string username = minecraft::protocol::readString(connection);
-    std::array<uint8_t, 16> uuid{};
+    std::array<std::uint8_t, 16> uuid{};
+    auto uuidBytes = packet.bytes(16);
 
-    connection.readAll(uuid.data(), uuid.size());
+    std::ranges::copy(uuidBytes, uuid.begin());
 
-    std::cout << "uuid: " << uuidToString(uuid) << "\nusername: " << username << "\n";
+    std::cout << "uuid: " << uuidToString(uuid) << "\nusername: " << username << '\n';
 
     client.profile = {.uuid = uuid, .username = username, .properties = {}};
 
-    std::vector<uint8_t> data;
+    castle::protocol::PacketWriter<castle::protocol::LoginClientbound> writer(
+        castle::protocol::LoginClientbound::LoginSuccess);
 
-    data.insert(data.end(), uuid.begin(), uuid.end());
+    // Game Profile
+    writer.addBytes(uuid);
+    writer.addString(username);
+    writer.addVarInt(0); // No properties
 
-    minecraft::protocol::writeString(username, data);
-    minecraft::protocol::writeVarInt(0, data);
+    // Session ID
+    writer.addBytes(generateUuid());
 
-    std::array<uint8_t, 16> sessionId = generateUuid();
+    castle::network::sendPacket(connection, writer);
 
-    data.insert(data.end(), sessionId.begin(), sessionId.end());
-
-    minecraft::protocol::sendPacket(connection, 0x02, data);
-    std::cout << "send login susch\n";
+    std::cout << "Sent Login Success\n";
   }
 
 } // namespace
 namespace minecraft::protocol::handlers {
   void handleLogin(Client& client) {
     csatle::network::TcpConnection& connection = client.connection();
-    int32_t length = minecraft::protocol::readVarInt(connection);
-    int32_t packetId = minecraft::protocol::readVarInt(connection);
 
-    switch (packetId) {
-    case 0x00:
-      handleLoginRequst(client);
+    std::vector<std::uint8_t> data = castle::network::receivePacket(connection);
+
+    castle::protocol::PacketReader<castle::protocol::LoginServerbound> packet(data);
+
+    switch (packet.PacketId) {
+    case castle::protocol::LoginServerbound::LoginStart:
+      handleLoginRequst(client, packet);
       break;
-    case 0x03:
+    case castle::protocol::LoginServerbound::LoginAcknowledged:
       client.updateState(minecraft::protocol::State::Configuration);
       break;
     default:
-      std::cerr << "Unknown Configuration packet: 0x" << std::hex << packetId << std::dec << '\n';
+      std::cerr << "Unknown Configuration packet: 0x" << std::hex
+                << static_cast<std::int32_t>(packet.PacketId) << std::dec << '\n';
       break;
     }
-
-    std::cout << "length: " << length << "\nacketId: " << packetId << "\n";
   }
 } // namespace minecraft::protocol::handlers

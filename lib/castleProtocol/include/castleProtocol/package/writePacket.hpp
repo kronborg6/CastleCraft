@@ -43,6 +43,10 @@ namespace castle::protocol {
         endian::writeBigEndian<std::int64_t>(d, _data);
       }
 
+      void addBytes(std::span<const std::uint8_t> data) {
+        _data.insert(_data.end(), data.begin(), data.end());
+      }
+
       [[nodiscard("why ask for it if you not gona look at it")]] std::size_t size() const {
         return _data.size();
       }

@@ -7,9 +7,7 @@
 #include "castleProtocol/protocol/play.hpp"
 #include "client.hpp"
 #include "protocol/endian.hpp"
-#include "protocol/packget.hpp"
 #include "protocol/protocol.hpp"
-#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
@@ -94,7 +92,7 @@ namespace minecraft::protocol::handlers {
     // Section data: VarInt length + raw bytes
     packet.addVarInt(static_cast<std::int32_t>(sections.size()));
 
-    data.insert(data.end(), sections.begin(), sections.end());
+    packet.addBytes(sections);
 
     // Block entities: none
     packet.addVarInt(0);
@@ -130,10 +128,7 @@ namespace minecraft::protocol::handlers {
 
     packet.addVarInt(teleportId);
 
-    packet
-        .addInt<std::int64_t>(T value)
-
-            packet.addInt<std::int64_t>(endian::doubleToint64(0));
+    packet.addInt<std::int64_t>(endian::doubleToint64(0));
     packet.addInt<std::int64_t>(endian::doubleToint64(64));
     packet.addInt<std::int64_t>(endian::doubleToint64(0));
 
@@ -151,56 +146,58 @@ namespace minecraft::protocol::handlers {
 
   void initialiizePlay(Client& clinet) {
     csatle::network::TcpConnection& connection = clinet.connection();
-    std::vector<uint8_t> data;
+
+    castle::protocol::PacketWriter<castle::protocol::PlayClientbound> packet(
+        castle::protocol::PlayClientbound::Login);
 
     // Player Enitity ID
-    endian::writeBigEndian<std::int32_t>(clinet.getEntityId(), data);
+    packet.addInt<std::int32_t>(clinet.getEntityId());
     // Is Hardcore
-    data.push_back(0x00);
+    packet.addByte(0x00);
     // Dimension Names
     std::vector<std::string> dimensions = {"minecraft:overworld"};
-    minecraft::protocol::writeVarInt(static_cast<std::int32_t>(dimensions.size()), data);
+    packet.addVarInt(static_cast<std::int32_t>(dimensions.size()));
     for (const auto& dimension : dimensions) {
-      minecraft::protocol::writeString(dimension, data);
+      packet.addString(dimension);
     }
     // Max Players
-    minecraft::protocol::writeVarInt(12, data);
+    packet.addVarInt(12);
     // View Distance
-    minecraft::protocol::writeVarInt(2, data);
+    packet.addVarInt(2);
     // Simulation Distance
-    minecraft::protocol::writeVarInt(2, data);
+    packet.addVarInt(2);
     // Reduced Debug Info
-    data.push_back(0x00);
+    packet.addByte(0x00);
     // Enable respawn screen
-    data.push_back(0x01);
+    packet.addByte(0x01);
     // Do limited crafting
-    data.push_back(0x00);
+    packet.addByte(0x00);
     // Dimension Type
-    minecraft::protocol::writeVarInt(0, data);
+    packet.addVarInt(0);
     // Dimension Name
-    minecraft::protocol::writeString("minecraft:overworld", data);
+    packet.addString("minecraft:overworld");
     // Hashed seed (not used at the moment just wanna join)
-    endian::writeBigEndian<std::int64_t>(std::uint64_t{0}, data);
+    packet.addInt<std::int64_t>(std::uint64_t{0});
     // Game mode
-    minecraft::protocol::writeVarInt(1, data);
+    packet.addVarInt(1);
     // Previous Game mode
-    minecraft::protocol::writeVarInt(0, data);
+    packet.addVarInt(0);
     // is Debug (flase)
-    data.push_back(0x00);
+    packet.addByte(0x00);
     // Is Flat (false)
-    data.push_back(0x00);
+    packet.addByte(0x00);
     // Has death location
-    data.push_back(0x00);
+    packet.addByte(0x00);
     // Portal cooldown
-    minecraft::protocol::writeVarInt(1000, data);
+    packet.addVarInt(1000);
     // Sea Level
-    minecraft::protocol::writeVarInt(20, data);
+    packet.addVarInt(20);
     // Online mode
-    data.push_back(0x01);
+    packet.addByte(0x01);
     // Enforces Secure Chat
-    data.push_back(0x00);
+    packet.addByte(0x00);
 
-    minecraft::protocol::sendPacket(connection, 0x32, data);
+    castle::network::sendPacket(connection, packet);
 
     start(connection);
     playerPostion(clinet);
