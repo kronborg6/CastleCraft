@@ -8,6 +8,7 @@
 #include "castleProtocol/package/writePacket.hpp"
 #include "castleProtocol/protocol/play.hpp"
 #include "castleProtocol/protocol/varint.hpp"
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
@@ -62,8 +63,25 @@ namespace castle::handlers {
     packet.addInt<std::int32_t>(x);
     packet.addInt<std::int32_t>(z);
 
-    // Heightmaps: 0 entries
-    packet.addVarInt(0);
+    // One WORLD_SURFACE heightmap. Stone fills Y=64 through Y=79, so the first
+    // free block is Y=80. Heightmap values are relative to min_y=-64.
+    std::vector<std::uint64_t> heightmap(37, 0);
+    constexpr std::uint64_t height = 144;
+
+    for (std::size_t column = 0; column < 256; ++column) {
+      const std::size_t longIndex = column / 7;
+      const int bitOffset = (column % 7) * 9;
+
+      heightmap[longIndex] |= height << bitOffset;
+    }
+
+    packet.addVarInt(1);  // Heightmap count
+    packet.addVarInt(1);  // WORLD_SURFACE
+    packet.addVarInt(37); // Packed long count
+
+    for (const std::uint64_t value : heightmap) {
+      packet.addInt<std::int64_t>(static_cast<std::int64_t>(value));
+    }
 
     // Standard Overworld: 384 / 16 = 24 sections
     //
