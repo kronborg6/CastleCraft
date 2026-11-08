@@ -1,6 +1,7 @@
 // #include <castleProtocol/protocol/varint.hpp>
 #include "castleProtocol/protocol/varint.hpp"
 #include <stdexcept>
+#include <vector>
 
 namespace castle::protocol {
   int32_t readVarInt(std::span<const std::uint8_t> data, std::size_t& offset) {
@@ -40,5 +41,18 @@ namespace castle::protocol {
     offset += static_cast<std::size_t>(length);
 
     return result;
+  }
+
+  void writeVarInt(int32_t value, std::vector<uint8_t>& output) {
+    while (true) {
+      if ((value & ~0x7F) == 0) {
+        output.push_back(static_cast<uint8_t>(value));
+        return;
+      }
+
+      output.push_back(static_cast<uint8_t>((value & 0x7F) | 0x80));
+
+      value = static_cast<uint32_t>(value) >> 7;
+    }
   }
 } // namespace castle::protocol

@@ -1,7 +1,9 @@
 #include "handlers/status.hpp"
 #include "castle/network/packet_receiver.hpp"
+#include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
 #include "castleProtocol/package/readPackage.hpp"
+#include "castleProtocol/package/writePacket.hpp"
 #include "castleProtocol/protocol/status.hpp"
 #include "client.hpp"
 #include "protocol/protocol.hpp"
@@ -35,10 +37,12 @@ namespace {
 
     std::vector<uint8_t> response;
 
-    minecraft::protocol::writeString(json, response);
+    castle::protocol::PacketWriter<castle::protocol::StatusClientbound> packet(
+        castle::protocol::StatusClientbound::StatusResponse);
 
-    minecraft::protocol::sendPacket(
-        client.connection(), minecraft::protocol::StatusServerbound::StatusRequest, response);
+    packet.addString(json);
+
+    castle::network::sendPacket(client.connection(), packet);
   }
   void
   handlePingRequest(Client& client,
@@ -68,11 +72,6 @@ namespace minecraft::protocol::handlers {
       handleStatusRequest(client);
       break;
     case castle::protocol::StatusServerbound::PingRequest:
-      std::cout << "we se ping\n";
-      std::cout << "we se ping\n";
-      std::cout << "we se ping\n";
-      std::cout << "we se ping\n";
-      std::cout << "we se ping\n";
       handlePingRequest(client, packet);
       break;
     default:

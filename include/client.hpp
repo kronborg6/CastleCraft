@@ -94,5 +94,6 @@ class Client {
     csatle::network::TcpConnection _connection;
     Postion _postion;
     bool _connected = true;
+
     minecraft::protocol::State _state = minecraft::protocol::State::Handshake;
 };

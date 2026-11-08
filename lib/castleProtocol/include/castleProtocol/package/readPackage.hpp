@@ -1,23 +1,15 @@
 #pragma once
 #include "../endian.hpp"
 
-#include "castleProtocol/protocol/varint.hpp"
+#include "castleProtocol/package/packet.hpp"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <span>
 #include <stdexcept>
 #include <string>
-#include <type_traits>
-#include <utility>
-#include <vector>
-
-template <typename T>
-concept Integral = std::is_integral_v<T>;
 
 namespace castle::protocol {
-  template <typename T>
-  concept Enum = std::is_enum_v<T>;
   template <Enum E> class PacketReader {
       // fields order does matter
       // is it good to need a order
