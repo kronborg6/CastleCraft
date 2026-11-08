@@ -1,8 +1,6 @@
-#include "endian.hpp"
+#include "../include/castleProtocol/endian.hpp"
 #include <bit>
 #include <cstdint>
-#include <type_traits>
-#include <vector>
 namespace castle::endian {
 
   uint32_t floatToUint32(float value) {

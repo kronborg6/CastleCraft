@@ -1,6 +1,6 @@
 build/
 
-.clang-format
+*.clang-format
 
 rust_proxcy/target
 

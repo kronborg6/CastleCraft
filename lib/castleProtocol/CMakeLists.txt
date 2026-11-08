@@ -13,6 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Library
 add_library(castleProtocol STATIC
+    src/endian.cpp
     src/protocol/varint.cpp
     src/uuid.cpp
     src/package.cpp
