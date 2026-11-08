@@ -63,10 +63,10 @@ namespace castle::handlers {
     packet.addInt<std::int32_t>(x);
     packet.addInt<std::int32_t>(z);
 
-    // One WORLD_SURFACE heightmap. Stone fills Y=64 through Y=79, so the first
-    // free block is Y=80. Heightmap values are relative to min_y=-64.
+    // One WORLD_SURFACE heightmap. Stone fills Y=48 through Y=63, so the first
+    // free block is Y=64. Heightmap values are relative to min_y=-64.
     std::vector<std::uint64_t> heightmap(37, 0);
-    constexpr std::uint64_t height = 144;
+    constexpr std::uint64_t height = 128;
 
     for (std::size_t column = 0; column < 256; ++column) {
       const std::size_t longIndex = column / 7;
@@ -96,7 +96,7 @@ namespace castle::handlers {
 
       // Block states: single-valued palette
       sections.push_back(0x00); // Bits per entry = 0
-      castle::protocol::writeVarInt(randomBlock ? 1 : 0,
+      castle::protocol::writeVarInt(randomBlock ? rand() % 25 + 1 : 0,
                                     sections); // Air
 
       // Biomes: single-valued palette
@@ -187,9 +187,9 @@ namespace castle::handlers {
     // Max Players
     packet.addVarInt(12);
     // View Distance
-    packet.addVarInt(2);
+    packet.addVarInt(10);
     // Simulation Distance
-    packet.addVarInt(2);
+    packet.addVarInt(10);
     // Reduced Debug Info
     packet.addByte(0x00);
     // Enable respawn screen
@@ -228,21 +228,18 @@ namespace castle::handlers {
     setCenterChuck(connection);
     startCuck(connection);
 
-    for (int i = -2; i <= 2; i++) {
-      for (int x = -2; x <= 2; x++) {
+    for (int i = -10; i <= 10; i++) {
+      for (int x = -10; x <= 10; x++) {
         chuck(connection, i, x);
       }
     }
-    finishChunkBatch(connection, 25);
+    finishChunkBatch(connection, 441);
   }
 
   // TODO
-  // DONE Game Event (0x27) — Send event 13 to tell the client to start waiting
-  // for chunks. DONE (not barebone but close) Synchronize Player Position (0x49)
-  // — Set the player's spawn position and rotation. DONE (barebone) Set Center
-  // Chunk (0x60) — Tell the client which chunk to load around. DONE (barebone)
-  // Chunk Data and Update Light (0x2E) — Send terrain and lighting information.
-  // Keep Alive (0x2D) — Keep the connection alive.
+  // update chucks when player move at the moment we get som invisble blcoks becus the server never
+  // send new blocks/chunks
+  // Center Chunk Data and Update Light (0x2E) — Send terrain and lighting information.
 
   void handlePlayState(Client& client) {
     csatle::network::TcpConnection& connection = client.connection();
