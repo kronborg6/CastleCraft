@@ -1,14 +1,14 @@
 #include "entries/entries.hpp"
+#include "castle/network/tcp_connection.hpp"
 #include "entries/banner.hpp"
 #include "entries/damge_types.hpp"
 #include "protocol/protocol.hpp"
 #include "registry/damge_types.hpp"
-#include "tcp.hpp"
 #include <cstdint>
 #include <vector>
 namespace castle::entries {
 
-  void entriesTypes(TcpConnection& connection) {
+  void entriesTypes(csatle::network::TcpConnection& connection) {
     std::vector<std::uint8_t> output;
     minecraft::protocol::writeVarInt(3, output);
 

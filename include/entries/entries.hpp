@@ -1,6 +1,6 @@
 #pragma once
-#include "tcp.hpp"
+#include "castle/network/tcp_connection.hpp"
 namespace castle::entries {
 
-  void entriesTypes(TcpConnection& connection);
+  void entriesTypes(csatle::network::TcpConnection& connection);
 }

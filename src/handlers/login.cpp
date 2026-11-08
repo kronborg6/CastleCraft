@@ -1,6 +1,6 @@
+#include "castle/network/tcp_connection.hpp"
 #include "client.hpp"
 #include "protocol/protocol.hpp"
-#include "tcp.hpp"
 #include <algorithm>
 #include <cstdint>
 #include <iomanip>
@@ -45,7 +45,7 @@ namespace {
 
   void handleLoginRequst(Client& client) {
 
-    TcpConnection& connection = client.connection();
+    csatle::network::TcpConnection& connection = client.connection();
 
     std::string username = minecraft::protocol::readString(connection);
     std::array<uint8_t, 16> uuid{};
@@ -74,7 +74,7 @@ namespace {
 } // namespace
 namespace minecraft::protocol::handlers {
   void handleLogin(Client& client) {
-    TcpConnection& connection = client.connection();
+    csatle::network::TcpConnection& connection = client.connection();
     int32_t length = minecraft::protocol::readVarInt(connection);
     int32_t packetId = minecraft::protocol::readVarInt(connection);
 

@@ -1,13 +1,13 @@
 #include "registry/banner_patterns.hpp"
+#include "castle/network/tcp_connection.hpp"
 #include "protocol/protocol.hpp"
-#include "tcp.hpp"
 #include <algorithm>
 #include <cstdint>
 #include <stdexcept>
 #include <string>
 namespace castle::registry {
 
-  void BannerPatternRegistry(TcpConnection& connection) {
+  void BannerPatternRegistry(csatle::network::TcpConnection& connection) {
 
     std::vector<uint8_t> data;
     minecraft::protocol::writeString("minecraft:banner_pattern", data);

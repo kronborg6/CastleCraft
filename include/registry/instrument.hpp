@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tcp.hpp"
+#include "castle/network/tcp_connection.hpp"
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -16,6 +16,6 @@ namespace castle::registry {
       "minecraft:dream_goat_horn",
   };
 
-  void instrumentRegistry(TcpConnection& connection);
+  void instrumentRegistry(csatle::network::TcpConnection& connection);
   std::uint16_t instrumentTypeId(std::string_view name);
 } // namespace castle::registry

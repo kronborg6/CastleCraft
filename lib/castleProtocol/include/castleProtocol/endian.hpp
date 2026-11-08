@@ -1,13 +1,35 @@
 #pragma once
 #include <cstdint>
 #include <span>
+#include <stdexcept>
 #include <vector>
 
 namespace castle::endian {
-  template <typename T> void writeBigEndian(T value, std::vector<std::uint8_t>& data);
-  template <typename T> void writeLittleEndian(T value, std::vector<std::uint8_t>& data);
+  template <std::integral T> void writeBigEndian(T value, std::vector<std::uint8_t>& data) {
+    for (int shift = static_cast<int>(sizeof(T) * 8) - 8; shift >= 0; shift -= 8) {
+      data.push_back(static_cast<std::uint8_t>((value >> shift) & 0xFF));
+    }
+  }
 
-  template <std::integral U> U readBigEndian(const std::span<const uint8_t> data, size_t& offset);
+  template <std::unsigned_integral T>
+  void writeLittleEndian(T value, std::vector<std::uint8_t>& data) {
+    for (int shift = 0; shift < static_cast<int>(sizeof(T) * 8); shift += 8) {
+      data.push_back(static_cast<std::uint8_t>((value >> shift) & 0xFF));
+    }
+  }
+
+  template <std::integral U>
+  [[nodiscard]] U readBigEndian(std::span<const std::uint8_t> data, std::size_t& offset) {
+    if (offset > data.size() || data.size() - offset < sizeof(U)) {
+      throw std::runtime_error("readBigEndian: unexpected end of data");
+    }
+    U value = 0;
+    for (std::size_t i = 0; i < sizeof(U); ++i) {
+      value = static_cast<U>((value << 8) | data[offset + i]);
+    }
+    offset += sizeof(U);
+    return value;
+  }
 
   uint32_t floatToUint32(float from);
   int32_t floatToint32(float from);

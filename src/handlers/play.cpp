@@ -1,9 +1,12 @@
 #include "handlers/play.hpp"
+#include "castle/network/packet_receiver.hpp"
+#include "castle/network/tcp_connection.hpp"
+#include "castleProtocol/package/readPackage.hpp"
+#include "castleProtocol/protocol/play.hpp"
 #include "client.hpp"
 #include "protocol/endian.hpp"
 #include "protocol/packget.hpp"
 #include "protocol/protocol.hpp"
-#include "tcp.hpp"
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -16,7 +19,7 @@ using namespace minecraft::protocol;
 namespace {} // namespace
 
 namespace minecraft::protocol::handlers {
-  void start(TcpConnection& connection) {
+  void start(csatle::network::TcpConnection& connection) {
     std::vector<std::uint8_t> data;
 
     data.push_back(0xd);
@@ -27,7 +30,7 @@ namespace minecraft::protocol::handlers {
     minecraft::protocol::sendPacket(connection, 0x27, data);
   }
 
-  void setCenterChuck(TcpConnection& connection) {
+  void setCenterChuck(csatle::network::TcpConnection& connection) {
     std::vector<std::uint8_t> data;
     writeVarInt(0, data);
     writeVarInt(0, data);
@@ -35,17 +38,17 @@ namespace minecraft::protocol::handlers {
     sendPacket(connection, 0x60, data);
   }
 
-  void startCuck(TcpConnection& connection) {
+  void startCuck(csatle::network::TcpConnection& connection) {
     std::vector<std::uint8_t> data;
     sendPacket(connection, 0x0C, data);
   }
-  void finishChunkBatch(TcpConnection& connection, std::int32_t chucks) {
+  void finishChunkBatch(csatle::network::TcpConnection& connection, std::int32_t chucks) {
     std::vector<std::uint8_t> data;
     writeVarInt(chucks, data);
     sendPacket(connection, 0x0B, data);
   }
 
-  void chuck(TcpConnection& connection, std::int32_t x, std::int32_t y) {
+  void chuck(csatle::network::TcpConnection& connection, std::int32_t x, std::int32_t y) {
     std::vector<std::uint8_t> data;
     std::vector<std::uint8_t> sections;
 
@@ -129,7 +132,7 @@ namespace minecraft::protocol::handlers {
   }
 
   void initialiizePlay(Client& clinet) {
-    TcpConnection& connection = clinet.connection();
+    csatle::network::TcpConnection& connection = clinet.connection();
     std::vector<uint8_t> data;
 
     // Player Enitity ID
@@ -202,17 +205,17 @@ namespace minecraft::protocol::handlers {
   // information. Keep Alive (0x2D) — Keep the connection alive.
 
   void handlePlayState(Client& client) {
+    csatle::network::TcpConnection& connection = client.connection();
 
-    TcpConnection& connection = client.connection();
+    std::vector<std::uint8_t> data = castle::network::receivePacket(connection);
 
-    Packget packget = createPacket(connection);
-    std::cout << "packetLength: " << packget.data.size() << " packetId: " << packget.packetId
-              << "\n";
+    castle::protocol::PacketReader<castle::protocol::PlayServerbound> packet(data);
 
-    switch (packget.packetId) {
-    case 0x00: {
-      std::size_t offset = 0;
-      std::int32_t teleportId = minecraft::protocol::readVarInt(packget.data, offset);
+    // Packget packget = createPacket(connection);
+
+    switch (packet.PacketId) {
+    case castle::protocol::PlayServerbound::ConfirmTeleportation: {
+      std::int32_t teleportId = packet.varInt();
 
       std::cout << "palyerTeleportId: " << client.getPlayer().teleportId() << "\n"
                 << "TeleportId: " << teleportId << std::endl;
@@ -224,11 +227,10 @@ namespace minecraft::protocol::handlers {
 
       break;
     }
-    case 0x32:
+    case castle::protocol::PlayServerbound::ResourcePackResponse:
       break;
-    case 0x1C: {
-      std::size_t offset = 0;
-      auto value = endian::readBigEndian<std::int64_t>(packget.data, offset);
+    case castle::protocol::PlayServerbound::KeepAlive: {
+      auto value = packet.getInt<std::int64_t>();
       if (value != client.lastPing) {
         std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
                   << "\n";

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tcp.hpp"
+#include "castle/network/tcp_connection.hpp"
 namespace castle::registry {
-  void potteryEntrie(TcpConnection& connection);
+  void potteryEntrie(csatle::network::TcpConnection& connection);
 } // namespace castle::registry

@@ -1,8 +1,11 @@
 #include "handlers/status.hpp"
+#include "castle/network/packet_receiver.hpp"
+#include "castle/network/tcp_connection.hpp"
+#include "castleProtocol/package/readPackage.hpp"
+#include "castleProtocol/protocol/status.hpp"
 #include "client.hpp"
 #include "protocol/protocol.hpp"
 #include "protocol/status.hpp"
-#include "tcp.hpp"
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -37,12 +40,12 @@ namespace {
     minecraft::protocol::sendPacket(
         client.connection(), minecraft::protocol::StatusServerbound::StatusRequest, response);
   }
-  void handlePingRequest(Client& client) {
-    TcpConnection& connection = client.connection();
+  void
+  handlePingRequest(Client& client,
+                    castle::protocol::PacketReader<castle::protocol::StatusServerbound>& packet) {
+    csatle::network::TcpConnection& connection = client.connection();
 
-    uint8_t payload[8];
-
-    connection.readAll(payload, sizeof(payload));
+    auto payload = packet.bytes(8);
 
     minecraft::protocol::sendPacket(
         connection, minecraft::protocol::StatusClientbound::PongResponse, payload);
@@ -54,24 +57,27 @@ namespace minecraft::protocol::handlers {
 
   void handleStatus(Client& client) {
 
-    TcpConnection& connection = client.connection();
+    csatle::network::TcpConnection& connection = client.connection();
 
-    minecraft::protocol::readVarInt(connection);
-    int32_t packetId = minecraft::protocol::readVarInt(connection);
-    switch (static_cast<StatusServerbound>(packetId)) {
-    case StatusServerbound::StatusRequest:
+    std::vector<std::uint8_t> data = castle::network::receivePacket(connection);
+
+    castle::protocol::PacketReader<castle::protocol::StatusServerbound> packet(data);
+
+    switch (packet.PacketId) {
+    case castle::protocol::StatusServerbound::StatusRequest:
       handleStatusRequest(client);
       break;
-    case StatusServerbound::PingRequest:
+    case castle::protocol::StatusServerbound::PingRequest:
       std::cout << "we se ping\n";
       std::cout << "we se ping\n";
       std::cout << "we se ping\n";
       std::cout << "we se ping\n";
       std::cout << "we se ping\n";
-      handlePingRequest(client);
+      handlePingRequest(client, packet);
       break;
     default:
-      std::cerr << "Unknown packet in Status state: " << packetId << '\n';
+      std::cerr << "Unknown packet in Status state: " << static_cast<std::int32_t>(packet.PacketId)
+                << '\n';
       break;
     }
     // implementation

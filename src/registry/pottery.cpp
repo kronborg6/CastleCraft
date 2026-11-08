@@ -1,10 +1,10 @@
 #include "registry/pottery.hpp"
+#include "castle/network/tcp_connection.hpp"
 #include "protocol/protocol.hpp"
-#include "tcp.hpp"
 #include <cstdint>
 #include <vector>
 namespace castle::registry {
-  void potteryEntrie(TcpConnection& connection) {
+  void potteryEntrie(csatle::network::TcpConnection& connection) {
     std::vector<std::uint8_t> output;
     constexpr std::array patterns = {
         "minecraft:angler",     "minecraft:archer", "minecraft:arms_up", "minecraft:blade",

@@ -1,10 +1,10 @@
 #include "registry/biome.hpp"
+#include "castle/network/tcp_connection.hpp"
 #include "protocol/protocol.hpp"
-#include "tcp.hpp"
 #include <cstdint>
 #include <vector>
 namespace castle::registry {
-  void biomeRegistry(TcpConnection& connection) {
+  void biomeRegistry(csatle::network::TcpConnection& connection) {
     std::vector<std::uint8_t> data;
 
     minecraft::protocol::writeString("minecraft:worldgen/biome", data);

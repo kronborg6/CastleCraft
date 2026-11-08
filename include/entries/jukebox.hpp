@@ -1,8 +1,6 @@
 #pragma once
-#include "tcp.hpp"
-#include <cstdint>
-#include <vector>
+#include "castle/network/tcp_connection.hpp"
 namespace castle::entries {
 
-  void jukeboxEntrie(TcpConnection& connection);
+  void jukeboxEntrie(csatle::network::TcpConnection& connection);
 }

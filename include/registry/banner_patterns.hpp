@@ -1,5 +1,5 @@
 #pragma once
-#include "tcp.hpp"
+#include "castle/network/tcp_connection.hpp"
 #include <cstdint>
 #include <string>
 #include <string_view>
@@ -52,6 +52,6 @@ namespace castle::registry {
       "minecraft:triangles_top",
   };
 
-  void BannerPatternRegistry(TcpConnection& connection);
+  void BannerPatternRegistry(csatle::network::TcpConnection& connection);
   std::uint16_t bannerPatternId(std::string_view name);
 } // namespace castle::registry

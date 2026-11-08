@@ -1,11 +1,11 @@
 #include "entries/mobs.hpp"
+#include "castle/network/tcp_connection.hpp"
 #include "protocol/protocol.hpp"
-#include "tcp.hpp"
 #include <cstdint>
 #include <vector>
 
 namespace castle::entries {
-  void cowEntrie(TcpConnection& connection) {
+  void cowEntrie(csatle::network::TcpConnection& connection) {
 
     std::vector<uint8_t> data;
     minecraft::protocol::writeString("minecraft:cow_variant", data);
@@ -24,7 +24,7 @@ namespace castle::entries {
 
     minecraft::protocol::sendPacket(connection, 0x07, data);
   }
-  void cowSoundEntrie(TcpConnection& connection) {
+  void cowSoundEntrie(csatle::network::TcpConnection& connection) {
     std::vector<std::uint8_t> data;
     minecraft::protocol::writeString("minecraft:cow_sound_variant", data);
     minecraft::protocol::writeVarInt(2, data);
@@ -37,7 +37,7 @@ namespace castle::entries {
     minecraft::protocol::sendPacket(connection, 0x07, data);
   }
 
-  void catEntrie(TcpConnection& connection) {
+  void catEntrie(csatle::network::TcpConnection& connection) {
     std::vector<std::uint8_t> data;
 
     minecraft::protocol::writeString("minecraft:cat_variant", data);
@@ -60,7 +60,7 @@ namespace castle::entries {
 
     minecraft::protocol::sendPacket(connection, 0x07, data);
   }
-  void catSoundEntrie(TcpConnection& connection) {
+  void catSoundEntrie(csatle::network::TcpConnection& connection) {
 
     std::vector<std::uint8_t> data;
     minecraft::protocol::writeString("minecraft:cat_sound_variant", data);
@@ -73,7 +73,7 @@ namespace castle::entries {
 
     minecraft::protocol::sendPacket(connection, 0x07, data);
   }
-  void chickenEntrie(TcpConnection& connection) {
+  void chickenEntrie(csatle::network::TcpConnection& connection) {
     std::vector<uint8_t> data;
     minecraft::protocol::writeString("minecraft:chicken_variant", data);
     minecraft::protocol::writeVarInt(3, data);
@@ -91,7 +91,7 @@ namespace castle::entries {
 
     minecraft::protocol::sendPacket(connection, 0x07, data);
   }
-  void chickenSoundEntrie(TcpConnection& connection) {
+  void chickenSoundEntrie(csatle::network::TcpConnection& connection) {
     std::vector<std::uint8_t> data;
     minecraft::protocol::writeString("minecraft:chicken_sound_variant", data);
     minecraft::protocol::writeVarInt(2, data);
@@ -103,7 +103,7 @@ namespace castle::entries {
 
     minecraft::protocol::sendPacket(connection, 0x07, data);
   }
-  void frogEntrie(TcpConnection& connection) {
+  void frogEntrie(csatle::network::TcpConnection& connection) {
     std::vector<uint8_t> data;
     minecraft::protocol::writeString("minecraft:frog_variant", data);
     minecraft::protocol::writeVarInt(3, data);
@@ -121,7 +121,7 @@ namespace castle::entries {
 
     minecraft::protocol::sendPacket(connection, 0x07, data);
   }
-  void paintingEntrie(TcpConnection& connection) {
+  void paintingEntrie(csatle::network::TcpConnection& connection) {
     std::vector<std::uint8_t> data;
 
     minecraft::protocol::writeString("minecraft:painting_variant", data);
@@ -162,7 +162,7 @@ namespace castle::entries {
 
     minecraft::protocol::sendPacket(connection, 0x07, data);
   }
-  void pigEntrie(TcpConnection& connection) {
+  void pigEntrie(csatle::network::TcpConnection& connection) {
     std::vector<uint8_t> data;
     minecraft::protocol::writeString("minecraft:pig_variant", data);
     minecraft::protocol::writeVarInt(3, data);
@@ -180,7 +180,7 @@ namespace castle::entries {
 
     minecraft::protocol::sendPacket(connection, 0x07, data);
   }
-  void pigSoundEntrie(TcpConnection& connection) {
+  void pigSoundEntrie(csatle::network::TcpConnection& connection) {
     std::vector<uint8_t> data;
     minecraft::protocol::writeString("minecraft:pig_sound_variant", data);
     minecraft::protocol::writeVarInt(3, data);
@@ -198,7 +198,7 @@ namespace castle::entries {
 
     minecraft::protocol::sendPacket(connection, 0x07, data);
   }
-  void wolfEntrie(TcpConnection& connection) {
+  void wolfEntrie(csatle::network::TcpConnection& connection) {
     std::vector<std::uint8_t> data;
 
     minecraft::protocol::writeString("minecraft:wolf_variant", data);
@@ -219,7 +219,7 @@ namespace castle::entries {
 
     minecraft::protocol::sendPacket(connection, 0x07, data);
   }
-  void wolfSoundEntrie(TcpConnection& connection) {
+  void wolfSoundEntrie(csatle::network::TcpConnection& connection) {
     std::vector<std::uint8_t> data;
 
     minecraft::protocol::writeString("minecraft:wolf_sound_variant", data);
@@ -238,7 +238,7 @@ namespace castle::entries {
 
     minecraft::protocol::sendPacket(connection, 0x07, data);
   }
-  void zombieEntrie(TcpConnection& connection) {
+  void zombieEntrie(csatle::network::TcpConnection& connection) {
     std::vector<std::uint8_t> data;
 
     minecraft::protocol::writeString("minecraft:zombie_nautilus_variant", data);

@@ -1,11 +1,11 @@
 #include "entries/damge_types.hpp"
+#include "castle/network/tcp_connection.hpp"
 #include "protocol/protocol.hpp"
 #include "registry/damge_types.hpp"
-#include "tcp.hpp"
 #include <cstdint>
 #include <vector>
 namespace castle::entries {
-  void damgeTypesEntrie(TcpConnection& connection) {
+  void damgeTypesEntrie(csatle::network::TcpConnection& connection) {
 
     std::vector<uint8_t> data;
     minecraft::protocol::writeString("minecraft:damage_type", data);

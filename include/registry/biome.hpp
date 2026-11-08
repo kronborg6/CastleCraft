@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tcp.hpp"
+#include "castle/network/tcp_connection.hpp"
 #include <array>
 namespace castle::registry {
 
@@ -8,5 +8,5 @@ namespace castle::registry {
       "minecraft:plains",
   };
 
-  void biomeRegistry(TcpConnection& connection);
+  void biomeRegistry(csatle::network::TcpConnection& connection);
 } // namespace castle::registry

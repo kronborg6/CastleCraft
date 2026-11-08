@@ -1,10 +1,10 @@
 #include "entries/jukebox.hpp"
+#include "castle/network/tcp_connection.hpp"
 #include "protocol/protocol.hpp"
 #include "protocol/state.hpp"
-#include "tcp.hpp"
 
 namespace castle::entries {
-  void jukeboxEntrie(TcpConnection& connection) {
+  void jukeboxEntrie(csatle::network::TcpConnection& connection) {
     std::vector<std::uint8_t> output;
     constexpr std::array variants = {
         "minecraft:11",        "minecraft:13",           "minecraft:5",

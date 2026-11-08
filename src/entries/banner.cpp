@@ -1,7 +1,6 @@
 #include "entries/banner.hpp"
 #include "protocol/protocol.hpp"
 #include "registry/banner_patterns.hpp"
-#include "tcp.hpp"
 #include <array>
 #include <cstdint>
 #include <vector>

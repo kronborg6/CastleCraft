@@ -1,6 +1,6 @@
 #include "registry/instrument.hpp"
+#include "castle/network/tcp_connection.hpp"
 #include "protocol/protocol.hpp"
-#include "tcp.hpp"
 #include <algorithm>
 #include <cstdint>
 #include <stdexcept>
@@ -8,7 +8,7 @@
 
 namespace castle::registry {
 
-  void instrumentRegistry(TcpConnection& connection) {
+  void instrumentRegistry(csatle::network::TcpConnection& connection) {
     std::vector<std::uint8_t> data;
 
     minecraft::protocol::writeString("minecraft:instrument", data);
