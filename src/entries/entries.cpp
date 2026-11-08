@@ -1,47 +1,54 @@
 #include "entries/entries.hpp"
+#include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
+#include "castleProtocol/protocol/configuration.hpp"
 #include "entries/banner.hpp"
 #include "entries/damge_types.hpp"
-#include "protocol/protocol.hpp"
 #include "registry/damge_types.hpp"
-#include <cstdint>
-#include <vector>
 namespace castle::entries {
+using ConfigurationPacket =
+    castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound>;
 
-  void entriesTypes(csatle::network::TcpConnection& connection) {
-    std::vector<std::uint8_t> output;
-    minecraft::protocol::writeVarInt(3, output);
+void entriesTypes(csatle::network::TcpConnection &connection) {
+	ConfigurationPacket packet(
+	    castle::protocol::ConfigurationClientbound::UpdateTags);
 
-    minecraft::protocol::writeString("minecraft:damage_type", output);
+	packet.addVarInt(3);
 
-    // Number of tags
-    minecraft::protocol::writeVarInt(3, output);
+	packet.addString("minecraft:damage_type");
 
-    explosionTypesEntrie(output);
-    fireTypesEntrie(output);
-    bypassShieldTypesEntrie(output);
+	// Number of tags
+	packet.addVarInt(3);
 
-    minecraft::protocol::writeString("minecraft:timeline", output);
+	explosionTypesEntrie(packet);
+	fireTypesEntrie(packet);
+	bypassShieldTypesEntrie(packet);
 
-    // Number of tags
-    minecraft::protocol::writeVarInt(2, output);
+	packet.addString("minecraft:timeline");
 
-    // Tag 0: minecraft:universal
-    minecraft::protocol::writeString("minecraft:universal", output);
-    minecraft::protocol::writeVarInt(1, output);
-    minecraft::protocol::writeVarInt(3, output);
+	// Number of tags
+	packet.addVarInt(2);
 
-    // Tag 1: minecraft:in_overworld
-    minecraft::protocol::writeString("minecraft:in_overworld", output);
-    minecraft::protocol::writeVarInt(4, output);
+	// Tag 0: minecraft:universal
+	packet.addString("minecraft:universal");
 
-    for (std::int32_t id = 0; id < 4; ++id) {
-      minecraft::protocol::writeVarInt(id, output);
-    }
+	packet.addVarInt(1);
 
-    bannerTagsEntrie(output);
+	packet.addVarInt(3);
 
-    // Send Update Tags
-    minecraft::protocol::sendPacket(connection, 0x0E, output);
-  }
+	// Tag 1: minecraft:in_overworld
+	packet.addString("minecraft:in_overworld");
+
+	packet.addVarInt(4);
+
+	for (std::int32_t id = 0; id < 4; ++id) {
+
+		packet.addVarInt(id);
+	}
+
+	bannerTagsEntrie(packet);
+
+	// Send Update Tags
+	castle::network::sendPacket(connection, packet);
+}
 } // namespace castle::entries

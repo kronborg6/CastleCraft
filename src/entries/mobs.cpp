@@ -1,130 +1,148 @@
 #include "entries/mobs.hpp"
+#include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
-#include "protocol/protocol.hpp"
+#include "castleProtocol/package/writePacket.hpp"
+#include "castleProtocol/protocol/configuration.hpp"
+#include <array>
 #include <cstdint>
-#include <vector>
 
 namespace castle::entries {
+  using ConfigurationPacket =
+      castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound>;
+
   void cowEntrie(csatle::network::TcpConnection& connection) {
+    ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
+    packet.addString("minecraft:cow_variant");
 
-    std::vector<uint8_t> data;
-    minecraft::protocol::writeString("minecraft:cow_variant", data);
-    minecraft::protocol::writeVarInt(3, data);
-    // Cold
-    minecraft::protocol::writeString("minecraft:cold", data);
-    data.push_back(0x00);
+    packet.addVarInt(3);
 
-    // Temperate
-    minecraft::protocol::writeString("minecraft:temperate", data);
-    data.push_back(0x00);
+    for (const auto& variant : {"minecraft:cold", "minecraft:temperate", "minecraft:warm"}) {
 
-    // Warm
-    minecraft::protocol::writeString("minecraft:warm", data);
-    data.push_back(0x00);
+      packet.addString(variant);
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+      packet.addByte(0x00);
+    }
+
+    castle::network::sendPacket(connection, packet);
   }
+
   void cowSoundEntrie(csatle::network::TcpConnection& connection) {
-    std::vector<std::uint8_t> data;
-    minecraft::protocol::writeString("minecraft:cow_sound_variant", data);
-    minecraft::protocol::writeVarInt(2, data);
+    ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
-    minecraft::protocol::writeString("minecraft:classic", data);
-    data.push_back(0x00);
-    minecraft::protocol::writeString("minecraft:moody", data);
-    data.push_back(0x00);
+    packet.addString("minecraft:cow_sound_variant");
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+    packet.addVarInt(2);
+
+    for (const auto& variant : {"minecraft:classic", "minecraft:moody"}) {
+
+      packet.addString(variant);
+
+      packet.addByte(0x00);
+    }
+
+    castle::network::sendPacket(connection, packet);
   }
 
   void catEntrie(csatle::network::TcpConnection& connection) {
-    std::vector<std::uint8_t> data;
+    ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
+    packet.addString("minecraft:cat_variant");
+    constexpr std::array variants = {"minecraft:all_black",
+                                     "minecraft:british_shorthair",
+                                     "minecraft:calico",
+                                     "minecraft:jellie",
+                                     "minecraft:persian",
+                                     "minecraft:ragdoll",
+                                     "minecraft:red",
+                                     "minecraft:siamese",
+                                     "minecraft:tabby",
+                                     "minecraft:black",
+                                     "minecraft:white"};
 
-    minecraft::protocol::writeString("minecraft:cat_variant", data);
-    minecraft::protocol::writeVarInt(11, data);
-
-    for (const auto& variant : {"minecraft:all_black",
-                                "minecraft:british_shorthair",
-                                "minecraft:calico",
-                                "minecraft:jellie",
-                                "minecraft:persian",
-                                "minecraft:ragdoll",
-                                "minecraft:red",
-                                "minecraft:siamese",
-                                "minecraft:tabby",
-                                "minecraft:black",
-                                "minecraft:white"}) {
-      minecraft::protocol::writeString(variant, data);
-      data.push_back(0x00);
+    packet.addVarInt(static_cast<std::int32_t>(variants.size()));
+    for (const auto& variant : variants) {
+      packet.addString(variant);
+      packet.addByte(0x00);
     }
-
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+    castle::network::sendPacket(connection, packet);
   }
+
   void catSoundEntrie(csatle::network::TcpConnection& connection) {
 
-    std::vector<std::uint8_t> data;
-    minecraft::protocol::writeString("minecraft:cat_sound_variant", data);
-    minecraft::protocol::writeVarInt(2, data);
+    ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
-    minecraft::protocol::writeString("minecraft:classic", data);
-    data.push_back(0x00);
-    minecraft::protocol::writeString("minecraft:royal", data);
-    data.push_back(0x00);
+    packet.addString("minecraft:cat_sound_variant");
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+    packet.addVarInt(2);
+
+    for (const auto& variant : {"minecraft:classic", "minecraft:royal"}) {
+
+      packet.addString(variant);
+
+      packet.addByte(0x00);
+    }
+
+    castle::network::sendPacket(connection, packet);
   }
+
   void chickenEntrie(csatle::network::TcpConnection& connection) {
-    std::vector<uint8_t> data;
-    minecraft::protocol::writeString("minecraft:chicken_variant", data);
-    minecraft::protocol::writeVarInt(3, data);
-    // Cold
-    minecraft::protocol::writeString("minecraft:cold", data);
-    data.push_back(0x00);
 
-    // Temperate
-    minecraft::protocol::writeString("minecraft:temperate", data);
-    data.push_back(0x00);
+    ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
-    // Warm
-    minecraft::protocol::writeString("minecraft:warm", data);
-    data.push_back(0x00);
+    packet.addString("minecraft:chicken_variant");
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+    packet.addVarInt(3);
+
+    for (const auto& variant : {"minecraft:cold", "minecraft:temperate", "minecraft:warm"}) {
+
+      packet.addString(variant);
+
+      packet.addByte(0x00);
+    }
+
+    castle::network::sendPacket(connection, packet);
   }
+
   void chickenSoundEntrie(csatle::network::TcpConnection& connection) {
-    std::vector<std::uint8_t> data;
-    minecraft::protocol::writeString("minecraft:chicken_sound_variant", data);
-    minecraft::protocol::writeVarInt(2, data);
 
-    minecraft::protocol::writeString("minecraft:classic", data);
-    data.push_back(0x00);
-    minecraft::protocol::writeString("minecraft:picky", data);
-    data.push_back(0x00);
+    ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+    packet.addString("minecraft:chicken_sound_variant");
+
+    packet.addVarInt(2);
+
+    for (const auto& variant : {"minecraft:classic", "minecraft:picky"}) {
+
+      packet.addString(variant);
+
+      packet.addByte(0x00);
+    }
+
+    castle::network::sendPacket(connection, packet);
   }
+
   void frogEntrie(csatle::network::TcpConnection& connection) {
-    std::vector<uint8_t> data;
-    minecraft::protocol::writeString("minecraft:frog_variant", data);
-    minecraft::protocol::writeVarInt(3, data);
-    // Cold
-    minecraft::protocol::writeString("minecraft:cold", data);
-    data.push_back(0x00);
 
-    // Temperate
-    minecraft::protocol::writeString("minecraft:temperate", data);
-    data.push_back(0x00);
+    ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
-    // Warm
-    minecraft::protocol::writeString("minecraft:warm", data);
-    data.push_back(0x00);
+    packet.addString("minecraft:frog_variant");
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+    packet.addVarInt(3);
+
+    for (const auto& variant : {"minecraft:cold", "minecraft:temperate", "minecraft:warm"}) {
+
+      packet.addString(variant);
+
+      packet.addByte(0x00);
+    }
+
+    castle::network::sendPacket(connection, packet);
   }
-  void paintingEntrie(csatle::network::TcpConnection& connection) {
-    std::vector<std::uint8_t> data;
 
-    minecraft::protocol::writeString("minecraft:painting_variant", data);
+  void paintingEntrie(csatle::network::TcpConnection& connection) {
+
+    ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
+
+    packet.addString("minecraft:painting_variant");
 
     constexpr std::array variants = {"minecraft:alban",        "minecraft:aztec",
                                      "minecraft:aztec2",       "minecraft:backyard",
@@ -153,106 +171,125 @@ namespace castle::entries {
                                      "minecraft:water",        "minecraft:wind",
                                      "minecraft:wither"};
 
-    minecraft::protocol::writeVarInt(variants.size(), data);
+    packet.addVarInt(static_cast<std::int32_t>(variants.size()));
 
     for (const auto& variant : variants) {
-      minecraft::protocol::writeString(variant, data);
-      data.push_back(0x00);
+
+      packet.addString(variant);
+
+      packet.addByte(0x00);
     }
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+    castle::network::sendPacket(connection, packet);
   }
+
   void pigEntrie(csatle::network::TcpConnection& connection) {
-    std::vector<uint8_t> data;
-    minecraft::protocol::writeString("minecraft:pig_variant", data);
-    minecraft::protocol::writeVarInt(3, data);
-    // Cold
-    minecraft::protocol::writeString("minecraft:cold", data);
-    data.push_back(0x00);
 
-    // Temperate
-    minecraft::protocol::writeString("minecraft:temperate", data);
-    data.push_back(0x00);
+    ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
-    // Warm
-    minecraft::protocol::writeString("minecraft:warm", data);
-    data.push_back(0x00);
+    packet.addString("minecraft:pig_variant");
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+    packet.addVarInt(3);
+
+    for (const auto& variant : {"minecraft:cold", "minecraft:temperate", "minecraft:warm"}) {
+
+      packet.addString(variant);
+
+      packet.addByte(0x00);
+    }
+
+    castle::network::sendPacket(connection, packet);
   }
+
   void pigSoundEntrie(csatle::network::TcpConnection& connection) {
-    std::vector<uint8_t> data;
-    minecraft::protocol::writeString("minecraft:pig_sound_variant", data);
-    minecraft::protocol::writeVarInt(3, data);
-    // Cold
-    minecraft::protocol::writeString("minecraft:big", data);
-    data.push_back(0x00);
 
-    // Temperate
-    minecraft::protocol::writeString("minecraft:classic", data);
-    data.push_back(0x00);
+    ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
-    // Warm
-    minecraft::protocol::writeString("minecraft:mini", data);
-    data.push_back(0x00);
+    packet.addString("minecraft:pig_sound_variant");
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+    packet.addVarInt(3);
+
+    for (const auto& variant : {"minecraft:big", "minecraft:classic", "minecraft:mini"}) {
+
+      packet.addString(variant);
+
+      packet.addByte(0x00);
+    }
+
+    castle::network::sendPacket(connection, packet);
   }
+
   void wolfEntrie(csatle::network::TcpConnection& connection) {
-    std::vector<std::uint8_t> data;
 
-    minecraft::protocol::writeString("minecraft:wolf_variant", data);
-    minecraft::protocol::writeVarInt(9, data);
+    ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
-    for (const auto& variant : {"minecraft:ashen",
-                                "minecraft:black",
-                                "minecraft:chestnut",
-                                "minecraft:pale",
-                                "minecraft:rusty",
-                                "minecraft:snowy",
-                                "minecraft:spotted",
-                                "minecraft:striped",
-                                "minecraft:woods"}) {
-      minecraft::protocol::writeString(variant, data);
-      data.push_back(0x00);
+    packet.addString("minecraft:wolf_variant");
+
+    constexpr std::array variants = {"minecraft:ashen",
+                                     "minecraft:black",
+                                     "minecraft:chestnut",
+                                     "minecraft:pale",
+                                     "minecraft:rusty",
+                                     "minecraft:snowy",
+                                     "minecraft:spotted",
+                                     "minecraft:striped",
+                                     "minecraft:woods"};
+
+    packet.addVarInt(static_cast<std::int32_t>(variants.size()));
+
+    for (const auto& variant : variants) {
+
+      packet.addString(variant);
+
+      packet.addByte(0x00);
     }
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+    castle::network::sendPacket(connection, packet);
   }
+
   void wolfSoundEntrie(csatle::network::TcpConnection& connection) {
-    std::vector<std::uint8_t> data;
 
-    minecraft::protocol::writeString("minecraft:wolf_sound_variant", data);
-    minecraft::protocol::writeVarInt(7, data);
+    ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
-    for (const auto& variant : {"minecraft:big",
-                                "minecraft:classic",
-                                "minecraft:cute",
-                                "minecraft:puglin",
-                                "minecraft:angry",
-                                "minecraft:grumpy",
-                                "minecraft:sad"}) {
-      minecraft::protocol::writeString(variant, data);
-      data.push_back(0x00);
+    packet.addString("minecraft:wolf_sound_variant");
+
+    constexpr std::array variants = {"minecraft:big",
+                                     "minecraft:classic",
+                                     "minecraft:cute",
+                                     "minecraft:puglin",
+                                     "minecraft:angry",
+                                     "minecraft:grumpy",
+                                     "minecraft:sad"};
+
+    packet.addVarInt(static_cast<std::int32_t>(variants.size()));
+
+    for (const auto& variant : variants) {
+
+      packet.addString(variant);
+
+      packet.addByte(0x00);
     }
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+    castle::network::sendPacket(connection, packet);
   }
+
   void zombieEntrie(csatle::network::TcpConnection& connection) {
-    std::vector<std::uint8_t> data;
 
-    minecraft::protocol::writeString("minecraft:zombie_nautilus_variant", data);
-    minecraft::protocol::writeVarInt(2, data);
+    ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
-    for (const auto& variant : {
-             "minecraft:temperate",
-             "minecraft:warm",
-         }) {
-      minecraft::protocol::writeString(variant, data);
-      data.push_back(0x00);
+    packet.addString("minecraft:zombie_nautilus_variant");
+
+    constexpr std::array variants = {"minecraft:temperate", "minecraft:warm"};
+
+    packet.addVarInt(static_cast<std::int32_t>(variants.size()));
+
+    for (const auto& variant : variants) {
+
+      packet.addString(variant);
+
+      packet.addByte(0x00);
     }
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
+    castle::network::sendPacket(connection, packet);
   }
-
 } // namespace castle::entries

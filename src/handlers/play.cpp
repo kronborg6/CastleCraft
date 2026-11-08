@@ -31,12 +31,12 @@ namespace minecraft::protocol::handlers {
   }
 
   void setCenterChuck(csatle::network::TcpConnection& connection) {
-    std::vector<std::uint8_t> data;
-    writeVarInt(0, data);
-    writeVarInt(0, data);
 
     castle::protocol::PacketWriter<castle::protocol::PlayClientbound> packet(
         castle::protocol::PlayClientbound::SetCenterChunk);
+
+    packet.addVarInt(0);
+    packet.addVarInt(0);
 
     castle::network::sendPacket(connection, packet);
   }
@@ -51,20 +51,20 @@ namespace minecraft::protocol::handlers {
   void finishChunkBatch(csatle::network::TcpConnection& connection, std::int32_t chucks) {
     castle::protocol::PacketWriter<castle::protocol::PlayClientbound> packet(
         castle::protocol::PlayClientbound::ChunkBatchFinished);
-    packet.addInt<std::int32_t>(chucks);
+    packet.addVarInt(chucks);
     castle::network::sendPacket(connection, packet);
   }
 
-  void chuck(csatle::network::TcpConnection& connection, std::int32_t x, std::int32_t y) {
+  void chuck(csatle::network::TcpConnection& connection, std::int32_t x, std::int32_t z) {
 
     std::vector<std::uint8_t> sections;
 
     castle::protocol::PacketWriter<castle::protocol::PlayClientbound> packet(
         castle::protocol::PlayClientbound::ChunkDataAndUpdateLight);
 
-    // Chunk coordinates (Int)
-    packet.addVarInt(x);
-    packet.addVarInt(y);
+    // Chunk coordinates (fixed-width Int, not VarInt)
+    packet.addInt<std::int32_t>(x);
+    packet.addInt<std::int32_t>(z);
 
     // Heightmaps: 0 entries
     packet.addVarInt(0);
@@ -75,10 +75,10 @@ namespace minecraft::protocol::handlers {
     for (int i = 0; i < 24; ++i) {
       bool randomBlock = (i == 7);
       // Non-air block count (Short)
-      packet.addInt<std::int16_t>(randomBlock ? 4096 : 0);
+      endian::writeBigEndian<std::int16_t>(randomBlock ? 4096 : 0, sections);
 
       // Fluid count (Short)
-      packet.addInt<std::int16_t>(0);
+      endian::writeBigEndian<std::int16_t>(0, sections);
 
       // Block states: single-valued palette
       sections.push_back(0x00); // Bits per entry = 0
@@ -119,7 +119,6 @@ namespace minecraft::protocol::handlers {
   }
 
   void playerPostion(Client& clinet) {
-    std::vector<std::uint8_t> data;
 
     castle::protocol::PacketWriter<castle::protocol::PlayClientbound> packet(
         castle::protocol::PlayClientbound::SynchronizePlayerPosition);
@@ -128,18 +127,18 @@ namespace minecraft::protocol::handlers {
 
     packet.addVarInt(teleportId);
 
-    packet.addInt<std::int64_t>(endian::doubleToint64(0));
-    packet.addInt<std::int64_t>(endian::doubleToint64(64));
-    packet.addInt<std::int64_t>(endian::doubleToint64(0));
+    packet.addDouble(0);
+    packet.addDouble(64);
+    packet.addDouble(0);
 
-    packet.addInt<std::int64_t>(endian::doubleToint64(0.0));
-    packet.addInt<std::int64_t>(endian::doubleToint64(0.0));
-    packet.addInt<std::int64_t>(endian::doubleToint64(0.0));
+    packet.addDouble(0);
+    packet.addDouble(0);
+    packet.addDouble(0);
 
-    packet.addInt<std::int64_t>(endian::floatToint32(0));
-    packet.addInt<std::int64_t>(endian::floatToint32(0));
+    packet.addFloat(0.0f);
+    packet.addFloat(0.0f);
 
-    packet.addInt<std::int64_t>(0);
+    packet.addInt<std::uint32_t>(0);
 
     castle::network::sendPacket(clinet.connection(), packet);
   }

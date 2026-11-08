@@ -1,36 +1,43 @@
 #include "registry/banner_patterns.hpp"
+#include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
-#include "protocol/protocol.hpp"
+#include "castleProtocol/protocol/configuration.hpp"
 #include <algorithm>
 #include <cstdint>
 #include <stdexcept>
 #include <string>
 namespace castle::registry {
+using ConfigurationPacket =
+    castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound>;
 
-  void BannerPatternRegistry(csatle::network::TcpConnection& connection) {
+void BannerPatternRegistry(csatle::network::TcpConnection &connection) {
 
-    std::vector<uint8_t> data;
-    minecraft::protocol::writeString("minecraft:banner_pattern", data);
-    minecraft::protocol::writeVarInt(static_cast<std::int32_t>(registry::BANNER_PATTERS.size()),
-                                     data);
+	ConfigurationPacket packet(
+	    castle::protocol::ConfigurationClientbound::RegistryData);
 
-    for (const auto& name : registry::BANNER_PATTERS) {
-      minecraft::protocol::writeString(name, data);
-      data.push_back(0x00);
-    }
+	packet.addString("minecraft:banner_pattern");
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
-  }
-  std::uint16_t bannerPatternId(std::string_view name) {
+	packet.addVarInt(
+	    static_cast<std::int32_t>(registry::BANNER_PATTERS.size()));
 
-    auto it = std::find_if(BANNER_PATTERS.begin(), BANNER_PATTERS.end(), [&](const std::string& d) {
-      return d == name;
-    });
+	for (const auto &name : registry::BANNER_PATTERS) {
 
-    if (it == BANNER_PATTERS.end()) {
-      throw std::runtime_error("unknown damge type: " + std::string(name));
-    }
+		packet.addString(name);
 
-    return static_cast<std::uint16_t>(std::distance(BANNER_PATTERS.begin(), it));
-  }
+		packet.addByte(0x00);
+	}
+
+	castle::network::sendPacket(connection, packet);
+}
+std::uint16_t bannerPatternId(std::string_view name) {
+	auto it = std::find_if(BANNER_PATTERS.begin(), BANNER_PATTERS.end(),
+	                       [&](const std::string &d) { return d == name; });
+
+	if (it == BANNER_PATTERS.end()) {
+		throw std::runtime_error("unknown damge type: " + std::string(name));
+	}
+
+	return static_cast<std::uint16_t>(
+	    std::distance(BANNER_PATTERS.begin(), it));
+}
 } // namespace castle::registry

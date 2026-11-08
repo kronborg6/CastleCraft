@@ -1,21 +1,27 @@
 #include "registry/biome.hpp"
+#include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
-#include "protocol/protocol.hpp"
+#include "castleProtocol/protocol/configuration.hpp"
 #include <cstdint>
 #include <vector>
 namespace castle::registry {
-  void biomeRegistry(csatle::network::TcpConnection& connection) {
-    std::vector<std::uint8_t> data;
+using ConfigurationPacket =
+    castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound>;
 
-    minecraft::protocol::writeString("minecraft:worldgen/biome", data);
+void biomeRegistry(csatle::network::TcpConnection &connection) {
+	ConfigurationPacket packet(
+	    castle::protocol::ConfigurationClientbound::RegistryData);
 
-    minecraft::protocol::writeVarInt(BIOME_TYPES.size(), data);
+	packet.addString("minecraft:worldgen/biome");
 
-    for (const auto& name : BIOME_TYPES) {
+	packet.addVarInt(static_cast<std::int32_t>(BIOME_TYPES.size()));
 
-      minecraft::protocol::writeString(name, data);
-      data.push_back(0x00);
-    }
-    minecraft::protocol::sendPacket(connection, 0x07, data);
-  }
+	for (const auto &name : BIOME_TYPES) {
+
+		packet.addString(name);
+
+		packet.addByte(0x00);
+	}
+	castle::network::sendPacket(connection, packet);
+}
 } // namespace castle::registry

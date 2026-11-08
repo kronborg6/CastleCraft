@@ -1,124 +1,121 @@
 #include "entries/damge_types.hpp"
+#include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
+#include "castleProtocol/protocol/configuration.hpp"
 #include "protocol/protocol.hpp"
 #include "registry/damge_types.hpp"
 #include <cstdint>
 #include <vector>
 namespace castle::entries {
-  void damgeTypesEntrie(csatle::network::TcpConnection& connection) {
+using ConfigurationPacket =
+    castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound>;
 
-    std::vector<uint8_t> data;
-    minecraft::protocol::writeString("minecraft:damage_type", data);
-    minecraft::protocol::writeVarInt(static_cast<std::int32_t>(registry::DAMAGE_TYPES.size()),
-                                     data);
+void damgeTypesEntrie(csatle::network::TcpConnection &connection) {
 
-    for (const auto& name : registry::DAMAGE_TYPES) {
-      minecraft::protocol::writeString(name.registryId, data);
-      data.push_back(0x00);
-    }
-    // Cold
+	ConfigurationPacket packet(
+	    castle::protocol::ConfigurationClientbound::RegistryData);
 
-    // Temperate
+	packet.addString("minecraft:damage_type");
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
-  }
+	packet.addVarInt(static_cast<std::int32_t>(registry::DAMAGE_TYPES.size()));
 
-  void explosionTypesEntrie(std::vector<std::uint8_t>& output) {
+	for (const auto &name : registry::DAMAGE_TYPES) {
 
-    constexpr std::array explosionTypes = {"minecraft:fireworks",
-                                           "minecraft:explosion",
-                                           "minecraft:player_explosion",
-                                           "minecraft:bad_respawn_point"};
+		packet.addString(name.registryId);
 
-    // Tag: minecraft:is_explosion
-    minecraft::protocol::writeString("minecraft:is_explosion", output);
+		packet.addByte(0x00);
+	}
 
-    // Number of entries
-    minecraft::protocol::writeVarInt(explosionTypes.size(), output);
+	castle::network::sendPacket(connection, packet);
+}
 
-    for (const auto& name : explosionTypes) {
-      minecraft::protocol::writeVarInt(castle::registry::dameTypeId(name), output);
-    }
-  }
+void explosionTypesEntrie(ConfigurationPacket &packet) {
 
-  void fireTypesEntrie(std::vector<std::uint8_t>& output) {
+	constexpr std::array explosionTypes = {
+	    "minecraft:fireworks", "minecraft:explosion",
+	    "minecraft:player_explosion", "minecraft:bad_respawn_point"};
 
-    constexpr std::array fireTypes = {"minecraft:in_fire",
-                                      "minecraft:campfire",
-                                      "minecraft:on_fire",
-                                      "minecraft:lava",
-                                      "minecraft:hot_floor",
-                                      "minecraft:sulfur_cube_hot",
-                                      "minecraft:unattributed_fireball",
-                                      "minecraft:fireball"};
+	// Tag: minecraft:is_explosion
+	packet.addString("minecraft:is_explosion");
 
-    // minecraft:is_fire
-    minecraft::protocol::writeString("minecraft:is_fire", output);
+	// Number of entries
+	packet.addVarInt(static_cast<std::int32_t>(explosionTypes.size()));
 
-    // 0 entries (temporary)
-    minecraft::protocol::writeVarInt(fireTypes.size(), output);
+	for (const auto &name : explosionTypes) {
+		packet.addVarInt(castle::registry::dameTypeId(name));
+	}
+}
 
-    for (const auto& name : fireTypes) {
-      minecraft::protocol::writeVarInt(castle::registry::dameTypeId(name), output);
-    }
-  }
-  void bypassShieldTypesEntrie(std::vector<std::uint8_t>& output) {
+void fireTypesEntrie(ConfigurationPacket &packet) {
 
-    constexpr std::array bypassesShield = {"minecraft:cactus",
-                                           "minecraft:campfire",
-                                           "minecraft:dry_out",
-                                           "minecraft:falling_anvil",
-                                           "minecraft:falling_stalactite",
-                                           "minecraft:hot_floor",
-                                           "minecraft:sulfur_cube_hot",
-                                           "minecraft:in_fire",
-                                           "minecraft:lava",
-                                           "minecraft:lightning_bolt",
-                                           "minecraft:sweet_berry_bush"};
+	constexpr std::array fireTypes = {"minecraft:in_fire",
+	                                  "minecraft:campfire",
+	                                  "minecraft:on_fire",
+	                                  "minecraft:lava",
+	                                  "minecraft:hot_floor",
+	                                  "minecraft:sulfur_cube_hot",
+	                                  "minecraft:unattributed_fireball",
+	                                  "minecraft:fireball"};
 
-    // Populate this from bypasses_armor.json
-    constexpr std::array bypassesArmor = {"minecraft:on_fire",
-                                          "minecraft:in_wall",
-                                          "minecraft:cramming",
-                                          "minecraft:drown",
-                                          "minecraft:fly_into_wall",
-                                          "minecraft:generic",
-                                          "minecraft:wither",
-                                          "minecraft:dragon_breath",
-                                          "minecraft:starve",
-                                          "minecraft:fall",
-                                          "minecraft:ender_pearl",
-                                          "minecraft:freeze",
-                                          "minecraft:stalagmite",
-                                          "minecraft:magic",
-                                          "minecraft:indirect_magic",
-                                          "minecraft:out_of_world",
-                                          "minecraft:generic_kill",
-                                          "minecraft:sonic_boom",
-                                          "minecraft:outside_border"};
+	// minecraft:is_fire
+	packet.addString("minecraft:is_fire");
 
-    std::vector<std::int32_t> shieldIds;
+	// 0 entries (temporary)
+	packet.addVarInt(static_cast<std::int32_t>(fireTypes.size()));
 
-    auto appendIds = [&](const auto& names) {
-      for (const auto& name : names) {
-        auto id = castle::registry::dameTypeId(name);
+	for (const auto &name : fireTypes) {
+		packet.addVarInt(castle::registry::dameTypeId(name));
+	}
+}
+void bypassShieldTypesEntrie(ConfigurationPacket &packet) {
 
-        if (std::ranges::find(shieldIds, id) == shieldIds.end()) {
-          shieldIds.push_back(id);
-        }
-      }
-    };
+	constexpr std::array bypassesShield = {"minecraft:cactus",
+	                                       "minecraft:campfire",
+	                                       "minecraft:dry_out",
+	                                       "minecraft:falling_anvil",
+	                                       "minecraft:falling_stalactite",
+	                                       "minecraft:hot_floor",
+	                                       "minecraft:sulfur_cube_hot",
+	                                       "minecraft:in_fire",
+	                                       "minecraft:lava",
+	                                       "minecraft:lightning_bolt",
+	                                       "minecraft:sweet_berry_bush"};
 
-    appendIds(bypassesArmor);
-    appendIds(bypassesShield);
+	// Populate this from bypasses_armor.json
+	constexpr std::array bypassesArmor = {
+	    "minecraft:on_fire",        "minecraft:in_wall",
+	    "minecraft:cramming",       "minecraft:drown",
+	    "minecraft:fly_into_wall",  "minecraft:generic",
+	    "minecraft:wither",         "minecraft:dragon_breath",
+	    "minecraft:starve",         "minecraft:fall",
+	    "minecraft:ender_pearl",    "minecraft:freeze",
+	    "minecraft:stalagmite",     "minecraft:magic",
+	    "minecraft:indirect_magic", "minecraft:out_of_world",
+	    "minecraft:generic_kill",   "minecraft:sonic_boom",
+	    "minecraft:outside_border"};
 
-    minecraft::protocol::writeString("minecraft:bypasses_shield", output);
+	std::vector<std::int32_t> shieldIds;
 
-    minecraft::protocol::writeVarInt(static_cast<std::int32_t>(shieldIds.size()), output);
+	auto appendIds = [&](const auto &names) {
+		for (const auto &name : names) {
+			auto id = castle::registry::dameTypeId(name);
 
-    for (auto id : shieldIds) {
-      minecraft::protocol::writeVarInt(id, output);
-    }
-  }
+			if (std::ranges::find(shieldIds, id) == shieldIds.end()) {
+				shieldIds.push_back(id);
+			}
+		}
+	};
+
+	appendIds(bypassesArmor);
+	appendIds(bypassesShield);
+
+	packet.addString("minecraft:bypasses_shield");
+
+	packet.addVarInt(static_cast<std::int32_t>(shieldIds.size()));
+
+	for (auto id : shieldIds) {
+		packet.addVarInt(id);
+	}
+}
 
 } // namespace castle::entries

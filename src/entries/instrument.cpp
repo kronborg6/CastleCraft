@@ -1,36 +1,42 @@
 #include "registry/instrument.hpp"
+#include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
-#include "protocol/protocol.hpp"
+#include "castleProtocol/protocol/configuration.hpp"
 #include <algorithm>
 #include <cstdint>
 #include <stdexcept>
 #include <vector>
 
 namespace castle::registry {
+using ConfigurationPacket =
+    castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound>;
 
-  void instrumentRegistry(csatle::network::TcpConnection& connection) {
-    std::vector<std::uint8_t> data;
+void instrumentRegistry(csatle::network::TcpConnection &connection) {
+	ConfigurationPacket packet(
+	    castle::protocol::ConfigurationClientbound::RegistryData);
 
-    minecraft::protocol::writeString("minecraft:instrument", data);
-    minecraft::protocol::writeVarInt(static_cast<std::int32_t>(INSTRUMENT_TYPES.size()), data);
+	packet.addString("minecraft:instrument");
 
-    for (const auto& name : INSTRUMENT_TYPES) {
-      minecraft::protocol::writeString(name, data);
-      data.push_back(0x00);
-    }
+	packet.addVarInt(static_cast<std::int32_t>(INSTRUMENT_TYPES.size()));
 
-    minecraft::protocol::sendPacket(connection, 0x07, data);
-  }
-  std::uint16_t instrumentTypeId(std::string_view name) {
+	for (const auto &name : INSTRUMENT_TYPES) {
 
-    auto it = std::find_if(INSTRUMENT_TYPES.begin(),
-                           INSTRUMENT_TYPES.end(),
-                           [&](const std::string& d) { return d == name; });
+		packet.addString(name);
 
-    if (it == INSTRUMENT_TYPES.end()) {
-      throw std::runtime_error("unknown damge type: " + std::string(name));
-    }
+		packet.addByte(0x00);
+	}
+	castle::network::sendPacket(connection, packet);
+}
+std::uint16_t instrumentTypeId(std::string_view name) {
 
-    return static_cast<std::uint16_t>(std::distance(INSTRUMENT_TYPES.begin(), it));
-  }
+	auto it = std::find_if(INSTRUMENT_TYPES.begin(), INSTRUMENT_TYPES.end(),
+	                       [&](const std::string &d) { return d == name; });
+
+	if (it == INSTRUMENT_TYPES.end()) {
+		throw std::runtime_error("unknown damge type: " + std::string(name));
+	}
+
+	return static_cast<std::uint16_t>(
+	    std::distance(INSTRUMENT_TYPES.begin(), it));
+}
 } // namespace castle::registry
