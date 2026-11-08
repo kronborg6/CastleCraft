@@ -1,6 +1,6 @@
 #pragma once
 
-#include "registry/damge_types.hpp"
+#include "castle/registry/damge_types.hpp"
 namespace castle::generators::registries {
 
   void createDamgeType(const registry::DamageTypeData& damgeType);

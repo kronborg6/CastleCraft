@@ -1,8 +1,7 @@
-#include "generators/registries/dimension.hpp"
+#include "castle/generators/registries/dimension.hpp"
 #include <castle/nbt.hpp>
 #include <castle/writer.hpp>
 #include <filesystem>
-#include <iostream>
 
 namespace fs = std::filesystem;
 

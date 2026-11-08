@@ -1,4 +1,4 @@
-#include "io/nbt_loader.hpp"
+#include "castle/io/nbt_loader.hpp"
 #include "castle/reader.hpp"
 
 namespace castle::io {

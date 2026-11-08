@@ -1,22 +1,22 @@
 #include "castle/handlers/configuration.hpp"
 #include "castle/client.hpp"
+#include "castle/entries/damge_types.hpp"
+#include "castle/entries/entries.hpp"
+#include "castle/entries/jukebox.hpp"
+#include "castle/entries/mobs.hpp"
 #include "castle/handlers/play.hpp"
+#include "castle/io/nbt_loader.hpp"
 #include "castle/nbt.hpp"
 #include "castle/network/packet_receiver.hpp"
 #include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
 #include "castle/reader.hpp"
+#include "castle/registry/banner_patterns.hpp"
+#include "castle/registry/biome.hpp"
+#include "castle/registry/instrument.hpp"
+#include "castle/registry/pottery.hpp"
 #include "castle/writer.hpp"
 #include "castleProtocol/package/writePacket.hpp"
-#include "entries/damge_types.hpp"
-#include "entries/entries.hpp"
-#include "entries/jukebox.hpp"
-#include "entries/mobs.hpp"
-#include "io/nbt_loader.hpp"
-#include "registry/banner_patterns.hpp"
-#include "registry/biome.hpp"
-#include "registry/instrument.hpp"
-#include "registry/pottery.hpp"
 #include <array>
 #include <castleProtocol/package/readPackage.hpp>
 #include <castleProtocol/protocol/configuration.hpp>
@@ -266,7 +266,7 @@ namespace castle::handlers {
       sendTrimMaterials(connection);
       blockTransformerEntrie(connection);
       sendEnty(connection); // dimension_type
-      castle::entries::damgeTypesEntrie(connection);
+      entries::damgeTypesEntrie(connection);
       castle::registry::BannerPatternRegistry(connection);
       castle::registry::instrumentRegistry(connection);
       castle::registry::potteryEntrie(connection);

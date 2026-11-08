@@ -1,4 +1,4 @@
-#include "entries/mobs.hpp"
+#include "castle/entries/mobs.hpp"
 #include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
 #include "castleProtocol/package/writePacket.hpp"

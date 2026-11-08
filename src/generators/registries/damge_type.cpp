@@ -1,8 +1,7 @@
-#include "generators/registries/damge_type.hpp"
+#include "castle/generators/registries/damge_type.hpp"
 #include "castle/nbt.hpp"
+#include "castle/registry/damge_types.hpp"
 #include "castle/writer.hpp"
-#include "registry/damge_types.hpp"
-#include <algorithm>
 #include <string>
 
 #include <filesystem>

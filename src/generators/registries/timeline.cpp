@@ -1,4 +1,4 @@
-#include "generators/registries/timeline.hpp"
+#include "castle/generators/registries/timeline.hpp"
 #include "castle/nbt.hpp"
 #include <castle/writer.hpp>
 #include <filesystem>

@@ -1,4 +1,4 @@
-#include "generators/registries/worldClock.hpp"
+#include "castle/generators/registries/worldClock.hpp"
 #include "castle/nbt.hpp"
 #include <castle/writer.hpp>
 #include <filesystem>
