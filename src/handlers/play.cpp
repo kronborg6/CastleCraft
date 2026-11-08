@@ -78,7 +78,7 @@ namespace castle::handlers {
 
       // Block states: single-valued palette
       sections.push_back(0x00); // Bits per entry = 0
-      castle::protocol::writeVarInt(randomBlock ? rand() % 25 : 0,
+      castle::protocol::writeVarInt(randomBlock ? 1 : 0,
                                     sections); // Air
 
       // Biomes: single-valued palette
@@ -94,22 +94,32 @@ namespace castle::handlers {
     // Block entities: none
     packet.addVarInt(0);
 
-    // Sky light mask: empty
+    std::vector<std::uint8_t> skyLight(2048, 0xFF);
+
+    // Sky light mask: all 26 light sections enabled.
+    packet.addVarInt(4);
+    packet.addByte(0xFF);
+    packet.addByte(0xFF);
+    packet.addByte(0xFF);
+    packet.addByte(0x03);
+
+    // Block light mask: empty.
     packet.addVarInt(0);
 
-    // Block light mask: empty
+    // Empty sky light mask: empty.
     packet.addVarInt(0);
 
-    // Empty sky light mask: empty
+    // Empty block light mask: empty.
     packet.addVarInt(0);
 
-    // Empty block light mask: empty
-    packet.addVarInt(0);
+    // Full-bright sky light arrays for all 26 light sections.
+    packet.addVarInt(26);
+    for (int i = 0; i < 26; ++i) {
+      packet.addVarInt(2048);
+      packet.addBytes(skyLight);
+    }
 
-    // Sky light arrays: none
-    packet.addVarInt(0);
-
-    // Block light arrays: none
+    // Block light arrays: none.
     packet.addVarInt(0);
 
     castle::network::sendPacket(connection, packet);

@@ -11,7 +11,7 @@ namespace castle::generators::registries {
 
     auto root = castle::nbt::Nbt::makeCompound("");
 
-    root.add(castle::nbt::Nbt::makeFloat("ambient_light", 0.0f));
+    root.add(castle::nbt::Nbt::makeFloat("ambient_light", 1.0f));
 
     root.add(castle::nbt::Nbt::makeCompound(
         "attributes",

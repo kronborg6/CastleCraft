@@ -43,11 +43,10 @@ void printHex(const std::vector<uint8_t>& data) {
 int main() {
 
   // castle::generators::registries::generateOverworld();
-  castle::generators::registries::generateOverworld();
-  castle::generators::registries::generateTimelines();
-  castle::generators::registries::generateWorldClock();
-  castle::generators::registries::generateDamgeType();
-
+  castle::generators::registries::generateOverworld(true);
+  castle::generators::registries::generateTimelines(true);
+  castle::generators::registries::generateWorldClock(true);
+  castle::generators::registries::generateDamgeType(true);
   std::vector<uint8_t> data;
 
   printHex(data);

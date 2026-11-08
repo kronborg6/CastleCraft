@@ -10,7 +10,7 @@ namespace fs = std::filesystem;
 
 namespace castle::generators::registries {
 
-  void createDamgeType(const registry::DamageTypeData& damgeType) {
+  void createDamgeType(const registry::DamageTypeData& damgeType, const fs::path& dir) {
 
     auto damge = nbt::Nbt::makeCompound("");
 
@@ -18,19 +18,18 @@ namespace castle::generators::registries {
     damge.add(nbt::Nbt::makeString("message_id", damgeType.messageId));
     damge.add(nbt::Nbt::makeString("scaling", damgeType.scaling));
 
-    nbt::NbtWriter::writer(damge,
-                           "./generated/registries/damge_types/" + damgeType.messageId + ".nbt",
-                           {.namelessRoot = true});
+    nbt::NbtWriter::writer(damge, dir / (damgeType.messageId + ".nbt"), {.namelessRoot = true});
   }
   void generateDamgeType(bool override) {
     const fs::path directory = "./generated/registries/damage_types";
+
     for (auto damgeType : registry::DAMAGE_TYPES) {
       const fs::path path = directory / (damgeType.messageId + ".nbt");
       if (std::filesystem::exists(path) && !override) {
         continue;
       }
 
-      createDamgeType(damgeType);
+      createDamgeType(damgeType, directory);
     }
   }
 } // namespace castle::generators::registries
