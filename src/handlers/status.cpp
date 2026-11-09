@@ -11,7 +11,7 @@
 #include <vector>
 
 namespace {
-  void handleStatusRequest(Client& client) {
+  void handleStatusRequest(castle::Client& client) {
 
     const std::string json = R"({
         "version": {
@@ -43,7 +43,7 @@ namespace {
     castle::network::sendPacket(client.connection(), packet);
   }
   void
-  handlePingRequest(Client& client,
+  handlePingRequest(castle::Client& client,
                     castle::protocol::PacketReader<castle::protocol::StatusServerbound>& packet) {
     csatle::network::TcpConnection& connection = client.connection();
 

@@ -49,7 +49,7 @@ namespace {
   }
 
   void
-  handleLoginRequst(Client& client,
+  handleLoginRequst(castle::Client& client,
                     castle::protocol::PacketReader<castle::protocol::LoginServerbound>& packet) {
     auto& connection = client.connection();
 

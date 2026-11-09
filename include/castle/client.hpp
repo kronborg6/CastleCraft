@@ -1,101 +1,108 @@
 #pragma once
+
 #include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
+#include "castle/player/game_profile.hpp"
+#include "castle/player/player.hpp"
+#include "castle/player/postion.hpp"
 #include "castleProtocol/package/writePacket.hpp"
 #include "castleProtocol/protocol/configuration.hpp"
 #include "castleProtocol/protocol/play.hpp"
 #include "castleProtocol/protocol/state.hpp"
+#include "network/packet_send.hpp"
+#include "network/tcp_connection.hpp"
 #include "player/game_profile.hpp"
 #include "player/player.hpp"
 #include "player/postion.hpp"
 #include <chrono>
 #include <cstdint>
 
-class Client {
-  public:
-    Client(int socketId, int32_t id) : _player(id), _connection(socketId) {
-    }
-    csatle::network::TcpConnection& connection() {
-      return _connection;
-    }
-    // int getSocket() const {
-    //   return _connection.;
-    // }
-    castle::protocol::State getState() const {
-      return _state;
-    }
-    void updateState(castle::protocol::State state) {
-      _state = state;
-    }
-    bool isConnected() const {
-      return _connected;
-    }
+namespace castle {
 
-    int32_t getEntityId() const {
-      return _player.entityId();
-    }
-    Player getPlayer() const {
-      return _player;
-    }
-
-    void disconected() {
-      _connected = false;
-    }
-
-    ~Client() {
-      _connected = false;
-    }
-
-    castle::player::GameProfile profile;
-    bool sent = false;
-
-    Postion getPostion() const {
-      return _postion;
-    }
-
-    void connectionCheck() {
-      auto now = std::chrono::steady_clock::now();
-
-      auto duration = now.time_since_epoch();
-
-      std::int64_t milliseconds =
-          std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-
-      if (lastPing + 10000 >= milliseconds) {
-        return;
+  class Client {
+    public:
+      Client(int socketId, int32_t id) : _player(id), _connection(socketId) {
+      }
+      csatle::network::TcpConnection& connection() {
+        return _connection;
       }
 
-      switch (_state) {
-      case castle::protocol::State::Play: {
-        castle::protocol::PacketWriter<castle::protocol::PlayClientbound> packetP(
-            castle::protocol::PlayClientbound::KeepAlive);
-
-        packetP.addInt<std::int64_t>(milliseconds);
-
-        castle::network::sendPacket(_connection, packetP);
-        break;
+      castle::protocol::State getState() const {
+        return _state;
       }
-      case castle::protocol::State::Configuration: {
-        castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound> packetC(
-            castle::protocol::ConfigurationClientbound::KeepAlive);
-        packetC.addInt<std::int64_t>(milliseconds);
-
-        castle::network::sendPacket(_connection, packetC);
-
-      } break;
-      default:
-        return;
+      void updateState(castle::protocol::State state) {
+        _state = state;
       }
-      lastPing = milliseconds;
-    }
+      bool isConnected() const {
+        return _connected;
+      }
 
-    long lastPing;
+      int32_t getEntityId() const {
+        return _player.entityId();
+      }
+      player::Player getPlayer() const {
+        return _player;
+      }
 
-  private:
-    Player _player;
-    csatle::network::TcpConnection _connection;
-    Postion _postion;
-    bool _connected = true;
+      void disconected() {
+        _connected = false;
+      }
 
-    castle::protocol::State _state = castle::protocol::State::Handshake;
-};
+      ~Client() {
+        _connected = false;
+      }
+
+      player::GameProfile profile;
+      bool sent = false;
+
+      player::Postion getPostion() const {
+        return _postion;
+      }
+
+      void connectionCheck() {
+        auto now = std::chrono::steady_clock::now();
+
+        auto duration = now.time_since_epoch();
+
+        std::int64_t milliseconds =
+            std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+
+        if (lastPing + 10000 >= milliseconds) {
+          return;
+        }
+
+        switch (_state) {
+        case castle::protocol::State::Play: {
+          castle::protocol::PacketWriter<castle::protocol::PlayClientbound> packetP(
+              castle::protocol::PlayClientbound::KeepAlive);
+
+          packetP.addInt<std::int64_t>(milliseconds);
+
+          network::sendPacket(_connection, packetP);
+          break;
+        }
+        case castle::protocol::State::Configuration: {
+          castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound> packetC(
+              castle::protocol::ConfigurationClientbound::KeepAlive);
+          packetC.addInt<std::int64_t>(milliseconds);
+
+          network::sendPacket(_connection, packetC);
+
+        } break;
+        default:
+          return;
+        }
+        lastPing = milliseconds;
+      }
+
+      long lastPing;
+
+    private:
+      player::Player _player;
+      csatle::network::TcpConnection _connection;
+      player::Postion _postion;
+      bool _connected = true;
+
+      castle::protocol::State _state = castle::protocol::State::Handshake;
+  };
+} // namespace castle

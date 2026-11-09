@@ -3,5 +3,5 @@
 #include "castle/client.hpp"
 
 namespace minecraft::protocol {
-void handleClient(Client &client);
+void handleClient(castle::Client& client);
 }

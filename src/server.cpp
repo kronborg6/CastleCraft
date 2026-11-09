@@ -9,7 +9,7 @@
 #include <iostream>
 
 namespace minecraft::protocol {
-  void handleClient(Client& client) {
+  void handleClient(castle::Client& client) {
     while (client.isConnected()) {
       try {
         client.connectionCheck();

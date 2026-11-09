@@ -100,7 +100,7 @@ int main() {
     if (socket < 0) {
       continue;
     }
-    Client client(socket, id++);
+    castle::Client client(socket, id++);
 
     try {
       minecraft::protocol::handleClient(client);
