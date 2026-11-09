@@ -39,6 +39,8 @@ namespace castle::endian {
 
   long int64ToLong(int64_t from);
 
+  float int32ToFloat(int32_t from);
+  double int64ToDouble(int64_t from);
   float uint32ToFloat(uint32_t from);
   double uint64ToDouble(uint64_t from);
 } // namespace castle::endian

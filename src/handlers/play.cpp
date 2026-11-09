@@ -3,6 +3,7 @@
 #include "castle/network/packet_receiver.hpp"
 #include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
+#include "castle/player/postion.hpp"
 #include "castleProtocol/endian.hpp"
 #include "castleProtocol/package/readPackage.hpp"
 #include "castleProtocol/package/writePacket.hpp"
@@ -152,9 +153,9 @@ namespace castle::handlers {
 
     packet.addVarInt(teleportId);
 
-    packet.addDouble(0);
+    packet.addDouble(8);
     packet.addDouble(64);
-    packet.addDouble(0);
+    packet.addDouble(8);
 
     packet.addDouble(0);
     packet.addDouble(0);
@@ -187,9 +188,9 @@ namespace castle::handlers {
     // Max Players
     packet.addVarInt(12);
     // View Distance
-    packet.addVarInt(10);
+    packet.addVarInt(2);
     // Simulation Distance
-    packet.addVarInt(10);
+    packet.addVarInt(2);
     // Reduced Debug Info
     packet.addByte(0x00);
     // Enable respawn screen
@@ -228,12 +229,12 @@ namespace castle::handlers {
     setCenterChuck(connection);
     startCuck(connection);
 
-    for (int i = -10; i <= 10; i++) {
-      for (int x = -10; x <= 10; x++) {
+    for (int i = -2; i <= 2; i++) {
+      for (int x = -2; x <= 2; x++) {
         chuck(connection, i, x);
       }
     }
-    finishChunkBatch(connection, 441);
+    finishChunkBatch(connection, 21);
   }
 
   // TODO
@@ -269,25 +270,62 @@ namespace castle::handlers {
     case castle::protocol::PlayServerbound::KeepAlive: {
       auto value = packet.getInt<std::int64_t>();
       if (value != client.lastPing) {
-        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
-                  << "\n";
-        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
-                  << "\n";
-        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
-                  << "\n";
-        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
-                  << "\n";
-        std::cout << "ping reeust did not match expted: " << client.lastPing << "\ngot: " << value
-                  << "\n";
+        // close connection send player left or timeout to other players
       }
-      std::cout << "keep alive match\n";
+      break;
+    }
+    case castle::protocol::PlayServerbound::SetPlayerPosition: {
+      castle::player::Position p = {
+          .x = packet.getDouble(),
+          .y = packet.getDouble(),
+          .z = packet.getDouble(),
+      };
+      client.getPlayer().updatePostion(p, player::UpdateType::Position);
+      // std::cout << "Player position:\n"
+      //           << "x: " << p.x << "\n"
+      //           << "feetY: " << p.y << "\n"
+      //           << "z: " << p.z << "\n"
+      //           << "flags: " << static_cast<int>(p.flags) << "\n";
       break;
     }
 
+    case castle::protocol::PlayServerbound::SetPlayerPositionAndRotation: {
+      castle::player::Position p = {
+          .x = packet.getDouble(),
+          .y = packet.getDouble(),
+          .z = packet.getDouble(),
+          .yaw = packet.getFloat(),
+          .pitch = packet.getFloat(),
+          .flags = packet.byte(),
+      };
+
+      client.getPlayer().updatePostion(p, player::UpdateType::PositionAndRotation);
+
+      // std::cout << "Player position and rotation:\n"
+      //           << "x: " << p.x << "\n"
+      //           << "feetY: " << p.y << "\n"
+      //           << "z: " << p.z << "\n"
+      //           << "yaw: " << p.yaw << "\n"
+      //           << "pitch: " << p.pitch << "\n"
+      //           << "flags: " << static_cast<int>(p.flags) << "\n";
+      break;
+    }
+    case castle::protocol::PlayServerbound::SetPlayerRotation: {
+      castle::player::Position p = {
+          .yaw = packet.getFloat(),
+          .pitch = packet.getFloat(),
+          .flags = packet.byte(),
+      };
+
+      auto newChunk = client.getPlayer().updatePostion(p, player::UpdateType::Rotation);
+      // std::cout << "yaw: " << p.yaw << "\npich: " << p.pitch << "\nbyte: " << +p.flags << "\n";
+
+      std::cout << "Player rotation\n";
+      break;
+    }
     default:
-      // std::cerr << "Unknown Configuration packet: 0x" << std::hex <<
-      // packget.packetId << std::dec
-      //           << '\n';
+      // std::cerr << "Unknown Configuration packet: 0x" << std::hex
+      //           << static_cast<std::int32_t>(packet.PacketId) << std::dec << '\n';
       break;
     }
   }

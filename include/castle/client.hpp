@@ -40,7 +40,10 @@ namespace castle {
       int32_t getEntityId() const {
         return _player.entityId();
       }
-      player::Player getPlayer() const {
+      player::Player& getPlayer() {
+        return _player;
+      }
+      const player::Player& getPlayer() const {
         return _player;
       }
 
@@ -55,9 +58,9 @@ namespace castle {
       player::GameProfile profile;
       bool sent = false;
 
-      player::Postion getPostion() const {
-        return _postion;
-      }
+      // castle::player::Position getPostion() const {
+      //   return _player.po;
+      // }
 
       void connectionCheck() {
         auto now = std::chrono::steady_clock::now();
@@ -95,12 +98,11 @@ namespace castle {
         lastPing = milliseconds;
       }
 
-      long lastPing;
+      std::int64_t lastPing = 0;
 
     private:
       player::Player _player;
       csatle::network::TcpConnection _connection;
-      player::Postion _postion;
       bool _connected = true;
 
       castle::protocol::State _state = castle::protocol::State::Handshake;

@@ -29,6 +29,10 @@ namespace castle::protocol {
         return endian::readBigEndian<T>(_data, _offset);
       }
 
+      template <Integral T> [[nodiscard]] T Int() {
+        return endian::readBigEndian<T>(_data, _offset);
+      }
+
       [[nodiscard]] std::int32_t varInt() {
         return this->readVarInt(_data, _offset);
       }
@@ -48,6 +52,13 @@ namespace castle::protocol {
 
         return result;
       }
+
+      [[nodiscard]] std::uint8_t byte() {
+        if (_offset >= _data.size()) {
+          throw std::out_of_range("PacketReader: Not enough bytes");
+        }
+        return _data[_offset++];
+      }
       [[nodiscard]] std::span<const std::uint8_t> bytes(std::size_t length) {
         if (_offset > _data.size() || length > _data.size() - _offset) {
           throw std::runtime_error("Not enough bytes in packet");
@@ -58,6 +69,13 @@ namespace castle::protocol {
         _offset += length;
 
         return result;
+      }
+
+      [[nodiscard]] float getFloat() {
+        return endian::int32ToFloat(endian::readBigEndian<std::int32_t>(_data, _offset));
+      }
+      [[nodiscard]] double getDouble() {
+        return endian::int64ToDouble(endian::readBigEndian<std::int64_t>(_data, _offset));
       }
 
     private:

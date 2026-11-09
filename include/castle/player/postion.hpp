@@ -1,17 +1,28 @@
 #pragma once
 
+#include <cstdint>
 namespace castle::player {
-  struct Postion {
-      double x;
-      double y;
-      double z;
+  enum class UpdateType {
+    Position,
+    Rotation,
+    PositionAndRotation
+  };
+  struct Position {
+      double x = 0.0;
+      double y = 0.0;
+      double z = 0.0;
 
-      double velocityX;
-      double velocityY;
-      double velocityZ;
+      float yaw = 0.0f;
+      float pitch = 0.0f;
 
-      float yaw;
-      float pitch;
+      std::uint8_t flags = 0;
+  };
+
+  struct ChuckPostion {
+      std::int32_t x = 0;
+      std::int32_t z = 0;
+
+      bool operator==(const ChuckPostion&) const = default;
   };
 
 } // namespace castle::player

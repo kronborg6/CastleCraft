@@ -27,6 +27,16 @@ namespace castle::endian {
     int64_t result = std::bit_cast<int64_t>(value);
     return result;
   }
+  float int32ToFloat(int32_t from) {
+    float result = std::bit_cast<float>(from);
+
+    return result;
+  }
+  double int64ToDouble(int64_t from) {
+    double reslut = std::bit_cast<double>(from);
+
+    return reslut;
+  }
 
   float uint32ToFloat(uint32_t from) {
     float result = std::bit_cast<float>(from);
