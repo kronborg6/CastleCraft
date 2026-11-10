@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <unordered_map>
 
 struct Teleport {
     std::int32_t id = -1;
@@ -12,6 +13,8 @@ struct Teleport {
 };
 
 namespace castle::player {
+
+  constexpr std::int32_t VIEW = 10;
   class Player {
     public:
       Player(std::int32_t id) : _entityId(id) {};

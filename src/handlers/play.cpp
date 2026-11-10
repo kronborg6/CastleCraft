@@ -3,6 +3,7 @@
 #include "castle/network/packet_receiver.hpp"
 #include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
+#include "castle/player/player.hpp"
 #include "castle/player/postion.hpp"
 #include "castle/world/chunk.hpp"
 #include "castle/world/chunkPostion.hpp"
@@ -20,6 +21,7 @@
 #include <vector>
 
 namespace castle::handlers {
+
   void start(csatle::network::TcpConnection& connection) {
 
     castle::protocol::PacketWriter<castle::protocol::PlayClientbound> packet(
@@ -179,23 +181,62 @@ namespace castle::handlers {
     castle::network::sendPacket(clinet.connection(), packet);
   }
 
-  void updateChunks(Client& clinet) {
-    csatle::network::TcpConnection& connection = clinet.connection();
+  void unloadChunk(csatle::network::TcpConnection& connection, world::ChunkPosition postion) {
+    protocol::PacketWriter<castle::protocol::PlayClientbound> packet(
+        protocol::PlayClientbound::UnloadChunk);
 
-    auto player = clinet.getPlayer();
-    auto newCenterChunk = player.getChunkPostion();
+    packet.addInt<std::int32_t>(postion.z);
+    packet.addInt<std::int32_t>(postion.x);
 
-    setCenterChuck(connection, newCenterChunk.x, newCenterChunk.z);
-    startCuck(connection);
+    network::sendPacket(connection, packet);
+  }
 
-    for (int x = -2; x <= 2; x++) {
-      for (int z = -2; z <= 2; z++) {
-        world::ChunkPosition position{newCenterChunk.x + x, newCenterChunk.z + z};
-        sendStoneChunk(connection, position);
-        // chuck(connection, i, x);
+  void updateChunks(Client& client) {
+    auto& connection = client.connection();
+
+    auto& player = client.getPlayer();
+    const auto center = player.getChunkPostion();
+
+    for (auto it = client.loadedChunks.begin(); it != client.loadedChunks.end();) {
+
+      const auto& pos = *it;
+
+      if (std::abs(pos.x - center.x) > player::VIEW || std::abs(pos.z - center.z) > player::VIEW) {
+
+        unloadChunk(connection, pos);
+        it = client.loadedChunks.erase(it);
+      } else {
+        ++it;
       }
     }
-    finishChunkBatch(connection, 25);
+
+    setCenterChuck(connection, center.x, center.z);
+
+    std::vector<world::ChunkPosition> chunksToSend;
+
+    for (int x = -player::VIEW; x <= player::VIEW; ++x) {
+      for (int z = -player::VIEW; z <= player::VIEW; ++z) {
+
+        world::ChunkPosition position{center.x + x, center.z + z};
+
+        if (!client.loadedChunks.contains(position)) {
+          chunksToSend.push_back(position);
+        }
+      }
+    }
+
+    if (chunksToSend.empty()) {
+      return;
+    }
+
+    startCuck(connection);
+
+    for (const auto& position : chunksToSend) {
+      sendStoneChunk(connection, position);
+      client.loadedChunks.insert(position);
+    }
+
+    finishChunkBatch(connection, static_cast<std::int32_t>(chunksToSend.size()));
   }
 
   void initialiizePlay(Client& clinet) {
@@ -217,9 +258,9 @@ namespace castle::handlers {
     // Max Players
     packet.addVarInt(12);
     // View Distance
-    packet.addVarInt(2);
+    packet.addVarInt(player::VIEW);
     // Simulation Distance
-    packet.addVarInt(2);
+    packet.addVarInt(player::VIEW);
     // Reduced Debug Info
     packet.addByte(0x00);
     // Enable respawn screen
@@ -310,7 +351,7 @@ namespace castle::handlers {
           .y = packet.getDouble(),
           .z = packet.getDouble(),
       };
-      if (!client.getPlayer().updatePostion(p, player::UpdateType::Position)) {
+      if (client.getPlayer().updatePostion(p, player::UpdateType::Position)) {
         updateChunks(client);
       }
       // std::cout << "Player position:\n"
@@ -331,7 +372,7 @@ namespace castle::handlers {
           .flags = packet.byte(),
       };
 
-      if (!client.getPlayer().updatePostion(p, player::UpdateType::PositionAndRotation)) {
+      if (client.getPlayer().updatePostion(p, player::UpdateType::PositionAndRotation)) {
         updateChunks(client);
       }
 

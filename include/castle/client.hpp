@@ -14,6 +14,7 @@
 #include "player/player.hpp"
 #include <chrono>
 #include <cstdint>
+#include <unordered_set>
 
 namespace castle {
 
@@ -97,6 +98,8 @@ namespace castle {
       }
 
       std::int64_t lastPing = 0;
+
+      std::unordered_set<world::ChunkPosition, world::ChunkPositionHash> loadedChunks;
 
     private:
       player::Player _player;
