@@ -1,6 +1,5 @@
 #pragma once
 
-#include "castle/world/chunk.hpp"
 #include <array>
 #include <cstdint>
 

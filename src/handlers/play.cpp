@@ -65,6 +65,9 @@ namespace castle::handlers {
     castle::network::sendPacket(connection, packet);
   }
 
+  void playerInfoUpdate(csatle::network::TcpConnection& connection, std::uint8_t action) {
+  }
+
   void chuck(csatle::network::TcpConnection& connection, std::int32_t x, std::int32_t z) {
 
     std::vector<std::uint8_t> sections;

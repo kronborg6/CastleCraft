@@ -14,6 +14,17 @@ struct Teleport {
 
 namespace castle::player {
 
+  enum class PlayerAction : std::uint8_t {
+    AddPlayer = 0x01,
+    InitializeChat = 0x02,
+    UpdateGameMode = 0x04,
+    UpdateListed = 0x08,
+    UpdateLatency = 0x10,
+    UpdateDisplayName = 0x20,
+    UpdateListPriority = 0x40,
+    UpdateHat = 0x80,
+  };
+
   constexpr std::int32_t VIEW = 10;
   class Player {
     public:
