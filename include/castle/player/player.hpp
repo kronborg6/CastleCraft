@@ -1,4 +1,5 @@
 #pragma once
+#include "castle/player/game_profile.hpp"
 #include "castle/player/postion.hpp"
 #include "castle/world/chunkPostion.hpp"
 #include <cmath>
@@ -82,6 +83,14 @@ namespace castle::player {
         return _chunkPosition != oldChunk;
       }
 
+      void setProfile(GameProfile profile) {
+        _profile = profile;
+      }
+
+      const GameProfile& getProfile() const {
+        return _profile;
+      }
+
       world::ChunkPosition getChunkPostion() const {
         return _chunkPosition;
       }
@@ -99,6 +108,7 @@ namespace castle::player {
 
     private:
       std::int32_t _entityId;
+      GameProfile _profile;
       Teleport _teleport;
       castle::player::Position _position;
       std::uint8_t _moment = 0x00;

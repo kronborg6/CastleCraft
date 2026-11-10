@@ -17,6 +17,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -65,7 +66,58 @@ namespace castle::handlers {
     castle::network::sendPacket(connection, packet);
   }
 
-  void playerInfoUpdate(csatle::network::TcpConnection& connection, std::uint8_t action) {
+  // only works for one person now needs to be changed
+  void playerInfoUpdate(Client& client, player::PlayerAction action) {
+    PlayPacketWriter packet(protocol::PlayClientbound::PlayerInfoUpdate);
+
+    const auto& profile = client.profile;
+
+    std::uint8_t actions = 0;
+
+    switch (action) {
+    case player::PlayerAction::AddPlayer:
+      actions = 0x01 | 0x04 | 0x08 | 0x10;
+      break;
+
+    case player::PlayerAction::UpdateGameMode:
+      actions = 0x04;
+      break;
+
+    case player::PlayerAction::UpdateListed:
+      actions = 0x08;
+      break;
+
+    case player::PlayerAction::UpdateLatency:
+      actions = 0x10;
+      break;
+    default:
+      throw std::runtime_error(
+          std::format("Not supported action: 0x{:02X}", static_cast<unsigned>(action)));
+    }
+
+    packet.addByte(actions);
+    packet.addVarInt(1); // player cout need to take for som where else
+    packet.addBytes(profile.uuid);
+
+    // Write fields in protocol action-bit order
+    if (actions & 0x01) {
+      packet.addString(profile.username); // use create a nickname fields and use that insted?
+      packet.addVarInt(0);                // Properties
+    }
+
+    if (actions & 0x04) {
+      packet.addVarInt(1); // take from client insted?
+    }
+
+    if (actions & 0x08) {
+      packet.addByte(1); // hide: 0 show: 1 in the tab take from player to or somfing
+    }
+
+    if (actions & 0x10) {
+      packet.addVarInt(0); // use last ping to calulte or somfing
+    }
+
+    network::sendPacket(client.connection(), packet);
   }
 
   void chuck(csatle::network::TcpConnection& connection, std::int32_t x, std::int32_t z) {
@@ -309,6 +361,7 @@ namespace castle::handlers {
       }
     }
     finishChunkBatch(connection, 21);
+    playerInfoUpdate(clinet, player::PlayerAction::AddPlayer);
   }
 
   // TODO
@@ -360,7 +413,7 @@ namespace castle::handlers {
       // std::cout << "Player position:\n"
       //           << "x: " << p.x << "\n"
       //           << "feetY: " << p.y << "\n"
-      //           << "z: " << p.z << "\n"
+      //           << "z: " << p.z << "\n"Enum E
       //           << "flags: " << static_cast<int>(p.flags) << "\n";
       break;
     }

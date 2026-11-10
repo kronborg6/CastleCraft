@@ -3,21 +3,21 @@
 #include "castle/client.hpp"
 #include "castle/world/chunk.hpp"
 #include "castle/world/chunkPostion.hpp"
+#include <memory>
+#include <mutex>
+#include <thread>
 #include <unordered_set>
 #include <vector>
 namespace castle::server {
 
   class Server {
     public:
-      Server() = default;
-      Server(Server&&) = default;
-      Server(const Server&) = default;
-      Server& operator=(Server&&) = default;
-      Server& operator=(const Server&) = default;
-      ~Server() = default;
-
     private:
       std::unordered_set<world::Chunk, world::ChunkPosition, world::ChunkPositionHash> chunks;
-      std::vector<castle::Client> _client;
+      std::vector<std::shared_ptr<castle::Client>> _clients;
+
+      std::mutex _clientMutex;
+
+      std::vector<std::jthread> _workers;
   };
 } // namespace castle::server
