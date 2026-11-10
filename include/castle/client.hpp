@@ -4,7 +4,6 @@
 #include "castle/network/tcp_connection.hpp"
 #include "castle/player/game_profile.hpp"
 #include "castle/player/player.hpp"
-#include "castle/player/postion.hpp"
 #include "castleProtocol/package/writePacket.hpp"
 #include "castleProtocol/protocol/configuration.hpp"
 #include "castleProtocol/protocol/play.hpp"
@@ -13,7 +12,6 @@
 #include "network/tcp_connection.hpp"
 #include "player/game_profile.hpp"
 #include "player/player.hpp"
-#include "player/postion.hpp"
 #include <chrono>
 #include <cstdint>
 

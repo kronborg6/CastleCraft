@@ -18,11 +18,4 @@ namespace castle::player {
       std::uint8_t flags = 0;
   };
 
-  struct ChuckPostion {
-      std::int32_t x = 0;
-      std::int32_t z = 0;
-
-      bool operator==(const ChuckPostion&) const = default;
-  };
-
 } // namespace castle::player

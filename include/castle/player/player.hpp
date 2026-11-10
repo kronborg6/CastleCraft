@@ -1,5 +1,6 @@
 #pragma once
 #include "castle/player/postion.hpp"
+#include "castle/world/chunkPostion.hpp"
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
@@ -54,7 +55,7 @@ namespace castle::player {
         if (type == UpdateType::Rotation) {
           return false;
         }
-        _chunkPosition = ChuckPostion{
+        _chunkPosition = world::ChunkPosition{
             .x = static_cast<std::int32_t>(std::floor(_position.x / 16.0)),
             .z = static_cast<std::int32_t>(std::floor(_position.z / 16.0)),
         };
@@ -67,7 +68,7 @@ namespace castle::player {
         return _chunkPosition != oldChunk;
       }
 
-      ChuckPostion getChunkPostion() const {
+      world::ChunkPosition getChunkPostion() const {
         return _chunkPosition;
       }
       Position getPostion() const {
@@ -87,7 +88,7 @@ namespace castle::player {
       Teleport _teleport;
       castle::player::Position _position;
       std::uint8_t _moment = 0x00;
-      ChuckPostion _chunkPosition;
+      world::ChunkPosition _chunkPosition;
   };
 
 } // namespace castle::player
