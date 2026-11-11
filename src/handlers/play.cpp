@@ -118,6 +118,8 @@ namespace castle::handlers {
     }
 
     network::sendPacket(client.connection(), packet);
+
+    client.broadcast(packet);
   }
 
   void chuck(csatle::network::TcpConnection& connection, std::int32_t x, std::int32_t z) {

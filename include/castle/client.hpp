@@ -15,12 +15,17 @@
 #include <chrono>
 #include <cstdint>
 #include <unordered_set>
+#include <utility>
 
 namespace castle {
 
   class Client {
     public:
-      Client(int socketId, int32_t id) : _player(id), _connection(socketId) {
+      using PlayPacket = protocol::PacketWriter<protocol::PlayClientbound>;
+      using BroadcastFn = std::function<void(const PlayPacket&, const Client*)>;
+
+      Client(int socketId, int32_t id, BroadcastFn broadcoast)
+          : _player(id), _connection(socketId), _broadcast(std::move(broadcoast)) {
       }
       csatle::network::TcpConnection& connection() {
         return _connection;
@@ -48,6 +53,9 @@ namespace castle {
 
       void disconected() {
         _connected = false;
+      }
+      void broadcast(const PlayPacket& packet) {
+        _broadcast(packet, this);
       }
 
       ~Client() {
@@ -105,6 +113,7 @@ namespace castle {
       player::Player _player;
       csatle::network::TcpConnection _connection;
       bool _connected = true;
+      BroadcastFn _broadcast;
 
       castle::protocol::State _state = castle::protocol::State::Handshake;
   };

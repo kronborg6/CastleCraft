@@ -65,7 +65,7 @@ add_library(minecraft_server_lib STATIC
     src/network/packet_receiver.cpp
     src/network/tcp_connection.cpp
     src/network/varint.cpp
-    src/server.cpp
+    src/server/server.cpp
     src/world/chunk.cpp
     src/world/worldGreanter.cpp
     src/handlers/handshake.cpp

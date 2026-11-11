@@ -1,15 +1,17 @@
-#include "server.hpp"
+#include "castle/server/server.hpp"
+#include "castle/client.hpp"
 #include "castle/handlers/configuration.hpp"
 #include "castle/handlers/handshake.hpp"
 #include "castle/handlers/login.hpp"
 #include "castle/handlers/play.hpp"
 #include "castle/handlers/status.hpp"
 #include "castleProtocol/protocol/state.hpp"
-#include <exception>
-#include <iostream>
+#include <cstdio>
+#include <mutex>
+#include <sys/socket.h>
 
-namespace minecraft::protocol {
-  void handleClient(castle::Client& client) {
+namespace castle::server {
+  void Server::handleClient(Client& client) {
     while (client.isConnected()) {
       try {
         client.connectionCheck();
@@ -42,4 +44,37 @@ namespace minecraft::protocol {
       }
     }
   }
-} // namespace minecraft::protocol
+
+  void Server::addClient(std::shared_ptr<Client> client) {
+    std::lock_guard<std::mutex> lock(_clientMutex);
+    _clients.push_back(std::move(client));
+  }
+
+  void Server::removeClient(const Client& client) {
+    std::lock_guard<std::mutex> lock(_clientMutex);
+
+    std::erase_if(_clients, [&](const auto& current) { return current.get() == &client; });
+  }
+
+  void Server::run() {
+    _serverRunning = true;
+    while (_serverRunning) {
+      int clientSocket = accept(_serverSocket, nullptr, nullptr);
+
+      if (clientSocket < 0) {
+        continue;
+      }
+      auto client = std::make_shared<castle::Client>(
+          clientSocket, _idCount++, [this](const auto& packet, const Client* exclude) {
+            broadcast(packet, exclude);
+          });
+
+      addClient(client);
+
+      _workers.emplace_back([this, client]() {
+        handleClient(*client);
+        removeClient(*client);
+      });
+    }
+  }
+} // namespace castle::server

@@ -1,9 +1,8 @@
-#include "castle/client.hpp"
 #include "castle/generators/registries/damge_type.hpp"
 #include "castle/generators/registries/dimension.hpp"
 #include "castle/generators/registries/timeline.hpp"
 #include "castle/generators/registries/worldClock.hpp"
-#include "server.hpp"
+#include "castle/server/server.hpp"
 #include <arpa/inet.h>
 #include <cerrno>
 #include <cstdint>
@@ -11,8 +10,6 @@
 #include <iomanip>
 #include <iostream>
 #include <netinet/in.h>
-#include <stdexcept>
-#include <string>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <vector>
@@ -51,16 +48,16 @@ int main() {
 
   printHex(data);
 
-  int server = socket(AF_INET, SOCK_STREAM, 0);
+  int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 
-  if (server < 0) {
+  if (serverSocket < 0) {
     std::cerr << "Could not create socket\n";
     return 1;
   }
 
   int reuse = 1;
 
-  setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
+  setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
 
   sockaddr_in address{};
 
@@ -70,12 +67,12 @@ int main() {
   address.sin_addr.s_addr = INADDR_ANY;
   address.sin_port = htons(port);
 
-  if (bind(server, reinterpret_cast<sockaddr*>(&address), sizeof(address)) < 0) {
+  if (bind(serverSocket, reinterpret_cast<sockaddr*>(&address), sizeof(address)) < 0) {
     if (errno == EADDRINUSE) {
       port = 25566;
       address.sin_port = htons(port);
 
-      if (bind(server, reinterpret_cast<sockaddr*>(&address), sizeof(address)) < 0) {
+      if (bind(serverSocket, reinterpret_cast<sockaddr*>(&address), sizeof(address)) < 0) {
         std::cerr << "failed to bind to port " << port << ": " << std::strerror(errno) << '\n';
         return 1;
       }
@@ -86,28 +83,17 @@ int main() {
     }
   }
 
-  if (listen(server, 16) < 0) {
+  if (listen(serverSocket, 16) < 0) {
     std::cerr << "Listen failed\n";
     return 1;
   }
   std::cout << "Minecraft server listening on port " << port << "\n";
 
-  int32_t id = 1;
+  // int32_t id = 1;
 
-  while (true) {
-    int socket = accept(server, nullptr, nullptr);
+  castle::server::Server server(serverSocket);
 
-    if (socket < 0) {
-      continue;
-    }
-    castle::Client client(socket, id++);
+  server.run();
 
-    try {
-      minecraft::protocol::handleClient(client);
-    } catch (const std::exception& error) {
-      std::cerr << "Client error: " << error.what() << "\n";
-    }
-  }
-
-  close(server);
+  close(serverSocket);
 }

@@ -1,8 +1,12 @@
 #pragma once
 
 #include "castle/client.hpp"
+#include "castle/network/packet_send.hpp"
 #include "castle/world/chunk.hpp"
 #include "castle/world/chunkPostion.hpp"
+#include "castleProtocol/package/packet.hpp"
+#include "castleProtocol/package/writePacket.hpp"
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -12,7 +16,36 @@ namespace castle::server {
 
   class Server {
     public:
+      Server(int socket) : _serverSocket(socket) {
+      }
+      void run();
+      void handleClient(castle::Client& client);
+      void addClient(std::shared_ptr<Client> client);
+      void removeClient(const Client& client);
+
+      void broadcast(const protocol::PacketWriter<protocol::PlayClientbound> packet,
+                     const Client* exclude = nullptr) {
+        auto clints = this->getClients();
+
+        for (const auto& client : clints) {
+
+          if (client.get() == exclude) {
+            continue;
+          }
+
+          auto& connection = client->connection();
+          network::sendPacket(connection, packet);
+        }
+      }
+      std::vector<std::shared_ptr<Client>> getClients() {
+        std::lock_guard<std::mutex> lock(_clientMutex);
+        return _clients;
+      }
+
     private:
+      std::int32_t _idCount = 1;
+      bool _serverRunning;
+      int _serverSocket;
       std::unordered_set<world::Chunk, world::ChunkPosition, world::ChunkPositionHash> chunks;
       std::vector<std::shared_ptr<castle::Client>> _clients;
 
