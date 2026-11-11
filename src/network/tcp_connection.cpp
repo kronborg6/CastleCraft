@@ -1,6 +1,7 @@
 #include "castle/network/tcp_connection.hpp"
 #include <cstddef>
 #include <cstdint>
+#include <mutex>
 #include <stdexcept>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -25,6 +26,7 @@ void csatle::network::TcpConnection::readAll(void* buffer, std::size_t size) {
 }
 
 void csatle::network::TcpConnection::writeAll(const void* buffer, size_t size) {
+  std::lock_guard<std::mutex> lock(_socketMutex);
   const uint8_t* bytes = static_cast<const uint8_t*>(buffer);
 
   size_t totalSent = 0;
