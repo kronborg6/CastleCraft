@@ -4,11 +4,11 @@
 #include "castle/network/packet_send.hpp"
 #include "castle/world/chunk.hpp"
 #include "castle/world/chunkPostion.hpp"
-#include "castleProtocol/package/packet.hpp"
 #include "castleProtocol/package/writePacket.hpp"
 #include "castleProtocol/protocol/state.hpp"
 #include <algorithm>
 #include <cstdint>
+#include <iterator>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -38,7 +38,7 @@ namespace castle::server {
         return result;
       }
 
-      void broadcast(const protocol::PacketWriter<protocol::PlayClientbound> packet,
+      void broadcast(const protocol::PacketWriter<protocol::PlayClientbound>& packet,
                      const Client* exclude = nullptr) {
         auto clints = this->getClientsByStatus(protocol::State::Play);
 
