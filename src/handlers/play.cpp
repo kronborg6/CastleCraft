@@ -5,6 +5,7 @@
 #include "castle/network/tcp_connection.hpp"
 #include "castle/player/player.hpp"
 #include "castle/player/postion.hpp"
+#include "castle/server/server.hpp"
 #include "castle/world/chunk.hpp"
 #include "castle/world/chunkPostion.hpp"
 #include "castle/world/woldGreanter.hpp"
@@ -117,9 +118,10 @@ namespace castle::handlers {
       packet.addVarInt(0); // use last ping to calulte or somfing
     }
 
-    network::sendPacket(client.connection(), packet);
-
-    client.broadcast(packet);
+    client.broadcast(packet, true);
+    // network::sendPacket(client.connection(), packet);
+    //
+    // client.broadcast(packet);
   }
 
   void chuck(csatle::network::TcpConnection& connection, std::int32_t x, std::int32_t z) {
@@ -363,6 +365,9 @@ namespace castle::handlers {
       }
     }
     finishChunkBatch(connection, 21);
+
+    // auto clients = clinet.get
+
     playerInfoUpdate(clinet, player::PlayerAction::AddPlayer);
   }
 
@@ -371,7 +376,7 @@ namespace castle::handlers {
   // send new blocks/chunks
   // Center Chunk Data and Update Light (0x2E) — Send terrain and lighting information.
 
-  void handlePlayState(Client& client) {
+  void handlePlayState(server::Server& server, Client& client) {
     csatle::network::TcpConnection& connection = client.connection();
 
     std::vector<std::uint8_t> data = castle::network::receivePacket(connection);

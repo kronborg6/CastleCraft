@@ -10,13 +10,17 @@
 #include "castle/network/packet_receiver.hpp"
 #include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
+#include "castle/player/player.hpp"
 #include "castle/reader.hpp"
 #include "castle/registry/banner_patterns.hpp"
 #include "castle/registry/biome.hpp"
 #include "castle/registry/instrument.hpp"
 #include "castle/registry/pottery.hpp"
+#include "castle/server/server.hpp"
 #include "castle/writer.hpp"
 #include "castleProtocol/package/writePacket.hpp"
+#include "castleProtocol/protocol/play.hpp"
+#include "castleProtocol/protocol/state.hpp"
 #include <array>
 #include <castleProtocol/package/readPackage.hpp>
 #include <castleProtocol/protocol/configuration.hpp>
@@ -205,7 +209,59 @@ namespace {
   }
 } // namespace
 namespace castle::handlers {
-  void handleConfiguration(Client& client) {
+  PlayPacketWriter playerInfo(const Client& client, player::PlayerAction action) {
+    PlayPacketWriter packet(protocol::PlayClientbound::PlayerInfoUpdate);
+
+    const auto& profile = client.profile;
+
+    std::uint8_t actions = 0;
+
+    switch (action) {
+    case player::PlayerAction::AddPlayer:
+      actions = 0x01 | 0x04 | 0x08 | 0x10;
+      break;
+
+    case player::PlayerAction::UpdateGameMode:
+      actions = 0x04;
+      break;
+
+    case player::PlayerAction::UpdateListed:
+      actions = 0x08;
+      break;
+
+    case player::PlayerAction::UpdateLatency:
+      actions = 0x10;
+      break;
+    default:
+      throw std::runtime_error(
+          std::format("Not supported action: 0x{:02X}", static_cast<unsigned>(action)));
+    }
+
+    packet.addByte(actions);
+    packet.addVarInt(1); // player cout need to take for som where else
+    packet.addBytes(profile.uuid);
+
+    // Write fields in protocol action-bit order
+    if (actions & 0x01) {
+      packet.addString(profile.username); // use create a nickname fields and use that insted?
+      packet.addVarInt(0);                // Properties
+    }
+
+    if (actions & 0x04) {
+      packet.addVarInt(1); // take from client insted?
+    }
+
+    if (actions & 0x08) {
+      packet.addByte(1); // hide: 0 show: 1 in the tab take from player to or somfing
+    }
+
+    if (actions & 0x10) {
+      packet.addVarInt(0); // use last ping to calulte or somfing
+    }
+
+    return packet;
+  }
+  void handleConfiguration(server::Server& server, Client& client) {
     csatle::network::TcpConnection& connection = client.connection();
 
     std::vector<std::uint8_t> data = castle::network::receivePacket(connection);
@@ -223,12 +279,34 @@ namespace castle::handlers {
       break;
     case castle::protocol::ConfigurationServerbound::PluginMessage:
       break;
-    case castle::protocol::ConfigurationServerbound::AcknowledgeFinishConfiguration:
+    case castle::protocol::ConfigurationServerbound::AcknowledgeFinishConfiguration: {
 
       client.updateState(castle::protocol::State::Play);
 
       castle::handlers::initialiizePlay(client);
+
+      const auto& clients = server.getClientsByStatus(protocol::State::Play);
+
+      nbt::Nbt text = nbt::Nbt::makeCompound("");
+
+      std::string msg = std::format("Welcome {} to CastleCraft", client.profile.username);
+      text.add(nbt::Nbt::makeString("text", msg));
+      text.add(nbt::Nbt::makeString("color", "yellow"));
+
+      PlayPacketWriter boardcastWellom(protocol::PlayClientbound::SystemChatMessage);
+
+      boardcastWellom.addBytes(nbt::NbtWriter::writer(text, {.namelessRoot = true}));
+      boardcastWellom.addByte(0x00);
+
+      client.broadcast(boardcastWellom, false);
+      network::sendPacket(connection, boardcastWellom);
+
+      for (const auto& player : clients) {
+        auto pack = playerInfo(*player, player::PlayerAction::AddPlayer);
+        network::sendPacket(connection, pack);
+      }
       break;
+    }
     case castle::protocol::ConfigurationServerbound::KeepAlive: {
       auto value = packet.getInt<std::int64_t>();
       // auto value = endian::readBigEndian<std::int64_t>(packet.data,

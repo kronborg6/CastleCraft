@@ -14,6 +14,7 @@
 #include "player/player.hpp"
 #include <chrono>
 #include <cstdint>
+#include <functional>
 #include <unordered_set>
 #include <utility>
 
@@ -21,7 +22,8 @@ namespace castle {
 
   class Client {
     public:
-      using PlayPacket = protocol::PacketWriter<protocol::PlayClientbound>;
+      using PlayPacket = protocol::PacketWriter<castle::protocol::PlayClientbound>;
+      // using PlayPacket = protocol::PacketWriter<protocol::PlayClientbound>;
       using BroadcastFn = std::function<void(const PlayPacket&, const Client*)>;
 
       Client(int socketId, int32_t id, BroadcastFn broadcoast)
@@ -54,8 +56,8 @@ namespace castle {
       void disconected() {
         _connected = false;
       }
-      void broadcast(const PlayPacket& packet) {
-        _broadcast(packet, this);
+      void broadcast(const PlayPacket& packet, bool includeSelf = false) {
+        _broadcast(packet, includeSelf ? this : this);
       }
 
       ~Client() {

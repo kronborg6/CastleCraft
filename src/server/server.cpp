@@ -5,6 +5,8 @@
 #include "castle/handlers/login.hpp"
 #include "castle/handlers/play.hpp"
 #include "castle/handlers/status.hpp"
+#include "castle/nbt.hpp"
+#include "castle/writer.hpp"
 #include "castleProtocol/protocol/state.hpp"
 #include <cstdio>
 #include <mutex>
@@ -27,18 +29,32 @@ namespace castle::server {
           castle::handlers::handleLogin(client);
           break;
         case castle::protocol::State::Configuration:
-          castle::handlers::handleConfiguration(client);
+          castle::handlers::handleConfiguration(*this, client);
           break;
         case castle::protocol::State::Play:
-          castle::handlers::handlePlayState(client);
+          castle::handlers::handlePlayState(*this, client);
           break;
         }
       } catch (const std::exception& error) {
         if (client.getState() == castle::protocol::State::Configuration ||
             client.getState() == castle::protocol::State::Play) {
           std::cout << client.profile.username << ": " << error.what() << '\n';
+
+          nbt::Nbt text = nbt::Nbt::makeCompound("");
+
+          std::string msg = std::format("{} left CastleCraft", client.profile.username);
+          text.add(nbt::Nbt::makeString("text", msg));
+          text.add(nbt::Nbt::makeString("color", "yellow"));
+
+          handlers::PlayPacketWriter boardcastWellom(protocol::PlayClientbound::SystemChatMessage);
+
+          boardcastWellom.addBytes(nbt::NbtWriter::writer(text, {.namelessRoot = true}));
+          boardcastWellom.addByte(0x00);
+
+          client.broadcast(boardcastWellom, false);
+
         } else {
-          std::cout << "Client disconnected: " << error.what() << '\n';
+          std::cout << ": " << error.what() << '\n';
         }
         client.disconected();
       }
