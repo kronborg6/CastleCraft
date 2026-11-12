@@ -52,9 +52,6 @@ namespace castle::server {
           boardcastWellom.addByte(0x00);
 
           client.broadcast(boardcastWellom, false);
-
-        } else {
-          std::cout << ": " << error.what() << '\n';
         }
         client.disconected();
       }
