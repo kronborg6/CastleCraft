@@ -11,7 +11,7 @@ namespace castle::registry {
   using ConfigurationPacket =
       castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound>;
 
-  void instrumentRegistry(csatle::network::TcpConnection& connection) {
+  void instrumentRegistry(castle::network::TcpConnection& connection) {
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
     packet.addString("minecraft:instrument");

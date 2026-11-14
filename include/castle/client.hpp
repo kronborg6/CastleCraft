@@ -29,7 +29,7 @@ namespace castle {
       Client(int socketId, int32_t id, BroadcastFn broadcoast)
           : _player(id), _connection(socketId), _broadcast(std::move(broadcoast)) {
       }
-      csatle::network::TcpConnection& connection() {
+      castle::network::TcpConnection& connection() {
         return _connection;
       }
 
@@ -113,7 +113,7 @@ namespace castle {
 
     private:
       player::Player _player;
-      csatle::network::TcpConnection _connection;
+      castle::network::TcpConnection _connection;
       bool _connected = true;
       BroadcastFn _broadcast;
 

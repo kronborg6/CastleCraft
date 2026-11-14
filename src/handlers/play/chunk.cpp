@@ -8,13 +8,13 @@
 
 namespace castle::handlers::play {
 
-  void startChunkBatch(csatle::network::TcpConnection& connection) {
+  void startChunkBatch(castle::network::TcpConnection& connection) {
 
     PlayPacketWriter packet(protocol::PlayClientbound::ChunkBatchStart);
 
     network::sendPacket(connection, packet);
   }
-  void finishChunkBatch(csatle::network::TcpConnection& connection, std::int32_t count) {
+  void finishChunkBatch(castle::network::TcpConnection& connection, std::int32_t count) {
 
     PlayPacketWriter packet(protocol::PlayClientbound::ChunkBatchFinished);
 
@@ -23,7 +23,7 @@ namespace castle::handlers::play {
     network::sendPacket(connection, packet);
   }
 
-  void sendStoneChunk(csatle::network::TcpConnection& connection,
+  void sendStoneChunk(castle::network::TcpConnection& connection,
                       const world::ChunkPosition& position) {
 
     world::Chunk chunk = world::generateStoneChunk(position);
@@ -41,7 +41,7 @@ namespace castle::handlers::play {
   // either her or where it is called load player in range
   void loadChunk(Client& client, const world::Chunk& chunk) {
 
-    csatle::network::TcpConnection& connection = client.connection();
+    castle::network::TcpConnection& connection = client.connection();
 
     auto packet = world::encodeChunk(chunk);
 
@@ -53,7 +53,7 @@ namespace castle::handlers::play {
     auto& connection = client.connection();
 
     auto& player = client.getPlayer();
-    const auto center = player.getChunkPostion();
+    const auto& center = player.getChunkPostion();
 
     for (auto it = client.loadedChunks.begin(); it != client.loadedChunks.end();) {
 
@@ -96,7 +96,7 @@ namespace castle::handlers::play {
 
     finishChunkBatch(connection, static_cast<std::int32_t>(chunksToSend.size()));
   }
-  void unloadPlayerChunk(csatle::network::TcpConnection& connection,
+  void unloadPlayerChunk(castle::network::TcpConnection& connection,
                          const world::ChunkPosition& postion) {
 
     PlayPacketWriter packet(protocol::PlayClientbound::UnloadChunk);
@@ -106,7 +106,7 @@ namespace castle::handlers::play {
 
     network::sendPacket(connection, packet);
   }
-  void setPlayerCenterChunk(csatle::network::TcpConnection& connection,
+  void setPlayerCenterChunk(castle::network::TcpConnection& connection,
                             const world::ChunkPosition& postion) {
 
     PlayPacketWriter packet(castle::protocol::PlayClientbound::SetCenterChunk);

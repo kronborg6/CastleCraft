@@ -8,5 +8,5 @@ namespace castle::registry {
       "minecraft:plains",
   };
 
-  void biomeRegistry(csatle::network::TcpConnection& connection);
+  void biomeRegistry(castle::network::TcpConnection& connection);
 } // namespace castle::registry

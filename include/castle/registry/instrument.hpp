@@ -16,6 +16,6 @@ namespace castle::registry {
       "minecraft:dream_goat_horn",
   };
 
-  void instrumentRegistry(csatle::network::TcpConnection& connection);
+  void instrumentRegistry(castle::network::TcpConnection& connection);
   std::uint16_t instrumentTypeId(std::string_view name);
 } // namespace castle::registry

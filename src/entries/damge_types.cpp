@@ -9,7 +9,7 @@ namespace castle::entries {
   using ConfigurationPacket =
       castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound>;
 
-  void damgeTypesEntrie(csatle::network::TcpConnection& connection) {
+  void damgeTypesEntrie(castle::network::TcpConnection& connection) {
 
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 

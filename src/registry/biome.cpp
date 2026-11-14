@@ -8,7 +8,7 @@ namespace castle::registry {
   using ConfigurationPacket =
       castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound>;
 
-  void biomeRegistry(csatle::network::TcpConnection& connection) {
+  void biomeRegistry(castle::network::TcpConnection& connection) {
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
     packet.addString("minecraft:worldgen/biome");

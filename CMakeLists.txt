@@ -72,9 +72,12 @@ add_library(minecraft_server_lib STATIC
     src/handlers/status.cpp
     src/handlers/login.cpp
     src/handlers/play.cpp
-    src/handlers/play/tabList.cpp
     src/handlers/play/chunk.cpp
+    src/handlers/play/gameEvent.cpp
+    src/handlers/play/join.cpp
     src/handlers/play/keepALive.cpp
+    src/handlers/play/movment.cpp
+    src/handlers/play/tabList.cpp
     src/handlers/configuration.cpp
     src/generators/registries/dimension.cpp
     src/generators/registries/timeline.cpp

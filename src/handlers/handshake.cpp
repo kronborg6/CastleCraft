@@ -12,7 +12,7 @@
 
 namespace castle::handlers {
   void handleHandshake(Client& client) {
-    csatle::network::TcpConnection& connection = client.connection();
+    castle::network::TcpConnection& connection = client.connection();
 
     std::vector<std::uint8_t> data = castle::network::receivePacket(connection);
 

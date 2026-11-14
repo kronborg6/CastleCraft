@@ -52,6 +52,6 @@ namespace castle::registry {
       "minecraft:triangles_top",
   };
 
-  void BannerPatternRegistry(csatle::network::TcpConnection& connection);
+  void BannerPatternRegistry(castle::network::TcpConnection& connection);
   std::uint16_t bannerPatternId(std::string_view name);
 } // namespace castle::registry

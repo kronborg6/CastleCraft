@@ -5,7 +5,7 @@
 
 namespace castle::network {
 std::vector<std::uint8_t>
-receivePacket(csatle::network::TcpConnection &connection) {
+receivePacket(castle::network::TcpConnection &connection) {
 
   const std::int32_t length = readVarInt(connection);
 

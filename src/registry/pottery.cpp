@@ -8,7 +8,7 @@ namespace castle::registry {
   using ConfigurationPacket =
       castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound>;
 
-  void potteryEntrie(csatle::network::TcpConnection& connection) {
+  void potteryEntrie(castle::network::TcpConnection& connection) {
     constexpr std::array patterns = {
         "minecraft:angler",     "minecraft:archer", "minecraft:arms_up", "minecraft:blade",
         "minecraft:brewer",     "minecraft:burn",   "minecraft:danger",  "minecraft:explorer",

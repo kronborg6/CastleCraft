@@ -5,12 +5,12 @@
 #include <cstdint>
 #include <vector>
 namespace castle::entries {
-  void damgeTypesEntrie(csatle::network::TcpConnection& connection);
+  void damgeTypesEntrie(castle::network::TcpConnection& connection);
   using ConfigurationPacket =
       castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound>;
   void explosionTypesEntrie(ConfigurationPacket& output);
   void fireTypesEntrie(ConfigurationPacket& output);
   void bypassShieldTypesEntrie(ConfigurationPacket& output);
 
-  void fireExplosionTypes(csatle::network::TcpConnection& connection);
+  void fireExplosionTypes(castle::network::TcpConnection& connection);
 } // namespace castle::entries

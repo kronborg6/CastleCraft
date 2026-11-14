@@ -5,6 +5,8 @@
 #include "castle/entries/jukebox.hpp"
 #include "castle/entries/mobs.hpp"
 #include "castle/handlers/play.hpp"
+#include "castle/handlers/play/gameEvent.hpp"
+#include "castle/handlers/play/join.hpp"
 #include "castle/io/nbt_loader.hpp"
 #include "castle/nbt.hpp"
 #include "castle/network/packet_receiver.hpp"
@@ -33,7 +35,7 @@ namespace {
   using ConfigurationPacket =
       castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound>;
 
-  void sendEnty(csatle::network::TcpConnection& connection) {
+  void sendEnty(castle::network::TcpConnection& connection) {
     std::vector<uint8_t> rawNbt;
 
     castle::io::appendsNbtFile("./generated/dimensions/overworld.nbt", rawNbt);
@@ -51,7 +53,7 @@ namespace {
     packet.addBytes(rawNbt);
     castle::network::sendPacket(connection, packet);
   }
-  void sendWorldClockRegistry(csatle::network::TcpConnection& connection) {
+  void sendWorldClockRegistry(castle::network::TcpConnection& connection) {
     auto clock = castle::nbt::Nbt::makeCompound("");
 
     std::vector<uint8_t> raw = castle::nbt::NbtWriter::writer(clock, {.namelessRoot = true});
@@ -69,7 +71,7 @@ namespace {
     packet.addBytes(raw);
     castle::network::sendPacket(connection, packet);
   }
-  void sendTimelineTags(csatle::network::TcpConnection& connection) {
+  void sendTimelineTags(castle::network::TcpConnection& connection) {
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::UpdateTags);
 
     packet.addVarInt(1);
@@ -95,7 +97,7 @@ namespace {
     castle::network::sendPacket(connection, packet);
   }
 
-  void sendTimelineRegistry(csatle::network::TcpConnection& connection) {
+  void sendTimelineRegistry(castle::network::TcpConnection& connection) {
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
     packet.addString("minecraft:timeline");
@@ -155,7 +157,7 @@ namespace {
     packet.addBytes(rawVillager);
     castle::network::sendPacket(connection, packet);
   }
-  void sendKnownPacks(csatle::network::TcpConnection& connection) {
+  void sendKnownPacks(castle::network::TcpConnection& connection) {
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::KnownPacks);
 
     packet.addVarInt(1);
@@ -167,7 +169,7 @@ namespace {
     packet.addString("26.3");
     castle::network::sendPacket(connection, packet);
   }
-  void sendTrimMaterials(csatle::network::TcpConnection& connection) {
+  void sendTrimMaterials(castle::network::TcpConnection& connection) {
     constexpr std::array variants = {"minecraft:quartz",
                                      "minecraft:iron",
                                      "minecraft:netherite",
@@ -192,7 +194,7 @@ namespace {
     }
     castle::network::sendPacket(connection, packet);
   }
-  void blockTransformerEntrie(csatle::network::TcpConnection& connection) {
+  void blockTransformerEntrie(castle::network::TcpConnection& connection) {
     constexpr std::array variants = {"minecraft:axe", "minecraft:hoe", "minecraft:shovel"};
 
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
@@ -262,7 +264,7 @@ namespace castle::handlers {
     return packet;
   }
   void handleConfiguration(server::Server& server, Client& client) {
-    csatle::network::TcpConnection& connection = client.connection();
+    castle::network::TcpConnection& connection = client.connection();
 
     std::vector<std::uint8_t> data = castle::network::receivePacket(connection);
 
@@ -283,9 +285,7 @@ namespace castle::handlers {
 
       client.updateState(castle::protocol::State::Play);
 
-      castle::handlers::initialiizePlay(client);
-
-      const auto& clients = server.getClientsByStatus(protocol::State::Play);
+      play::join(server, client);
 
       nbt::Nbt text = nbt::Nbt::makeCompound("");
 
@@ -293,18 +293,9 @@ namespace castle::handlers {
       text.add(nbt::Nbt::makeString("text", msg));
       text.add(nbt::Nbt::makeString("color", "yellow"));
 
-      PlayPacketWriter boardcastWellom(protocol::PlayClientbound::SystemChatMessage);
+      auto message = play::systemMessage(text, false);
 
-      boardcastWellom.addBytes(nbt::NbtWriter::writer(text, {.namelessRoot = true}));
-      boardcastWellom.addByte(0x00);
-
-      client.broadcast(boardcastWellom, false);
-      network::sendPacket(connection, boardcastWellom);
-
-      for (const auto& player : clients) {
-        auto pack = playerInfo(*player, player::PlayerAction::AddPlayer);
-        network::sendPacket(connection, pack);
-      }
+      client.broadcast(message, true);
       break;
     }
     case castle::protocol::ConfigurationServerbound::KeepAlive: {

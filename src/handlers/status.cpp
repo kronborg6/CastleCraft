@@ -45,7 +45,7 @@ namespace {
   void
   handlePingRequest(castle::Client& client,
                     castle::protocol::PacketReader<castle::protocol::StatusServerbound>& packet) {
-    csatle::network::TcpConnection& connection = client.connection();
+    castle::network::TcpConnection& connection = client.connection();
 
     auto payload = packet.bytes(8);
 
@@ -62,7 +62,7 @@ namespace castle::handlers {
 
   void handleStatus(Client& client) {
 
-    csatle::network::TcpConnection& connection = client.connection();
+    castle::network::TcpConnection& connection = client.connection();
 
     std::vector<std::uint8_t> data = castle::network::receivePacket(connection);
 

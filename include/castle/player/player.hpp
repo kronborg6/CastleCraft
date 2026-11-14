@@ -91,7 +91,7 @@ namespace castle::player {
         return _profile;
       }
 
-      world::ChunkPosition getChunkPostion() const {
+      const world::ChunkPosition& getChunkPostion() const {
         return _chunkPosition;
       }
       Position getPostion() const {

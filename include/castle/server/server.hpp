@@ -58,15 +58,26 @@ namespace castle::server {
         return _clients;
       }
 
+      std::int32_t getMaxPlayerCount() const {
+        return _maxPlayerCount;
+      }
+
+      std::int32_t getPlayerCount() const {
+        return _playerCount;
+      }
+
     private:
-      std::int32_t _idCount = 1;
-      bool _serverRunning;
       int _serverSocket;
-      std::unordered_set<world::Chunk, world::ChunkPosition, world::ChunkPositionHash> chunks;
+      bool _serverRunning;
+      std::int32_t _playerCount = 0;
+      std::int32_t _maxPlayerCount = 24;
+
+      std::int32_t _idCount = 1;
       std::vector<std::shared_ptr<castle::Client>> _clients;
+      std::vector<std::jthread> _workers;
+
+      std::unordered_set<world::Chunk, world::ChunkPosition, world::ChunkPositionHash> chunks;
 
       std::mutex _clientMutex;
-
-      std::vector<std::jthread> _workers;
   };
 } // namespace castle::server

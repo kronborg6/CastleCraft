@@ -83,7 +83,7 @@ namespace {
 } // namespace
 namespace castle::handlers {
   void handleLogin(Client& client) {
-    csatle::network::TcpConnection& connection = client.connection();
+    castle::network::TcpConnection& connection = client.connection();
 
     std::vector<std::uint8_t> data = castle::network::receivePacket(connection);
 

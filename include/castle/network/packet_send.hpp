@@ -5,7 +5,7 @@
 #include "castleProtocol/package/writePacket.hpp"
 namespace castle::network {
   template <castle::protocol::Enum E>
-  void sendPacket(csatle::network::TcpConnection& connection,
+  void sendPacket(castle::network::TcpConnection& connection,
                   const protocol::PacketWriter<E>& packet) {
     auto data = packet.frame();
     connection.writeAll(data.data(), data.size());

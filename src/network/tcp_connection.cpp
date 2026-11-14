@@ -6,7 +6,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-void csatle::network::TcpConnection::readAll(void* buffer, std::size_t size) {
+void castle::network::TcpConnection::readAll(void* buffer, std::size_t size) {
   uint8_t* byte = static_cast<uint8_t*>(buffer);
 
   size_t totalRead = 0;
@@ -25,7 +25,7 @@ void csatle::network::TcpConnection::readAll(void* buffer, std::size_t size) {
   }
 }
 
-void csatle::network::TcpConnection::writeAll(const void* buffer, size_t size) {
+void castle::network::TcpConnection::writeAll(const void* buffer, size_t size) {
   std::lock_guard<std::mutex> lock(_socketMutex);
   const uint8_t* bytes = static_cast<const uint8_t*>(buffer);
 
@@ -42,7 +42,7 @@ void csatle::network::TcpConnection::writeAll(const void* buffer, size_t size) {
   }
 }
 
-uint8_t csatle::network::TcpConnection::readByte() {
+uint8_t castle::network::TcpConnection::readByte() {
   uint8_t byte;
   readAll(&byte, 1);
   return byte;

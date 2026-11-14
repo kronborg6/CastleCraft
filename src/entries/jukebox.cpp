@@ -7,7 +7,7 @@ namespace castle::entries {
   using ConfigurationPacket =
       castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound>;
 
-  void jukeboxEntrie(csatle::network::TcpConnection& connection) {
+  void jukeboxEntrie(castle::network::TcpConnection& connection) {
     constexpr std::array variants = {
         "minecraft:11",        "minecraft:13",           "minecraft:5",
         "minecraft:blocks",    "minecraft:bounce",       "minecraft:cat",

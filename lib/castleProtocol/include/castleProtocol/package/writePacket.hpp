@@ -21,6 +21,14 @@ namespace castle::protocol {
       void addByte(std::uint8_t byte) {
         _data.push_back(byte);
       }
+
+      void addBoolean(bool boolean) {
+        if (boolean) {
+          _data.push_back(0x01);
+        } else {
+          _data.push_back(0x00);
+        }
+      }
       void addVarInt(std::int32_t value) {
         writeVarInt(value, _data);
       }

@@ -10,7 +10,7 @@ namespace castle::entries {
   using ConfigurationPacket =
       castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound>;
 
-  void cowEntrie(csatle::network::TcpConnection& connection) {
+  void cowEntrie(castle::network::TcpConnection& connection) {
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
     packet.addString("minecraft:cow_variant");
 
@@ -26,7 +26,7 @@ namespace castle::entries {
     castle::network::sendPacket(connection, packet);
   }
 
-  void cowSoundEntrie(csatle::network::TcpConnection& connection) {
+  void cowSoundEntrie(castle::network::TcpConnection& connection) {
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
     packet.addString("minecraft:cow_sound_variant");
@@ -43,7 +43,7 @@ namespace castle::entries {
     castle::network::sendPacket(connection, packet);
   }
 
-  void catEntrie(csatle::network::TcpConnection& connection) {
+  void catEntrie(castle::network::TcpConnection& connection) {
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
     packet.addString("minecraft:cat_variant");
     constexpr std::array variants = {"minecraft:all_black",
@@ -66,7 +66,7 @@ namespace castle::entries {
     castle::network::sendPacket(connection, packet);
   }
 
-  void catSoundEntrie(csatle::network::TcpConnection& connection) {
+  void catSoundEntrie(castle::network::TcpConnection& connection) {
 
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
@@ -84,7 +84,7 @@ namespace castle::entries {
     castle::network::sendPacket(connection, packet);
   }
 
-  void chickenEntrie(csatle::network::TcpConnection& connection) {
+  void chickenEntrie(castle::network::TcpConnection& connection) {
 
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
@@ -102,7 +102,7 @@ namespace castle::entries {
     castle::network::sendPacket(connection, packet);
   }
 
-  void chickenSoundEntrie(csatle::network::TcpConnection& connection) {
+  void chickenSoundEntrie(castle::network::TcpConnection& connection) {
 
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
@@ -120,7 +120,7 @@ namespace castle::entries {
     castle::network::sendPacket(connection, packet);
   }
 
-  void frogEntrie(csatle::network::TcpConnection& connection) {
+  void frogEntrie(castle::network::TcpConnection& connection) {
 
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
@@ -138,7 +138,7 @@ namespace castle::entries {
     castle::network::sendPacket(connection, packet);
   }
 
-  void paintingEntrie(csatle::network::TcpConnection& connection) {
+  void paintingEntrie(castle::network::TcpConnection& connection) {
 
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
@@ -183,7 +183,7 @@ namespace castle::entries {
     castle::network::sendPacket(connection, packet);
   }
 
-  void pigEntrie(csatle::network::TcpConnection& connection) {
+  void pigEntrie(castle::network::TcpConnection& connection) {
 
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
@@ -201,7 +201,7 @@ namespace castle::entries {
     castle::network::sendPacket(connection, packet);
   }
 
-  void pigSoundEntrie(csatle::network::TcpConnection& connection) {
+  void pigSoundEntrie(castle::network::TcpConnection& connection) {
 
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
@@ -219,7 +219,7 @@ namespace castle::entries {
     castle::network::sendPacket(connection, packet);
   }
 
-  void wolfEntrie(csatle::network::TcpConnection& connection) {
+  void wolfEntrie(castle::network::TcpConnection& connection) {
 
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
@@ -247,7 +247,7 @@ namespace castle::entries {
     castle::network::sendPacket(connection, packet);
   }
 
-  void wolfSoundEntrie(csatle::network::TcpConnection& connection) {
+  void wolfSoundEntrie(castle::network::TcpConnection& connection) {
 
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
@@ -273,7 +273,7 @@ namespace castle::entries {
     castle::network::sendPacket(connection, packet);
   }
 
-  void zombieEntrie(csatle::network::TcpConnection& connection) {
+  void zombieEntrie(castle::network::TcpConnection& connection) {
 
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 

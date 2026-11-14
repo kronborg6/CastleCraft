@@ -2,8 +2,8 @@
 #include "castle/handlers/play/play.hpp"
 
 namespace castle::handlers::play {
-  void playerInfoUpdate(Client& client, player::PlayerAction action) {
-    PacketPlayClient packet(protocol::PlayClientbound::PlayerInfoUpdate);
+  PlayPacketWriter playerInfoUpdate(Client& client, player::PlayerAction action) {
+    PlayPacketWriter packet(protocol::PlayClientbound::PlayerInfoUpdate);
 
     const auto& profile = client.profile;
 
@@ -52,7 +52,7 @@ namespace castle::handlers::play {
       packet.addVarInt(0); // use last ping to calulte or somfing
     }
 
-    client.broadcast(packet, true);
+    return packet;
     // network::sendPacket(client.connection(), packet);
     //
     // client.broadcast(packet);

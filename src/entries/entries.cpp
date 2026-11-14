@@ -8,7 +8,7 @@ namespace castle::entries {
   using ConfigurationPacket =
       castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound>;
 
-  void entriesTypes(csatle::network::TcpConnection& connection) {
+  void entriesTypes(castle::network::TcpConnection& connection) {
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::UpdateTags);
 
     packet.addVarInt(3);

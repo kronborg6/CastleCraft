@@ -5,7 +5,7 @@
 #include <mutex>
 #include <unistd.h>
 
-namespace csatle::network {
+namespace castle::network {
 
   class TcpConnection {
     public:
@@ -32,4 +32,4 @@ namespace csatle::network {
       int _socket;
       std::mutex _socketMutex;
   };
-} // namespace csatle::network
+} // namespace castle::network

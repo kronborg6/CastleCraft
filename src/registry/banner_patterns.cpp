@@ -10,7 +10,7 @@ namespace castle::registry {
   using ConfigurationPacket =
       castle::protocol::PacketWriter<castle::protocol::ConfigurationClientbound>;
 
-  void BannerPatternRegistry(csatle::network::TcpConnection& connection) {
+  void BannerPatternRegistry(castle::network::TcpConnection& connection) {
 
     ConfigurationPacket packet(castle::protocol::ConfigurationClientbound::RegistryData);
 
