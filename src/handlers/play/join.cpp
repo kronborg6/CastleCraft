@@ -1,5 +1,6 @@
 #include "castle/handlers/play/join.hpp"
 #include "castle/handlers/play/chunk.hpp"
+#include "castle/handlers/play/entity.hpp"
 #include "castle/handlers/play/gameEvent.hpp"
 #include "castle/handlers/play/movment.hpp"
 #include "castle/handlers/play/play.hpp"
@@ -103,9 +104,16 @@ namespace castle::handlers::play {
 
     auto players = server.getClientsByStatus(protocol::State::Play);
 
+    auto thisLoadPlayer = addPlayerEntity(client);
+    client.broadcast(thisLoadPlayer);
     for (const auto& player : players) {
       auto playerPacket = playerInfoUpdate(*player, player::PlayerAction::AddPlayer);
+      auto loadPlayer = addPlayerEntity(*player);
       network::sendPacket(connection, playerPacket);
+
+      if (player.get() != &client) {
+        network::sendPacket(connection, loadPlayer);
+      }
     }
 
     // playerInfoUpdate(clinet, player::PlayerAction::AddPlayer);
