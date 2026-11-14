@@ -1,5 +1,4 @@
 #include "castle/handlers/play/gameEvent.hpp"
-#include "castle/handlers/play.hpp"
 #include "castle/network/packet_send.hpp"
 #include "castle/writer.hpp"
 #include "castleProtocol/protocol/play.hpp"

@@ -3,10 +3,10 @@
 #include "castle/handlers/configuration.hpp"
 #include "castle/handlers/handshake.hpp"
 #include "castle/handlers/login.hpp"
-#include "castle/handlers/play.hpp"
+#include "castle/handlers/play/gameEvent.hpp"
+#include "castle/handlers/play/play.hpp"
 #include "castle/handlers/status.hpp"
 #include "castle/nbt.hpp"
-#include "castle/writer.hpp"
 #include "castleProtocol/protocol/state.hpp"
 #include <cstdio>
 #include <mutex>
@@ -32,7 +32,7 @@ namespace castle::server {
           castle::handlers::handleConfiguration(*this, client);
           break;
         case castle::protocol::State::Play:
-          castle::handlers::handlePlayState(*this, client);
+          handlers::play::handlePlayState(*this, client);
           break;
         }
       } catch (const std::exception& error) {
@@ -46,12 +46,9 @@ namespace castle::server {
           text.add(nbt::Nbt::makeString("text", msg));
           text.add(nbt::Nbt::makeString("color", "yellow"));
 
-          handlers::PlayPacketWriter boardcastWellom(protocol::PlayClientbound::SystemChatMessage);
+          auto message = handlers::play::systemMessage(text, false);
 
-          boardcastWellom.addBytes(nbt::NbtWriter::writer(text, {.namelessRoot = true}));
-          boardcastWellom.addByte(0x00);
-
-          client.broadcast(boardcastWellom, false);
+          client.broadcast(message, false);
         }
         client.disconected();
       }
