@@ -7,6 +7,8 @@
 #include "castle/network/packet_send.hpp"
 #include "castle/player/player.hpp"
 #include "castleProtocol/protocol/state.hpp"
+#include <algorithm>
+#include <iostream>
 
 namespace castle::handlers::play {
 
@@ -81,20 +83,23 @@ namespace castle::handlers::play {
     setPlayerCenterChunk(connection, {0, 0});
     startChunkBatch(connection);
 
+    const auto& center = client.getPlayer().getChunkPostion();
+
     std::int32_t count = 0;
-    for (int i = -2; i <= 2; i++) {
-      for (int x = -2; x <= 2; x++) {
-        count++;
-        sendStoneChunk(connection, {i, x});
-        // chuck(connection, i, x);
+    for (int z = -2; z <= 2; ++z) {
+      for (int x = -2; x <= 2; ++x) {
+        sendStoneChunk(connection, {center.x + x, center.z + z});
+
+        ++count;
       }
     }
 
+    std::cout << count << std::endl;
     finishChunkBatch(connection, count);
 
-    // auto thisPlayer = playerInfoUpdate(client, player::PlayerAction::AddPlayer);
-    //
-    // client.broadcast(thisPlayer, true);
+    auto thisPlayer = playerInfoUpdate(client, player::PlayerAction::AddPlayer);
+
+    client.broadcast(thisPlayer, false);
 
     auto players = server.getClientsByStatus(protocol::State::Play);
 

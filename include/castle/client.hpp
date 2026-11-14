@@ -57,7 +57,7 @@ namespace castle {
         _connected = false;
       }
       void broadcast(const PlayPacket& packet, bool includeSelf = false) {
-        _broadcast(packet, includeSelf ? this : nullptr);
+        _broadcast(packet, includeSelf ? nullptr : this);
       }
 
       ~Client() {
