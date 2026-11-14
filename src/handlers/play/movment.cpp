@@ -1,5 +1,6 @@
 #include "castle/handlers/play/movment.hpp"
 #include "castle/handlers/play/play.hpp"
+#include "castle/player/postion.hpp"
 
 namespace castle::handlers::play {
   void SetPlayerPositionAndRotation(PlayPacketReader& recive, Client& client) {
@@ -26,6 +27,8 @@ namespace castle::handlers::play {
     packet.addFloat(postion.pitch);
 
     packet.addInt<std::uint32_t>(0);
+
+    client.getPlayer().updatePostion(postion, player::UpdateType::PositionAndRotation);
 
     castle::network::sendPacket(client.connection(), packet);
   }

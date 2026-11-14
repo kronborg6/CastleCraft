@@ -3,4 +3,5 @@
 namespace castle::entries {
 
   void entriesTypes(castle::network::TcpConnection& connection);
-}
+
+} // namespace castle::entries

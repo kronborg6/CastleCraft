@@ -16,6 +16,8 @@ namespace castle::player {
       float pitch = 0.0f;
 
       std::uint8_t flags = 0;
+
+      bool operator==(const Position&) const = default;
   };
 
 } // namespace castle::player

@@ -1,7 +1,10 @@
 #include "castle/handlers/play/play.hpp"
 
 #include "castle/client.hpp"
+#include "castle/entries/entries.hpp"
 #include "castle/handlers/play/chunk.hpp"
+#include "castle/handlers/play/entity.hpp"
+#include "castle/helper/print.hpp"
 #include "castle/network/packet_receiver.hpp"
 #include "castle/network/tcp_connection.hpp"
 #include "castle/player/player.hpp"
@@ -48,18 +51,24 @@ namespace castle::handlers::play {
       break;
     }
     case castle::protocol::PlayServerbound::SetPlayerPosition: {
+      auto& player = client.getPlayer();
+      auto& oldPostion = player.getPostion();
       castle::player::Position p = {
           .x = packet.getDouble(),
           .y = packet.getDouble(),
           .z = packet.getDouble(),
       };
-      if (client.getPlayer().updatePostion(p, player::UpdateType::Position)) {
+      moveEntity(client, oldPostion, p, true);
+      if (player.updatePostion(p, player::UpdateType::Position)) {
         play::updatePlayerLoadeChunks(client);
       }
+      // helper::print::printMovemet(client);
       break;
     }
 
     case castle::protocol::PlayServerbound::SetPlayerPositionAndRotation: {
+      auto& player = client.getPlayer();
+      auto& oldPostion = player.getPostion();
       castle::player::Position p = {
           .x = packet.getDouble(),
           .y = packet.getDouble(),
@@ -68,22 +77,25 @@ namespace castle::handlers::play {
           .pitch = packet.getFloat(),
           .flags = packet.byte(),
       };
+      helper::print::printMovemet(client);
 
-      if (client.getPlayer().updatePostion(p, player::UpdateType::PositionAndRotation)) {
+      moveEntity(client, oldPostion, p, true);
+      if (player.updatePostion(p, player::UpdateType::PositionAndRotation)) {
         play::updatePlayerLoadeChunks(client);
       }
 
       break;
     }
     case castle::protocol::PlayServerbound::SetPlayerRotation: {
+      auto& player = client.getPlayer();
+      auto& oldPostion = player.getPostion();
       castle::player::Position p = {
           .yaw = packet.getFloat(),
           .pitch = packet.getFloat(),
           .flags = packet.byte(),
       };
 
-      auto newChunk = client.getPlayer().updatePostion(p, player::UpdateType::Rotation);
-      // std::cout << "yaw: " << p.yaw << "\npich: " << p.pitch << "\nbyte: " << +p.flags << "\n";
+      auto newChunk = player.updatePostion(p, player::UpdateType::Rotation);
 
       std::cout << "Player rotation\n";
       break;
