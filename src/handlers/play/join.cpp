@@ -16,120 +16,120 @@
 
 namespace castle::handlers::play {
 
-void start(castle::network::TcpConnection& connection) {
+  void start(castle::network::TcpConnection& connection) {
 
-  castle::protocol::PacketWriter<castle::protocol::PlayClientbound> packet(
-      castle::protocol::PlayClientbound::GameEvent);
+    castle::protocol::PacketWriter<castle::protocol::PlayClientbound> packet(
+        castle::protocol::PlayClientbound::GameEvent);
 
-  packet.addByte(0xd);
-  packet.addFloat(0.0f);
+    packet.addByte(0xd);
+    packet.addFloat(0.0f);
 
-  castle::network::sendPacket(connection, packet);
-}
-void join(server::Server& server, Client& client) {
-  castle::network::TcpConnection& connection = client.connection();
-
-  PlayPacketWriter play(castle::protocol::PlayClientbound::Login);
-
-  // Player Enitity ID
-  play.addInt<std::int32_t>(client.getEntityId());
-  // Is Hardcore
-  play.addByte(0x00);
-  // Dimension Names
-  std::vector<std::string> dimensions = {"minecraft:overworld"};
-  play.addVarInt(static_cast<std::int32_t>(dimensions.size()));
-  for (const auto& dimension : dimensions) {
-    play.addString(dimension);
+    castle::network::sendPacket(connection, packet);
   }
-  // Max Players
-  play.addVarInt(server.getMaxPlayerCount());
-  // View Distance
-  play.addVarInt(player::VIEW);
-  // Simulation Distance
-  play.addVarInt(player::VIEW);
-  // Reduced Debug Info
-  play.addBoolean(false);
-  // Enable respawn screen
-  play.addBoolean(true);
-  // Do limited crafting
-  play.addBoolean(false);
-  // Dimension Type
-  play.addVarInt(0);
-  // Dimension Name
-  play.addString("minecraft:overworld");
-  // Hashed seed (not used at the moment just wanna join)
-  play.addInt<std::int64_t>(std::uint64_t{0});
-  // Game mode
-  play.addVarInt(1);
-  // Previous Game mode
-  play.addVarInt(0);
-  // is Debug (flase)
-  play.addBoolean(false);
-  // Is Flat (false)
-  play.addBoolean(false);
-  // Has death location
-  play.addBoolean(false);
-  // Portal cooldown
-  play.addVarInt(1000);
-  // Sea Level
-  play.addVarInt(20);
-  // Online mode
-  play.addBoolean(true);
-  // Enforces Secure Chat
-  play.addBoolean(false);
+  void join(server::Server& server, Client& client) {
+    castle::network::TcpConnection& connection = client.connection();
 
-  castle::network::sendPacket(connection, play);
+    PlayPacketWriter play(castle::protocol::PlayClientbound::Login);
 
-  gameEvent(connection, GameEvent::StartWaitingForChunks, 0.0f);
+    // Player Enitity ID
+    play.addInt<std::int32_t>(client.getEntityId());
+    // Is Hardcore
+    play.addByte(0x00);
+    // Dimension Names
+    std::vector<std::string> dimensions = {"minecraft:overworld"};
+    play.addVarInt(static_cast<std::int32_t>(dimensions.size()));
+    for (const auto& dimension : dimensions) {
+      play.addString(dimension);
+    }
+    // Max Players
+    play.addVarInt(server.getMaxPlayerCount());
+    // View Distance
+    play.addVarInt(player::VIEW);
+    // Simulation Distance
+    play.addVarInt(player::VIEW);
+    // Reduced Debug Info
+    play.addBoolean(false);
+    // Enable respawn screen
+    play.addBoolean(true);
+    // Do limited crafting
+    play.addBoolean(false);
+    // Dimension Type
+    play.addVarInt(0);
+    // Dimension Name
+    play.addString("minecraft:overworld");
+    // Hashed seed (not used at the moment just wanna join)
+    play.addInt<std::int64_t>(std::uint64_t{0});
+    // Game mode
+    play.addVarInt(1);
+    // Previous Game mode
+    play.addVarInt(0);
+    // is Debug (flase)
+    play.addBoolean(false);
+    // Is Flat (false)
+    play.addBoolean(false);
+    // Has death location
+    play.addBoolean(false);
+    // Portal cooldown
+    play.addVarInt(1000);
+    // Sea Level
+    play.addVarInt(20);
+    // Online mode
+    play.addBoolean(true);
+    // Enforces Secure Chat
+    play.addBoolean(false);
 
-  teleportPlayer(client, {0, 64, 0, 0, 0, 0});
+    castle::network::sendPacket(connection, play);
 
-  setPlayerCenterChunk(connection, {0, 0});
-  startChunkBatch(connection);
+    gameEvent(connection, GameEvent::StartWaitingForChunks, 0.0f);
 
-  const auto& center = client.getPlayer().getChunkPostion();
+    teleportPlayer(client, {0, 64, 0, 0, 0, 0});
 
-  std::int32_t count = 0;
-  for (int z = -2; z <= 2; ++z) {
-    for (int x = -2; x <= 2; ++x) {
-      sendStoneChunk(connection, {center.x + x, center.z + z});
+    setPlayerCenterChunk(connection, {0, 0});
+    startChunkBatch(connection);
 
-      ++count;
+    const auto& center = client.getPlayer().getChunkPostion();
+
+    std::int32_t count = 0;
+    for (int z = -2; z <= 2; ++z) {
+      for (int x = -2; x <= 2; ++x) {
+        sendStoneChunk(connection, {center.x + x, center.z + z});
+
+        ++count;
+      }
+    }
+
+    std::cout << count << std::endl;
+    finishChunkBatch(connection, count);
+
+    auto thisPlayer = playerInfoUpdate(client, player::PlayerAction::AddPlayer);
+
+    client.broadcast(thisPlayer, false);
+
+    auto players = server.getClientsByStatus(protocol::State::Play);
+
+    auto thisLoadPlayer = addPlayerEntity(client);
+    client.broadcast(thisLoadPlayer);
+    for (const auto& player : players) {
+      auto playerPacket = playerInfoUpdate(*player, player::PlayerAction::AddPlayer);
+      auto loadPlayer = addPlayerEntity(*player);
+      network::sendPacket(connection, playerPacket);
+
+      if (player.get() != &client) {
+        network::sendPacket(connection, loadPlayer);
+      }
     }
   }
+  void leave(server::Server& server, Client& client) {
 
-  std::cout << count << std::endl;
-  finishChunkBatch(connection, count);
+    std::vector<std::int32_t> entitsIds{client.getEntityId()};
 
-  auto thisPlayer = playerInfoUpdate(client, player::PlayerAction::AddPlayer);
+    PlayPacketWriter removePlayer = removeEntitys(entitsIds);
 
-  client.broadcast(thisPlayer, false);
+    server.broadcast(removePlayer);
 
-  auto players = server.getClientsByStatus(protocol::State::Play);
-
-  auto thisLoadPlayer = addPlayerEntity(client);
-  client.broadcast(thisLoadPlayer);
-  for (const auto& player : players) {
-    auto playerPacket = playerInfoUpdate(*player, player::PlayerAction::AddPlayer);
-    auto loadPlayer = addPlayerEntity(*player);
-    network::sendPacket(connection, playerPacket);
-
-    if (player.get() != &client) {
-      network::sendPacket(connection, loadPlayer);
-    }
+    std::array<std::array<uint8_t, 16>, 1> uuids{client.profile.uuid};
+    PlayPacketWriter removeFromTablist = playerInfoRemove(uuids);
+    //
+    server.broadcast(removeFromTablist, &client);
   }
-}
-void leave(server::Server& server, Client& client) {
-
-  std::vector<std::int32_t> entitsIds{client.getEntityId()};
-
-  PlayPacketWriter removePlayer = removeEntitys(entitsIds);
-
-  server.broadcast(removePlayer);
-
-  std::array<std::array<uint8_t, 16>, 1> uuids{client.profile.uuid};
-  PlayPacketWriter removeFromTablist = playerInfoRemove(uuids);
-
-  server.broadcast(removeFromTablist);
-}
 } // namespace castle::handlers::play

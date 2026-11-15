@@ -4,6 +4,7 @@
 #include "castle/network/packet_send.hpp"
 #include "castle/world/chunk.hpp"
 #include "castle/world/chunkPostion.hpp"
+#include "castle/world/woldGreanter.hpp"
 #include "castleProtocol/package/writePacket.hpp"
 #include "castleProtocol/protocol/state.hpp"
 #include <algorithm>
@@ -66,6 +67,16 @@ namespace castle::server {
         return _playerCount;
       }
 
+      world::Chunk GetChunk(world::ChunkPosition postion) {
+        auto it = _chunks.find(postion);
+        if (it != _chunks.end()) {
+          return it->second;
+        }
+        auto newChunk = world::generateStoneChunk(postion);
+        _chunks[postion] = newChunk;
+        return newChunk;
+      }
+
     private:
       int _serverSocket;
       bool _serverRunning;
@@ -76,7 +87,7 @@ namespace castle::server {
       std::vector<std::shared_ptr<castle::Client>> _clients;
       std::vector<std::jthread> _workers;
 
-      std::unordered_set<world::Chunk, world::ChunkPosition, world::ChunkPositionHash> chunks;
+      std::unordered_map<world::ChunkPosition, world::Chunk, world::ChunkPositionHash> _chunks;
 
       std::mutex _clientMutex;
   };
