@@ -4,6 +4,7 @@
 #include "castle/handlers/handshake.hpp"
 #include "castle/handlers/login.hpp"
 #include "castle/handlers/play/gameEvent.hpp"
+#include "castle/handlers/play/join.hpp"
 #include "castle/handlers/play/play.hpp"
 #include "castle/handlers/status.hpp"
 #include "castle/nbt.hpp"
@@ -47,6 +48,8 @@ namespace castle::server {
           text.add(nbt::Nbt::makeString("color", "yellow"));
 
           auto message = handlers::play::systemMessage(text, false);
+
+          handlers::play::leave(*this, client);
 
           client.broadcast(message, false);
         }

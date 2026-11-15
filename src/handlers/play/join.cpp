@@ -7,9 +7,11 @@
 #include "castle/handlers/play/tabList.hpp"
 #include "castle/network/packet_send.hpp"
 #include "castle/player/player.hpp"
+#include "castleProtocol/protocol/play.hpp"
 #include "castleProtocol/protocol/state.hpp"
 #include <algorithm>
 #include <iostream>
+#include <vector>
 
 namespace castle::handlers::play {
 
@@ -115,8 +117,18 @@ namespace castle::handlers::play {
         network::sendPacket(connection, loadPlayer);
       }
     }
-
-    // playerInfoUpdate(clinet, player::PlayerAction::AddPlayer);
   }
-  void leave(server::Server&, Client& client);
+  void leave(server::Server& server, Client& client) {
+    PlayPacketWriter removePlayer(protocol::PlayClientbound::RemoveEntities);
+
+    std::vector<std::int32_t> entitsIds(1);
+    entitsIds.push_back(client.getEntityId());
+
+    removePlayer.addVarInt(static_cast<std::int32_t>(entitsIds.size()));
+    for (const auto& id : entitsIds) {
+      removePlayer.addVarInt(id);
+    }
+
+    server.broadcast(removePlayer);
+  }
 } // namespace castle::handlers::play

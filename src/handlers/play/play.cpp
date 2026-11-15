@@ -58,7 +58,7 @@ namespace castle::handlers::play {
           .y = packet.getDouble(),
           .z = packet.getDouble(),
       };
-      moveEntity(client, oldPostion, p, true);
+      moveEntity(client, oldPostion, p, true, player::UpdateType::Position);
       if (player.updatePostion(p, player::UpdateType::Position)) {
         play::updatePlayerLoadeChunks(client);
       }
@@ -79,7 +79,7 @@ namespace castle::handlers::play {
       };
       helper::print::printMovemet(client);
 
-      moveEntity(client, oldPostion, p, true);
+      moveEntity(client, oldPostion, p, true, player::UpdateType::PositionAndRotation);
       if (player.updatePostion(p, player::UpdateType::PositionAndRotation)) {
         play::updatePlayerLoadeChunks(client);
       }
@@ -97,6 +97,7 @@ namespace castle::handlers::play {
 
       auto newChunk = player.updatePostion(p, player::UpdateType::Rotation);
 
+      moveEntity(client, oldPostion, p, true, player::UpdateType::Rotation);
       std::cout << "Player rotation\n";
       break;
     }

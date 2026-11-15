@@ -8,6 +8,25 @@
 #include <cstdint>
 
 namespace castle::handlers::play {
+  std::uint8_t toAngle(float degrees) {
+    float normalized = std::fmod(degrees, 360.0f);
+
+    if (normalized < 0.0f) {
+      normalized += 360.0f;
+    }
+
+    return static_cast<std::uint8_t>(normalized * 256.0f / 360.0f);
+  }
+
+  void setHeadRotation(Client& client, const player::Position& pos) {
+
+    PlayPacketWriter packet(protocol::PlayClientbound::SetHeadRotation);
+
+    packet.addVarInt(client.getEntityId());
+    packet.addByte(toAngle(pos.yaw));
+
+    client.broadcast(packet);
+  }
   PlayPacketWriter addPlayerEntity(const Client& client) {
     PlayPacketWriter packet(castle::protocol::PlayClientbound::SpawnEntity);
 
@@ -36,27 +55,72 @@ namespace castle::handlers::play {
   void moveEntity(Client& client,
                   const player::Position& oldPos,
                   const player::Position& newPos,
-                  bool onGround) {
+                  bool onGround,
+                  player::UpdateType type) {
 
     if (oldPos == newPos) {
       return;
     }
 
-    PlayPacketWriter packet(protocol::PlayClientbound::UpdateEntityPosition);
+    switch (type) {
 
-    packet.addVarInt(client.getEntityId());
+    case castle::player::UpdateType::Position: {
+      PlayPacketWriter packet(protocol::PlayClientbound::UpdateEntityPosition);
 
-    // Step Count = 0
-    packet.addVarInt(onGround ? 1 : 0);
+      packet.addVarInt(client.getEntityId());
 
-    auto delta = [](double oldValue, double newValue) -> std::int16_t {
-      return static_cast<std::int16_t>(std::lround((newValue - oldValue) * 4096.0));
+      // Step Count = 0
+      packet.addVarInt(onGround ? 1 : 0);
+
+      auto delta = [](double oldValue, double newValue) -> std::int16_t {
+        return static_cast<std::int16_t>(std::lround((newValue - oldValue) * 4096.0));
+      };
+
+      packet.addInt<std::int16_t>(delta(oldPos.x, newPos.x));
+      packet.addInt<std::int16_t>(delta(oldPos.y, newPos.y));
+      packet.addInt<std::int16_t>(delta(oldPos.z, newPos.z));
+
+      client.broadcast(packet, true);
+      break;
+    }
+    case castle::player::UpdateType::PositionAndRotation: {
+      PlayPacketWriter packet(protocol::PlayClientbound::UpdateEntityPositionAndRotation);
+
+      packet.addVarInt(client.getEntityId());
+
+      // Step Count = 0
+      packet.addVarInt(onGround ? 1 : 0);
+
+      auto delta = [](double oldValue, double newValue) -> std::int16_t {
+        return static_cast<std::int16_t>(std::lround((newValue - oldValue) * 4096.0));
+      };
+
+      packet.addInt<std::int16_t>(delta(oldPos.x, newPos.x));
+      packet.addInt<std::int16_t>(delta(oldPos.y, newPos.y));
+      packet.addInt<std::int16_t>(delta(oldPos.z, newPos.z));
+
+      packet.addByte(toAngle(newPos.yaw));
+      packet.addByte(toAngle(newPos.pitch));
+
+      client.broadcast(packet, true);
+      setHeadRotation(client, newPos);
+      break;
+    }
+    case castle::player::UpdateType::Rotation: {
+      PlayPacketWriter packet(protocol::PlayClientbound::UpdateEntityRotation);
+
+      packet.addVarInt(client.getEntityId());
+
+      // Step Count = 0
+      packet.addVarInt(onGround ? 1 : 0);
+
+      packet.addByte(toAngle(newPos.yaw));
+      packet.addByte(toAngle(newPos.pitch));
+
+      setHeadRotation(client, newPos);
+      client.broadcast(packet, true);
+      break;
+    }
     };
-
-    packet.addInt<std::int16_t>(delta(oldPos.x, newPos.x));
-    packet.addInt<std::int16_t>(delta(oldPos.y, newPos.y));
-    packet.addInt<std::int16_t>(delta(oldPos.z, newPos.z));
-
-    client.broadcast(packet, true);
   }
 } // namespace castle::handlers::play
