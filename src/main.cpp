@@ -92,6 +92,7 @@ int main() {
   // int32_t id = 1;
 
   castle::server::Server server(serverSocket);
+  server.initWorld();
 
   server.run();
 

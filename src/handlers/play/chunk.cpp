@@ -2,6 +2,7 @@
 #include "castle/handlers/play/play.hpp"
 #include "castle/network/packet_send.hpp"
 #include "castle/network/tcp_connection.hpp"
+#include "castle/server/server.hpp"
 #include "castle/world/woldGreanter.hpp"
 #include "castleProtocol/protocol/play.hpp"
 #include <cstdint>
@@ -48,7 +49,7 @@ namespace castle::handlers::play {
     castle::network::sendPacket(connection, packet);
   }
 
-  void updatePlayerLoadeChunks(Client& client) {
+  void updatePlayerLoadeChunks(server::Server& server, Client& client) {
 
     auto& connection = client.connection();
 
@@ -90,7 +91,11 @@ namespace castle::handlers::play {
     startChunkBatch(connection);
 
     for (const auto& position : chunksToSend) {
-      sendStoneChunk(connection, position);
+
+      auto chunk = server.GetChunk(position);
+
+      loadChunk(client, chunk);
+
       client.loadedChunks.insert(position);
     }
 

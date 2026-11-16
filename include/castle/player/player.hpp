@@ -26,7 +26,7 @@ namespace castle::player {
     UpdateHat = 0x80,
   };
 
-  constexpr std::int32_t VIEW = 10;
+  constexpr std::int32_t VIEW = 5;
   class Player {
     public:
       Player(std::int32_t id) : _entityId(id) {};

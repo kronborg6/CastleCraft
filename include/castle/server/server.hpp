@@ -67,14 +67,27 @@ namespace castle::server {
         return _playerCount;
       }
 
-      world::Chunk GetChunk(world::ChunkPosition postion) {
+      const world::Chunk& GetChunk(world::ChunkPosition postion) {
+        std::lock_guard<std::mutex> lock(_clientMutex);
+
         auto it = _chunks.find(postion);
+
         if (it != _chunks.end()) {
           return it->second;
         }
-        auto newChunk = world::generateStoneChunk(postion);
-        _chunks[postion] = newChunk;
-        return newChunk;
+
+        auto [newIt, inserted] = _chunks.emplace(postion, world::generateStoneChunk(postion));
+
+        return newIt->second;
+      }
+
+      void initWorld() {
+        for (int z = -10; z <= 10; ++z) {
+          for (int x = -10; x <= 10; ++x) {
+            world::ChunkPosition postion = {x, z};
+            _chunks[postion] = world::generateStoneChunk(postion);
+          }
+        }
       }
 
     private:

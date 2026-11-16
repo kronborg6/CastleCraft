@@ -60,7 +60,7 @@ namespace castle::handlers::play {
       };
       moveEntity(client, oldPostion, p, true, player::UpdateType::Position);
       if (player.updatePostion(p, player::UpdateType::Position)) {
-        play::updatePlayerLoadeChunks(client);
+        play::updatePlayerLoadeChunks(server, client);
       }
       // helper::print::printMovemet(client);
       break;
@@ -81,7 +81,7 @@ namespace castle::handlers::play {
 
       moveEntity(client, oldPostion, p, true, player::UpdateType::PositionAndRotation);
       if (player.updatePostion(p, player::UpdateType::PositionAndRotation)) {
-        play::updatePlayerLoadeChunks(client);
+        play::updatePlayerLoadeChunks(server, client);
       }
 
       break;

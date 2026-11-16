@@ -92,7 +92,9 @@ namespace castle::handlers::play {
     std::int32_t count = 0;
     for (int z = -2; z <= 2; ++z) {
       for (int x = -2; x <= 2; ++x) {
-        sendStoneChunk(connection, {center.x + x, center.z + z});
+        const auto& chunk = server.GetChunk({center.x + x, center.z + z});
+
+        loadChunk(client, chunk);
 
         ++count;
       }

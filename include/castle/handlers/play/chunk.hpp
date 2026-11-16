@@ -2,6 +2,7 @@
 
 #include "castle/client.hpp"
 #include "castle/network/tcp_connection.hpp"
+#include "castle/server/server.hpp"
 #include "castle/world/chunk.hpp"
 #include "castle/world/chunkPostion.hpp"
 #include <cstdint>
@@ -10,7 +11,7 @@ namespace castle::handlers::play {
 
   void finishChunkBatch(castle::network::TcpConnection& connection, std::int32_t count);
 
-  void updatePlayerLoadeChunks(Client& client);
+  void updatePlayerLoadeChunks(server::Server& server, Client& client);
 
   void unloadPlayerChunk(castle::network::TcpConnection& connection,
                          const world::ChunkPosition& postion);
