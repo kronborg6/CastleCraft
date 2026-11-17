@@ -98,12 +98,37 @@ namespace castle::handlers::play {
       auto newChunk = player.updatePostion(p, player::UpdateType::Rotation);
 
       moveEntity(client, oldPostion, p, true, player::UpdateType::Rotation);
-      std::cout << "Player rotation\n";
+      // std::cout << "Player rotation\n";
+      break;
+    }
+    case castle::protocol::PlayServerbound::UseItemOn: {
+      auto hand = packet.varInt();
+      auto [x, y, z] = packet.getPosition();
+      auto face = packet.varInt();
+      auto cursorX = packet.getFloat();
+      auto cursorY = packet.getFloat();
+      auto cursorZ = packet.getFloat();
+      auto insideBlock = packet.byte();
+      auto worldBorderHit = packet.byte();
+      auto sequence = packet.varInt();
+
+      std::cout << "Hand: " << hand << '\n'
+                << "Position: " << x << ", " << y << ", " << z << '\n'
+                << "Face: " << face << '\n'
+                << "Cursor X: " << cursorX << '\n'
+                << "Cursor Y: " << cursorY << '\n'
+                << "Cursor Z: " << cursorZ << '\n'
+                << "Inside Block: " << static_cast<bool>(insideBlock) << '\n'
+                << "World Border Hit: " << static_cast<bool>(worldBorderHit) << '\n'
+                << "Sequence: " << sequence << '\n';
+      break;
+    }
+    case castle::protocol::PlayServerbound::ClientTickEnd: {
       break;
     }
     default:
-      // std::cerr << "Unknown Configuration packet: 0x" << std::hex
-      //           << static_cast<std::int32_t>(packet.PacketId) << std::dec << '\n';
+      std::cerr << "Unknown Configuration packet: 0x" << std::hex
+                << static_cast<std::int32_t>(packet.PacketId) << std::dec << '\n';
       break;
     }
   }

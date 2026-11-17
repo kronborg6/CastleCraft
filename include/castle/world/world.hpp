@@ -14,7 +14,7 @@ namespace castle::world {
       ~World() = default;
 
     private:
-      std::unordered_map<ChuckPostion, Chunk, ChunkPositionHash> chunks;
+      std::unordered_map<chunkPostion, Chunk, ChunkPositionHash> chunks;
   };
 
 } // namespace castle::world

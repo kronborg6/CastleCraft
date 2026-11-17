@@ -93,6 +93,14 @@ namespace castle::protocol {
         }
       }
 
+      void addPosition(std::int32_t x, std::int32_t y, std::int32_t z) {
+        const std::uint64_t packed = ((static_cast<std::uint64_t>(x) & 0x3FFFFFFULL) << 38) |
+                                     ((static_cast<std::uint64_t>(z) & 0x3FFFFFFULL) << 12) |
+                                     (static_cast<std::uint64_t>(y) & 0xFFFULL);
+
+        addInt<std::uint64_t>(packed);
+      }
+
       [[nodiscard("why ask for it if you not gona look at it")]] std::size_t size() const {
         return _data.size();
       }

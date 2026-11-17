@@ -8,6 +8,7 @@
 #include <span>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 
 namespace castle::protocol {
   template <Enum E> class PacketReader {
@@ -69,6 +70,24 @@ namespace castle::protocol {
         _offset += length;
 
         return result;
+      }
+
+      [[nodiscard]] std::tuple<std::int32_t, std::int32_t, std::int32_t> getPosition() {
+        const std::uint64_t packed = getInt<std::uint64_t>();
+
+        auto signExtend = [](std::uint32_t value, int bits) -> std::int32_t {
+          const std::uint32_t sign = 1U << (bits - 1);
+          return static_cast<std::int32_t>((value ^ sign) - sign);
+        };
+
+        const std::int32_t x = signExtend(static_cast<std::uint32_t>(packed >> 38), 26);
+
+        const std::int32_t y = signExtend(static_cast<std::uint32_t>(packed & 0xFFFULL), 12);
+
+        const std::int32_t z =
+            signExtend(static_cast<std::uint32_t>((packed >> 12) & 0x3FFFFFFULL), 26);
+
+        return {x, y, z};
       }
 
       [[nodiscard]] float getFloat() {
