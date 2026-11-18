@@ -1,12 +1,14 @@
 #pragma once
+#include "castle/item/inventory.hpp"
 #include "castle/player/game_profile.hpp"
 #include "castle/player/postion.hpp"
 #include "castle/world/chunkPostion.hpp"
+#include "game_profile.hpp"
+#include "postion.hpp"
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
-#include <unordered_map>
 
 struct Teleport {
     std::int32_t id = -1;
@@ -113,6 +115,8 @@ namespace castle::player {
       castle::player::Position _position;
       std::uint8_t _moment = 0x00;
       world::ChunkPosition _chunkPosition;
+
+      item::Inventory _inventory;
   };
 
 } // namespace castle::player

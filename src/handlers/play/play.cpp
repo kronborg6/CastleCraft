@@ -126,6 +126,14 @@ namespace castle::handlers::play {
     case castle::protocol::PlayServerbound::ClientTickEnd: {
       break;
     }
+    case castle::protocol::PlayServerbound::PickItemFromBlock: {
+      auto [x, y, z] = packet.getPosition();
+      auto includeData = packet.byte();
+      std::cout << "Position: " << x << ", " << y << ", " << z << '\n'
+                << "IncludeData: " << static_cast<bool>(includeData) << '\n';
+
+      break;
+    }
     default:
       std::cerr << "Unknown Configuration packet: 0x" << std::hex
                 << static_cast<std::int32_t>(packet.PacketId) << std::dec << '\n';

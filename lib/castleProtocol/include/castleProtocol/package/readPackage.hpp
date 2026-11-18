@@ -11,6 +11,7 @@
 #include <tuple>
 
 namespace castle::protocol {
+  // i thinking about updateing all the function that return a value to getX inted of just x
   template <Enum E> class PacketReader {
       // fields order does matter
       // is it good to need a order
@@ -70,6 +71,10 @@ namespace castle::protocol {
         _offset += length;
 
         return result;
+      }
+
+      [[nodiscard]] std::int16_t getShort() {
+        return endian::readBigEndian<std::int16_t>(_data, _offset);
       }
 
       [[nodiscard]] std::tuple<std::int32_t, std::int32_t, std::int32_t> getPosition() {

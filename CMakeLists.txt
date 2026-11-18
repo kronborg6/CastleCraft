@@ -92,6 +92,7 @@ add_library(minecraft_server_lib STATIC
     src/generators/registries/mobs/wolf.cpp
     src/generators/registries/mobs/zombie.cpp
     src/generators/biome.cpp
+    src/player/player.cpp
     src/registry/damge_types.cpp
     src/registry/banner_patterns.cpp
     src/registry/instrument.cpp
