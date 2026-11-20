@@ -10,20 +10,20 @@ namespace castle::item {
   class Inventory {
     public:
       static constexpr std::uint8_t HOTBAR_SIZE = 9;
-      static constexpr std::uint8_t INVENTORY_SIZE = 36;
+      static constexpr std::uint8_t INVENTORY_SIZE = 45;
 
       void insert(std::uint16_t slot, Item item) {
-        checkRange(INVENTORY_SIZE, slot);
+        // checkRange(INVENTORY_SIZE, slot);
 
         _items.insert_or_assign(slot, std::move(item));
       }
       void remove(std::uint16_t slot) {
-        checkRange(INVENTORY_SIZE, slot);
+        // checkRange(INVENTORY_SIZE, slot);
         _items.erase(slot);
       }
 
       [[nodiscard]] Item* getItem(std::uint16_t slot) {
-        checkRange(INVENTORY_SIZE, slot);
+        // checkRange(INVENTORY_SIZE, slot);
         auto it = _items.find(slot);
 
         return it != _items.end() ? &it->second : nullptr;
@@ -34,10 +34,18 @@ namespace castle::item {
       }
 
       void updateSelectedHotbarSlot(std::uint8_t slot) {
-        checkRange(HOTBAR_SIZE, slot);
+        // checkRange(HOTBAR_SIZE, slot);
 
         _selectedHotbarSlot = slot;
       }
+
+      std::uint8_t hotbarNumber() const {
+        return _selectedHotbarSlot;
+      }
+
+      void consumeItem(std::uint16_t slot);
+
+      void consumeHeldItem();
 
     private:
       std::map<std::uint16_t, Item> _items;

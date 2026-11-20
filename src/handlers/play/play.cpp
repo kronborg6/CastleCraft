@@ -4,12 +4,16 @@
 #include "castle/entries/entries.hpp"
 #include "castle/handlers/play/chunk.hpp"
 #include "castle/handlers/play/entity.hpp"
+#include "castle/handlers/play/inventory.hpp"
 #include "castle/helper/print.hpp"
+#include "castle/item/item.hpp"
 #include "castle/network/packet_receiver.hpp"
 #include "castle/network/tcp_connection.hpp"
 #include "castle/player/player.hpp"
 #include "castle/player/postion.hpp"
 #include "castle/server/server.hpp"
+#include "castle/world/chunkPostion.hpp"
+#include "castleProtocol/endian.hpp"
 #include "castleProtocol/package/readPackage.hpp"
 #include "castleProtocol/protocol/play.hpp"
 #include <cstdint>
@@ -77,7 +81,7 @@ namespace castle::handlers::play {
           .pitch = packet.getFloat(),
           .flags = packet.byte(),
       };
-      helper::print::printMovemet(client);
+      // helper::print::printMovemet(client);
 
       moveEntity(client, oldPostion, p, true, player::UpdateType::PositionAndRotation);
       if (player.updatePostion(p, player::UpdateType::PositionAndRotation)) {
@@ -103,7 +107,7 @@ namespace castle::handlers::play {
     }
     case castle::protocol::PlayServerbound::UseItemOn: {
       auto hand = packet.varInt();
-      auto [x, y, z] = packet.getPosition();
+      auto postion = packet.getPosition();
       auto face = packet.varInt();
       auto cursorX = packet.getFloat();
       auto cursorY = packet.getFloat();
@@ -113,7 +117,7 @@ namespace castle::handlers::play {
       auto sequence = packet.varInt();
 
       std::cout << "Hand: " << hand << '\n'
-                << "Position: " << x << ", " << y << ", " << z << '\n'
+                << "Position: " << postion.x << ", " << postion.y << ", " << postion.z << '\n'
                 << "Face: " << face << '\n'
                 << "Cursor X: " << cursorX << '\n'
                 << "Cursor Y: " << cursorY << '\n'
@@ -121,6 +125,14 @@ namespace castle::handlers::play {
                 << "Inside Block: " << static_cast<bool>(insideBlock) << '\n'
                 << "World Border Hit: " << static_cast<bool>(worldBorderHit) << '\n'
                 << "Sequence: " << sequence << '\n';
+
+      auto inv = client.getPlayer().getInventory();
+      auto itemUsed = inv.getHeldItem();
+
+      if (itemUsed != nullptr) {
+        server.setBlock(postion, 4);
+        std::cout << "ItemID: " << itemUsed->itemId << std::endl;
+      }
       break;
     }
     case castle::protocol::PlayServerbound::ClientTickEnd: {
@@ -134,8 +146,33 @@ namespace castle::handlers::play {
 
       break;
     }
+    case castle::protocol::PlayServerbound::SetCreativeModeSlot: {
+      auto slotIndex = packet.getInt<std::int16_t>();
+      auto slot = packet.getSlot();
+
+      item::Item item = {static_cast<std::uint32_t>(slot.itemId),
+                         static_cast<std::uint8_t>(slot.itemCount)};
+
+      updateInventory(client, static_cast<std::uint16_t>(slotIndex), item);
+
+      std::cout << "Slot index: " << slotIndex << '\n';
+      std::cout << slot << '\n';
+
+      break;
+      break;
+    }
+    case castle::protocol::PlayServerbound::SetHeldItem: {
+      auto hotBarPostion = packet.getShort();
+
+      client.getPlayer().getInventory().updateSelectedHotbarSlot(
+          static_cast<std::uint8_t>(hotBarPostion));
+
+      std::cout << "hotbar number: " << client.getPlayer().getInventory().hotbarNumber()
+                << std::endl;
+      break;
+    }
     default:
-      std::cerr << "Unknown Configuration packet: 0x" << std::hex
+      std::cerr << "Unknown play packet: 0x" << std::hex
                 << static_cast<std::int32_t>(packet.PacketId) << std::dec << '\n';
       break;
     }

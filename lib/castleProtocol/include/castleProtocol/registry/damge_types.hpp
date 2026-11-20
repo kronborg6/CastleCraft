@@ -11,7 +11,23 @@ namespace castle::registry {
       float exhaustion;
       std::string scaling;
   };
-
+  enum class DataComponentType : std::int32_t {
+    CustomData = 0,
+    MaxStackSize = 1,
+    MaxDamage = 2,
+    Damage = 3,
+    Unbreakable = 4,
+    UseEffects = 5,
+    CustomName = 6,
+    MinimumAttackCharge = 7,
+    DamageType = 8,
+    ItemName = 9,
+    ItemModel = 10,
+    Lore = 11,
+    Rarity = 12,
+    Enchantments = 13,
+    // Add the remaining components as needed
+  };
   static const std::vector<DamageTypeData> DAMAGE_TYPES = {
       {
           "minecraft:arrow",

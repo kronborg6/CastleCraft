@@ -66,6 +66,7 @@ add_library(minecraft_server_lib STATIC
     src/network/tcp_connection.cpp
     src/network/varint.cpp
     src/server/server.cpp
+    src/world/chunkPostion.cpp
     src/world/chunk.cpp
     src/world/worldGreanter.cpp
     src/handlers/handshake.cpp
@@ -74,12 +75,14 @@ add_library(minecraft_server_lib STATIC
     src/handlers/play/chunk.cpp
     src/handlers/play/entity.cpp
     src/handlers/play/gameEvent.cpp
+    src/handlers/play/inventory.cpp
     src/handlers/play/join.cpp
     src/handlers/play/keepALive.cpp
     src/handlers/play/movment.cpp
     src/handlers/play/play.cpp
     src/handlers/play/tabList.cpp
     src/handlers/configuration.cpp
+    src/gameplay/blockPlacement.cpp
     src/generators/registries/dimension.cpp
     src/generators/registries/timeline.cpp
     src/generators/registries/worldClock.cpp

@@ -2,6 +2,9 @@
 #include "../endian.hpp"
 
 #include "castleProtocol/package/packet.hpp"
+#include "castleProtocol/registry/damge_types.hpp"
+#include "castleProtocol/types/postion.hpp"
+#include "castleProtocol/types/slot.hpp"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -77,7 +80,7 @@ namespace castle::protocol {
         return endian::readBigEndian<std::int16_t>(_data, _offset);
       }
 
-      [[nodiscard]] std::tuple<std::int32_t, std::int32_t, std::int32_t> getPosition() {
+      [[nodiscard]] type::Postion getPosition() {
         const std::uint64_t packed = getInt<std::uint64_t>();
 
         auto signExtend = [](std::uint32_t value, int bits) -> std::int32_t {
@@ -100,6 +103,39 @@ namespace castle::protocol {
       }
       [[nodiscard]] double getDouble() {
         return endian::int64ToDouble(endian::readBigEndian<std::int64_t>(_data, _offset));
+      }
+
+      [[nodiscard]] type::Slot getSlot() {
+        type::Slot slot;
+
+        slot.itemCount = varInt();
+
+        if (slot.itemCount < 0) {
+          throw std::runtime_error("INvalid item count");
+        }
+
+        if (slot.itemCount == 0) {
+          return slot;
+        }
+
+        slot.itemId = varInt();
+
+        const auto addCount = varInt();
+        const auto removeCount = varInt();
+
+        if (addCount < 0 || removeCount < 0) {
+          throw std::runtime_error("Invalid component count");
+        }
+
+        for (std::int32_t i = 0; i < addCount; ++i) {
+          slot.componentsToAdd.push_back(readDataComponent());
+        }
+
+        for (std::int32_t i = 0; i < removeCount; ++i) {
+          slot.componentsToRemove.push_back(varInt());
+        }
+
+        return slot;
       }
 
     private:
@@ -127,6 +163,45 @@ namespace castle::protocol {
         }
 
         throw std::runtime_error("VarInt too large");
+      }
+      std::size_t position() const {
+        return _offset;
+      }
+
+      std::vector<std::uint8_t> copyRange(std::size_t start, std::size_t end) const {
+        if (start > end || end > _data.size()) {
+          throw std::out_of_range("Invalid packet range");
+        }
+
+        return {_data.begin() + start, _data.begin() + end};
+      }
+      type::DataComponent readDataComponent() {
+        type::DataComponent component;
+
+        component.typeId = varInt();
+
+        const auto start = position();
+
+        auto type = static_cast<registry::DataComponentType>(component.typeId);
+
+        switch (type) {
+        case registry::DataComponentType::MaxStackSize:
+        case registry::DataComponentType::MaxDamage:
+        case registry::DataComponentType::Damage:
+          varInt();
+          break;
+        case registry::DataComponentType::Unbreakable:
+          // No data to read
+          break;
+
+        default:
+          throw std::runtime_error("Unsupported component type: " +
+                                   std::to_string(component.typeId));
+        }
+
+        component.data = copyRange(start, position());
+
+        return component;
       }
   };
 } // namespace castle::protocol

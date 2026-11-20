@@ -7,6 +7,7 @@
 #include "castle/handlers/play/tabList.hpp"
 #include "castle/network/packet_send.hpp"
 #include "castle/player/player.hpp"
+#include "castle/world/chunkPostion.hpp"
 #include "castleProtocol/protocol/play.hpp"
 #include "castleProtocol/protocol/state.hpp"
 #include <algorithm>
@@ -92,9 +93,13 @@ namespace castle::handlers::play {
     std::int32_t count = 0;
     for (int z = -2; z <= 2; ++z) {
       for (int x = -2; x <= 2; ++x) {
-        const auto& chunk = server.GetChunk({center.x + x, center.z + z});
+        const world::ChunkPosition chunkPosition = {center.x + x, center.z + z};
+        const auto& chunk = server.GetChunk(chunkPosition);
 
-        loadChunk(client, chunk);
+        if (!client.loadedChunks.contains(chunkPosition)) {
+          loadChunk(client, chunk);
+          client.loadedChunks.insert(chunkPosition);
+        }
 
         ++count;
       }

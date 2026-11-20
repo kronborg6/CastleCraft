@@ -1,5 +1,6 @@
 #pragma once
 #include "castle/item/inventory.hpp"
+#include "castle/nbt.hpp"
 #include "castle/player/game_profile.hpp"
 #include "castle/player/postion.hpp"
 #include "castle/world/chunkPostion.hpp"
@@ -32,6 +33,12 @@ namespace castle::player {
   class Player {
     public:
       Player(std::int32_t id) : _entityId(id) {};
+
+      // load player profile from nbt
+      // Player(std::int32_t id, nbt::Nbt playerData)
+      //     : _entityId(id) {
+      //
+      //       };
 
       std::int32_t entityId() const {
         return _entityId;
@@ -108,6 +115,10 @@ namespace castle::player {
         return false;
       }
 
+      item::Inventory& getInventory() {
+        return _inventory;
+      }
+
     private:
       std::int32_t _entityId;
       GameProfile _profile;
@@ -115,8 +126,7 @@ namespace castle::player {
       castle::player::Position _position;
       std::uint8_t _moment = 0x00;
       world::ChunkPosition _chunkPosition;
-
-      item::Inventory _inventory;
+      item::Inventory _inventory = {};
   };
 
 } // namespace castle::player

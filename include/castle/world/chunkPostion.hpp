@@ -1,8 +1,11 @@
 #pragma once
 
+#include "castleProtocol/types/postion.hpp"
 #include <cstdint>
 #include <functional>
 namespace castle::world {
+
+  static constexpr std::size_t BLOCK_COUNT = 16 * 16 * 16;
   struct ChunkPosition {
       std::int32_t x = 0;
       std::int32_t z = 0;
@@ -18,5 +21,8 @@ namespace castle::world {
         return h1 ^ (h2 << 1);
       };
   };
+
+  ChunkPosition getChunkFromPostion(const float& x, const float& z);
+  ChunkPosition getChunkFromPostion(const type::Postion& postion);
 
 }; // namespace castle::world

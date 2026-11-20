@@ -5,6 +5,7 @@
 #include "castle/world/chunk.hpp"
 #include "castle/world/chunkPostion.hpp"
 #include "castle/world/woldGreanter.hpp"
+#include "castle/world/world.hpp"
 #include "castleProtocol/package/writePacket.hpp"
 #include "castleProtocol/protocol/state.hpp"
 #include <algorithm>
@@ -81,6 +82,38 @@ namespace castle::server {
         return newIt->second;
       }
 
+      void setBlock(type::Postion position, std::uint32_t blockId) {
+        constexpr std::int32_t MIN_Y = -64;
+        constexpr std::int32_t MAX_Y = 320;
+        constexpr std::int32_t SIZE = 16;
+
+        const auto x = static_cast<std::int32_t>(std::floor(position.x));
+        const auto y = static_cast<std::int32_t>(std::floor(position.y));
+        const auto z = static_cast<std::int32_t>(std::floor(position.z));
+
+        if (y < MIN_Y || y >= MAX_Y) {
+          return;
+        }
+
+        const auto chunkPosition = world::getChunkFromPostion(position);
+        auto& chunk = _GetChunk({chunkPosition.x, chunkPosition.z});
+
+        // Local block coordinates inside the chunk.
+        const auto localX = x - chunkPosition.x * SIZE;
+        const auto localZ = z - chunkPosition.z * SIZE;
+
+        // Y relative to the bottom of the world.
+        const auto relativeY = y - MIN_Y;
+
+        const auto sectionIndex = relativeY / SIZE;
+        const auto localY = relativeY % SIZE;
+
+        const std::size_t index =
+            static_cast<std::size_t>((localY * SIZE + localZ) * SIZE + localX);
+
+        chunk.sections[static_cast<std::size_t>(sectionIndex)].blocks[index] = blockId;
+      }
+
       void initWorld() {
         for (int z = -10; z <= 10; ++z) {
           for (int x = -10; x <= 10; ++x) {
@@ -91,6 +124,19 @@ namespace castle::server {
       }
 
     private:
+      world::Chunk& _GetChunk(world::ChunkPosition postion) {
+        std::lock_guard<std::mutex> lock(_clientMutex);
+
+        auto it = _chunks.find(postion);
+
+        if (it != _chunks.end()) {
+          return it->second;
+        }
+
+        auto [newIt, inserted] = _chunks.emplace(postion, world::generateStoneChunk(postion));
+
+        return newIt->second;
+      }
       int _serverSocket;
       bool _serverRunning;
       std::int32_t _playerCount = 0;
@@ -99,6 +145,7 @@ namespace castle::server {
       std::int32_t _idCount = 1;
       std::vector<std::shared_ptr<castle::Client>> _clients;
       std::vector<std::jthread> _workers;
+      world::World _world;
 
       std::unordered_map<world::ChunkPosition, world::Chunk, world::ChunkPositionHash> _chunks;
 
