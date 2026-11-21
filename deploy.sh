@@ -11,6 +11,7 @@ echo "==> Syncing CastleCraft..."
 
 rsync -avz --progress \
     --exclude='build/' \
+    --exclude='generated/' \
     --exclude='build-arm64/' \
     --exclude='.git/' \
     "$LOCAL_DIR/" \

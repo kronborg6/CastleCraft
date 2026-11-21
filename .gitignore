@@ -6,3 +6,6 @@ rust_proxcy/target
 
 *.nbt
 .clang-format
+
+generated/*
+.cache

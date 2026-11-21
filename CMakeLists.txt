@@ -160,6 +160,63 @@ target_link_libraries(${PROJECT_NAME}
         project_warnings
 )
 
+###########
+# package
+###########
+
+include(FetchContent)
+
+FetchContent_Declare(
+    nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG v3.12.0
+)
+
+FetchContent_MakeAvailable(nlohmann_json)
+
+
+target_link_libraries(minecraft_server_lib
+    PRIVATE
+        nlohmann_json::nlohmann_json
+)
+
+target_link_libraries(minecraft_server_lib PRIVATE nlohmann_json::nlohmann_json)
+
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+set(MINECRAFT_VERSION "1.21.11")
+
+set(MINECRAFT_DATA_DIR
+    "${CMAKE_SOURCE_DIR}/data/generated/${MINECRAFT_VERSION}"
+)
+
+set(MINECRAFT_BLOCKS_JSON
+    "${MINECRAFT_DATA_DIR}/reports/blocks.json"
+)
+
+add_custom_command(
+    OUTPUT "${MINECRAFT_BLOCKS_JSON}"
+
+    COMMAND
+        ${Python3_EXECUTABLE}
+        "${CMAKE_SOURCE_DIR}/tools/generate_data.py"
+        "${MINECRAFT_VERSION}"
+
+    DEPENDS
+        "${CMAKE_SOURCE_DIR}/tools/generate_data.py"
+
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+
+    COMMENT "Generating Minecraft ${MINECRAFT_VERSION} data"
+    VERBATIM
+)
+
+add_custom_target(minecraft_data
+    DEPENDS "${MINECRAFT_BLOCKS_JSON}"
+)
+
+add_dependencies(${PROJECT_NAME} minecraft_data)
+
 ########
 # Tests
 ########
