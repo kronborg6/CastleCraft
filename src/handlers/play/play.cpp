@@ -1,7 +1,7 @@
 #include "castle/handlers/play/play.hpp"
 
 #include "castle/client.hpp"
-#include "castle/entries/entries.hpp"
+#include "castle/handlers/play/block.hpp"
 #include "castle/handlers/play/chunk.hpp"
 #include "castle/handlers/play/entity.hpp"
 #include "castle/handlers/play/inventory.hpp"
@@ -12,8 +12,6 @@
 #include "castle/player/player.hpp"
 #include "castle/player/postion.hpp"
 #include "castle/server/server.hpp"
-#include "castle/world/chunkPostion.hpp"
-#include "castleProtocol/endian.hpp"
 #include "castleProtocol/package/readPackage.hpp"
 #include "castleProtocol/protocol/play.hpp"
 #include <cstdint>
@@ -106,33 +104,9 @@ namespace castle::handlers::play {
       break;
     }
     case castle::protocol::PlayServerbound::UseItemOn: {
-      auto hand = packet.varInt();
-      auto postion = packet.getPosition();
-      auto face = packet.varInt();
-      auto cursorX = packet.getFloat();
-      auto cursorY = packet.getFloat();
-      auto cursorZ = packet.getFloat();
-      auto insideBlock = packet.byte();
-      auto worldBorderHit = packet.byte();
-      auto sequence = packet.varInt();
 
-      std::cout << "Hand: " << hand << '\n'
-                << "Position: " << postion.x << ", " << postion.y << ", " << postion.z << '\n'
-                << "Face: " << face << '\n'
-                << "Cursor X: " << cursorX << '\n'
-                << "Cursor Y: " << cursorY << '\n'
-                << "Cursor Z: " << cursorZ << '\n'
-                << "Inside Block: " << static_cast<bool>(insideBlock) << '\n'
-                << "World Border Hit: " << static_cast<bool>(worldBorderHit) << '\n'
-                << "Sequence: " << sequence << '\n';
+      useBlockOn(server, client, packet);
 
-      auto inv = client.getPlayer().getInventory();
-      auto itemUsed = inv.getHeldItem();
-
-      if (itemUsed != nullptr) {
-        server.setBlock(postion, 4);
-        std::cout << "ItemID: " << itemUsed->itemId << std::endl;
-      }
       break;
     }
     case castle::protocol::PlayServerbound::ClientTickEnd: {
