@@ -22,9 +22,7 @@ namespace castle::gameplay {
     //
 
     // later when we have more then one world get current world from client
-    // if (!server.getWorld().setBlock(id, postion)) {
-    //
-    // }
+    server.setBlock(postion, 1);
 
     return false;
   }

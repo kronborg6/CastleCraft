@@ -3,16 +3,21 @@
 #include "castle/generators/registries/timeline.hpp"
 #include "castle/generators/registries/worldClock.hpp"
 #include "castle/server/server.hpp"
+#include "nlohmann/json_fwd.hpp"
 #include <arpa/inet.h>
 #include <cerrno>
 #include <cstdint>
 #include <cstring>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <netinet/in.h>
+#include <nlohmann/json.hpp>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <vector>
+
+using nlohmann::json;
 #define PROXCY false
 
 #include <castle/nbt.hpp>
@@ -38,6 +43,9 @@ void printHex(const std::vector<uint8_t>& data) {
   std::cout << std::dec << '\n';
 }
 int main() {
+
+  std::ifstream f("../generated/1.21.11/reports/blocks.json");
+  json blocks = json::parse(f);
 
   // castle::generators::registries::generateOverworld();
   castle::generators::registries::generateOverworld(true);

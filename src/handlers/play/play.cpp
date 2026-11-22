@@ -120,6 +120,11 @@ namespace castle::handlers::play {
 
       break;
     }
+    case castle::protocol::PlayServerbound::PlayerAction: {
+      playerAction(server, client, packet);
+      std::cout << "started mining\n";
+      break;
+    }
     case castle::protocol::PlayServerbound::SetCreativeModeSlot: {
       auto slotIndex = packet.getInt<std::int16_t>();
       auto slot = packet.getSlot();

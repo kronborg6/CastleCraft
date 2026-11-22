@@ -175,6 +175,12 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(nlohmann_json)
 
 
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        nlohmann_json::nlohmann_json
+)
+
+
 target_link_libraries(minecraft_server_lib
     PRIVATE
         nlohmann_json::nlohmann_json

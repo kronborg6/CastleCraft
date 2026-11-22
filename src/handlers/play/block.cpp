@@ -2,6 +2,8 @@
 #include "castle/client.hpp"
 #include "castle/handlers/play/play.hpp"
 #include "castle/server/server.hpp"
+#include "castleProtocol/package/writePacket.hpp"
+#include "castleProtocol/protocol/play.hpp"
 #include "castleProtocol/types/postion.hpp"
 #include <cstdint>
 #include <stdexcept>
@@ -63,5 +65,22 @@ namespace castle::handlers::play {
       server.setBlock(postion, 9);
       std::cout << "ItemID: " << itemUsed->itemId << std::endl;
     }
+  }
+  // for now we a allways in createive (gamemode 1) so all is insta later we need to check tool and
+  // enchanment
+  void playerAction(server::Server& server, Client& client, PlayPacketReader& packet) {
+    auto status = packet.varInt();
+    type::Postion postion = packet.getPosition();
+    auto face = packet.byte();
+    auto sequence = packet.varInt();
+
+    server.setBlock(postion, 0);
+
+    PlayPacketWriter send(protocol::PlayClientbound::BlockUpdate);
+
+    send.addPosition(postion);
+    send.addVarInt(0);
+
+    server.broadcast(send);
   }
 } // namespace castle::handlers::play

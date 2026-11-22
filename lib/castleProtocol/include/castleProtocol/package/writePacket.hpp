@@ -3,6 +3,7 @@
 #include "../endian.hpp"
 #include "castleProtocol/package/packet.hpp"
 #include "castleProtocol/protocol/varint.hpp"
+#include "castleProtocol/types/postion.hpp"
 #include <array>
 #include <concepts>
 #include <cstddef>
@@ -93,6 +94,14 @@ namespace castle::protocol {
         }
       }
 
+      void addPosition(type::Postion& postion) {
+        const std::uint64_t packed =
+            ((static_cast<std::uint64_t>(postion.x) & 0x3FFFFFFULL) << 38) |
+            ((static_cast<std::uint64_t>(postion.z) & 0x3FFFFFFULL) << 12) |
+            (static_cast<std::uint64_t>(postion.y) & 0xFFFULL);
+
+        addInt<std::uint64_t>(packed);
+      }
       void addPosition(std::int32_t x, std::int32_t y, std::int32_t z) {
         const std::uint64_t packed = ((static_cast<std::uint64_t>(x) & 0x3FFFFFFULL) << 38) |
                                      ((static_cast<std::uint64_t>(z) & 0x3FFFFFFULL) << 12) |
