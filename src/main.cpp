@@ -44,9 +44,6 @@ void printHex(const std::vector<uint8_t>& data) {
 }
 int main() {
 
-  std::ifstream f("../generated/1.21.11/reports/blocks.json");
-  json blocks = json::parse(f);
-
   // castle::generators::registries::generateOverworld();
   castle::generators::registries::generateOverworld(true);
   castle::generators::registries::generateTimelines(true);
